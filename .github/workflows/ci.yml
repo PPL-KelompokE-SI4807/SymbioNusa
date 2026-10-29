@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [staging, main]
+  push:
+    branches: [staging]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: symbionusa_test
+      DB_USERNAME: root
+      DB_PASSWORD: root
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: symbionusa_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, gd, pdo_mysql, zip
+          coverage: none
+
+      - name: Salin env
+        run: cp .env.example .env
+
+      - name: Install dependensi PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - run: php artisan key:generate
+
+      - name: Gaya kode (Pint)
+        run: ./vendor/bin/pint --test
+
+      - name: Analisis statis (Larastan)
+        run: ./vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+
+      - name: Migrasi dari nol + seed
+        run: php artisan migrate:fresh --seed --force
+
+      - name: Test (Pest/PHPUnit)
+        run: php artisan test
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Build aset
+        run: npm ci && npm run build
