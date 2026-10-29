@@ -55,8 +55,8 @@ jobs:
       - name: Gaya kode (Pint)
         run: ./vendor/bin/pint --test
 
-      #  - name: Analisis statis (Larastan)
-      #    run: ./vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+      - name: Analisis statis (Larastan)
+        run: ./vendor/bin/phpstan analyse --memory-limit=1G --no-progress
 
       - name: Migrasi dari nol + seed
         run: php artisan migrate:fresh --seed --force
