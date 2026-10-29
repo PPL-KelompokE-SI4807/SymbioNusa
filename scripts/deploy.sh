@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+set -e
+
+# Load environment path untuk Node & NPM (SSH Non-Interactive Session)
+export PATH=$PATH:/usr/bin:/usr/local/bin:~/.nvm/versions/node/$(ls ~/.nvm/versions/node 2>/dev/null | tail -n 1)/bin
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+echo "🚀 Memulai Deployment SymbioNusa Staging..."
 # Dijalankan DI SERVER (OCI VM). Lokasi: /var/www/symbionusa/scripts/deploy.sh
 set -euo pipefail
 
