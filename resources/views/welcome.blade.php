@@ -19,9 +19,7 @@
     </head>
     <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
         <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
-            <div style="background-color: #10B981; color: white; text-align: center; padding: 10px; font-weight: bold;">
-    🚀 STAGING TEST CI/CD AUTOMATION - SUCCESS!
-</div>
+
             @if (Route::has('login'))
                 <nav class="flex items-center justify-end gap-4">
                     @auth
@@ -90,7 +88,7 @@
                                 </span>
                             </span>
                             <span>
-                                Watch video tutoria at
+                                Watch video tutorials at
                                 <a href="https://laracasts.com" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
                                     <span>Laracasts</span>
                                     <svg
