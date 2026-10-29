@@ -24,5 +24,5 @@ php artisan queue:restart
 php artisan up
 
 # Pemeriksaan kesehatan (rute /up bawaan Laravel 11)
-curl --fail --silent --show-error http://127.0.0.1:20128/up > /dev/null
+curl --fail --silent --show-error http://127.0.0.1:20129/up > /dev/null
 echo "Deploy selesai: $(date -u +%FT%TZ)"
