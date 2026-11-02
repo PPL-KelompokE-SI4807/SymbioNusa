@@ -74,6 +74,7 @@ Jangan mengubah berkas milik anggota lain tanpa koordinasi di Slack. Perubahan l
 - Validasi unggahan: tipe (PDF/JPG/PNG), ukuran maksimal 5 MB, simpan lewat `Storage`.
 - Gunakan Eloquent atau query builder berparameter; tanpa SQL mentah dari input pengguna.
 - Antarmuka berbahasa Indonesia, mata uang Rupiah, satuan kg/ton, zona waktu WIB. Komentar kode singkat dalam Bahasa Indonesia untuk logika yang tidak jelas.
+- Untuk setiap pengerjaan antarmuka frontend, komponen Livewire, atau tampilan UI, agen **wajib** menerapkan prinsip desain profesional dan menggunakan perintah dari skill `impeccable` (seperti audit, polish, typeset, dan layout) untuk memastikan UI bersih, responsif, elegan, dan terhindar dari estetika generik ("AI slop").
 - Jangan menambah paket Composer/NPM tanpa persetujuan PM.
 
 ## 8. Alur kerja agen (ikuti urutannya)
@@ -132,3 +133,8 @@ Ikuti alur kerja bagian 8. Mulai dengan rencana singkat, lalu tunggu persetujuan
 sebelum mengubah banyak berkas. Setelah selesai: jalankan test, Pint, Larastan, dan
 buatkan draf log AI untuk docs/ai-log.
 ```
+
+## 15. Aturan Integrasi FigCraft & UI (Wajib untuk Semua Agent)
+- Setiap kali agent mengerjakan pembuatan, perbaikan, atau manipulasi antarmuka/UI, **agent wajib menggunakan FigCraft MCP** secara otomatis tanpa perlu instruksi eksplisit berulang dari pengguna.
+- Konfigurasi koneksi dan invite link global FigCraft telah tersedia di `/tmp/opencode/figcraft-connection.md`.
+- Gunakan perintah `tools.figcraft.run_command` dengan `collab.join` (menggunakan link dari file global tersebut) untuk menyambungkan sesi kerja UI ke server kolaborasi secara otomatis sebelum melakukan aksi desain atau modifikasi layer.
