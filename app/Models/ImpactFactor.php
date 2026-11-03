@@ -11,7 +11,9 @@ class ImpactFactor extends Model
     use HasFactory;
 
     protected $table = 'impact_factors';
+
     protected $primaryKey = 'id_impact_factor';
+
     public $timestamps = false;
 
     protected $fillable = [

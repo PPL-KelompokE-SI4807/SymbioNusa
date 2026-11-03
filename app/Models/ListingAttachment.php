@@ -11,7 +11,9 @@ class ListingAttachment extends Model
     use HasFactory;
 
     protected $table = 'listing_attachments';
+
     protected $primaryKey = 'id_listing_attachment';
+
     public $timestamps = false;
 
     protected $fillable = [
