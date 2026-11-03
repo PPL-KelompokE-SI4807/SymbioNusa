@@ -96,7 +96,7 @@ Built a **self-improving Hermes Lead Orchestrator** for SymbioNusa that can plan
 |-----------|-------|---------------------|
 | **PBI-01, 02, 03** | **Mayhesa (PM)** | ✅ Full orchestration |
 | **FND-*** | **Mayhesa (PM)** | ✅ Full orchestration |
-| PBI-04, 05, 06 | Dhafi | ❌ Reject — branch `dhafi` |
+| PBI-04, 05, 06 | Dhafi | ❌ Reject — branch `dhafi` (FND-04 sendiri milik Mayhesa) |
 | PBI-07, 14, 15, 16 | Zacky | ❌ Reject — branch `zacky` |
 | PBI-08, 09, 10 | Haris | ❌ Reject — branch `haris` |
 | PBI-11, 12, 13 | Inaya | ❌ Reject — branch `inaya` |
