@@ -19,7 +19,7 @@ return new class extends Migration
             foreach ($statements as $stmt) {
                 $stmt = trim($stmt);
                 if ($stmt) {
-                    DB::unprepared($stmt . ';');
+                    DB::unprepared($stmt.';');
                 }
             }
         }
@@ -38,7 +38,7 @@ return new class extends Migration
             'payments', 'invoices', 'purchase_orders', 'rfq_offers', 'rfq_contracts',
             'demand_requests', 'supply_schedules', 'listing_attachments', 'listings',
             'impact_factors', 'inspector_profiles', 'categories', 'company_documents',
-            'users', 'companies'
+            'users', 'companies',
         ];
         foreach ($tables as $table) {
             Schema::dropIfExists($table);
