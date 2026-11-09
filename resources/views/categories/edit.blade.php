@@ -218,7 +218,7 @@
             <a href="{{ route('admin.categories.show', $category) }}" class="px-5 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                 Batal
             </a>
-            <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-bold text-white shadow-xs hover:shadow-md transition focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-bold text-white shadow-xs hover:shadow-md transition focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
                 Simpan Perubahan
             </button>
         </div>

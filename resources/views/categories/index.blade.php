@@ -18,7 +18,7 @@
             </p>
         </div>
         <div class="flex items-center">
-            <a href="{{ route('admin.categories.create') }}" class="inline-flex items-center justify-center px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-xs hover:shadow-md transition focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+            <a href="{{ route('admin.categories.create') }}" class="inline-flex items-center justify-center px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-xs hover:shadow-md transition focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
                 <svg class="w-5 h-5 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>

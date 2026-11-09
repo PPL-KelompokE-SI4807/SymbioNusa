@@ -26,7 +26,7 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Brand Logo & Name -->
                 <div class="flex items-center space-x-6">
-                    <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 group focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded-lg p-1" aria-label="SymbioNusa Beranda">
+                    <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 group focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded-lg p-1" >
                         <div class="h-10 w-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-extrabold text-xl shadow-md group-hover:bg-emerald-700 transition">
                             SN
                         </div>
