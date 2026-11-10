@@ -37,7 +37,7 @@
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
                 <div class="px-4 py-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium flex items-center space-x-2.5 text-white">
                     <svg class="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    <span>{{ now()->translatedFormat('l, d F Y') }}</span>
+                    <span>{{ now()->locale('id')->translatedFormat('l, d F Y') }}</span>
                 </div>
             </div>
         </div>
@@ -446,7 +446,7 @@
                                         @endif
                                     </td>
                                     <td class="px-5 py-3.5 text-slate-600 text-xs">
-                                        {{ $ins->jadwal ? $ins->jadwal->translatedFormat('d M Y, H:i') : '-' }}
+                                        {{ $ins->jadwal ? $ins->jadwal->locale('id')->translatedFormat('d M Y, H:i') : '-' }}
                                     </td>
                                     <td class="px-5 py-3.5 text-right">
                                         <span class="inline-flex px-2 py-0.5 rounded-md text-2xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
