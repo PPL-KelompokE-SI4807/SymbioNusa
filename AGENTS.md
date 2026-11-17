@@ -6,15 +6,16 @@ Berlaku untuk **semua AI agent/tool** yang dipakai tim (Antigravity, OpenCode, G
 
 SymbioNusa adalah platform web B2B ekonomi sirkular untuk sisa produksi industri non-B3 (Seller menawarkan, Buyer membutuhkan, Inspector memverifikasi, Admin/DLH mengawasi). Proyek ini bersifat *pure software*: tanpa IoT, tanpa e-wallet, pembayaran lewat invoice dan transfer bank manual. Penilaian dosen berbasis **PBI yang dikerjakan end-to-end** (Migration, Model, Controller/Livewire, Form Request, Policy, View, Test).
 
-Kelompok SI-48-07 B-A, PM: Mayhesa Rachmadiharja. Sumber kebenaran: `docs/Proposal_PPL_Kelompok_SI-48-07_B-A.docx` (aturan PBI, alur, toleransi), `docs/DDL_ERD_SymbioNusa.sql` (skema), dan berkas ini (cara kerja).
+Kelompok SI-48-07 B-A, PM: Mayhesa Rachmadiharja. Sumber kebenaran: `docs/Proposal PPL_Kelompok SI-48-07 B-A.docx` (aturan PBI, alur, toleransi; versi Markdown yang mudah dibaca agent: `docs/design/Proposal_SymbioNusa_lengkap.md`), `docs/DDL ERD SymbioNusa.sql` (skema), `docs/design/` (desain UI, label dan warna status), dan berkas ini (cara kerja).
 
 ## 2. Stack (jangan diganti tanpa persetujuan PM)
 
-- PHP 8.2+ (CI memakai 8.3), **Laravel 11**, **Livewire 3**, Alpine.js, Tailwind CSS, Vite
+- PHP 8.3, **Laravel 13**, **Livewire 4** (Alpine.js ikut Livewire), **Tailwind CSS 4** lewat `@tailwindcss/vite`, Vite 8
 - **MySQL 8.0** (InnoDB, kolom JSON), Eloquent ORM
 - Laravel Breeze (login, logout, reset password), Policy dan Gate untuk RBAC
-- `barryvdh/laravel-dompdf` (PDF invoice dan manifes), `maatwebsite/excel` (ekspor DLH)
-- Uji: Pest/PHPUnit; Laravel Dusk hanya untuk alur utama; gaya kode: Laravel Pint; analisis statis: Larastan
+- `barryvdh/laravel-dompdf` (PDF invoice dan manifes), `maatwebsite/excel` (ekspor DLH) — direncanakan, belum terpasang
+- Uji: **PHPUnit 12** (Pest tidak dipakai); Laravel Dusk hanya untuk alur utama; gaya kode: Laravel Pint; analisis statis: Larastan
+- Versi pasti selalu lihat `composer.lock` dan `package.json`; bila berbeda dengan daftar ini, lock file yang benar
 - Dokumentasi endpoint: Scribe. Notifikasi: tabel `notifications` sesuai DDL via `NotificationService`
 
 Node.js hanya untuk membangun aset (Vite), bukan runtime aplikasi.
@@ -24,7 +25,7 @@ Node.js hanya untuk membangun aset (Vite), bukan runtime aplikasi.
 ```bash
 composer install && cp .env.example .env && php artisan key:generate
 php artisan migrate:fresh --seed        # HANYA di lokal dan CI, jangan di staging/produksi
-php artisan test                         # seluruh Pest/PHPUnit
+php artisan test                         # seluruh test PHPUnit
 ./vendor/bin/pint                        # rapikan gaya kode (wajib sebelum commit)
 ./vendor/bin/phpstan analyse             # Larastan
 npm ci && npm run build                  # aset Vite
@@ -74,16 +75,21 @@ Jangan mengubah berkas milik anggota lain tanpa koordinasi di Slack. Perubahan l
 - Validasi unggahan: tipe (PDF/JPG/PNG), ukuran maksimal 5 MB, simpan lewat `Storage`.
 - Gunakan Eloquent atau query builder berparameter; tanpa SQL mentah dari input pengguna.
 - Antarmuka berbahasa Indonesia, mata uang Rupiah, satuan kg/ton, zona waktu WIB. Komentar kode singkat dalam Bahasa Indonesia untuk logika yang tidak jelas.
-- Untuk setiap pengerjaan antarmuka frontend, komponen Livewire, atau tampilan UI, agen **wajib** menerapkan prinsip desain profesional dan menggunakan perintah dari skill `impeccable` (seperti audit, polish, typeset, dan layout) untuk memastikan UI bersih, responsif, elegan, dan terhindar dari estetika generik ("AI slop").
+- **UI wajib mengikuti `docs/design/`.** Sebelum tugas UI, baca `docs/design/prompts/00_BACA_INI.md`. Ringkasnya:
+  - Nilai visual (warna, font Inter, ukuran, radius, spacing) dari `docs/design/DESIGN.md`, dipakai lewat kelas token Tailwind (`bg-primary`, `text-on-surface-muted`), bukan hex mentah atau palet bawaan (`emerald-*`, `slate-*`, `teal-*`, `purple-*`), tanpa gradien, teks minimal 12 px.
+  - Label dan warna status dari `docs/design/prompts/03_STATUS_MAP.md`, lewat method `label()`/`badge()` di PHP Enum.
+  - Menu sidebar dan teks UI persis dari `docs/design/STITCH_BRIEF.md`; isi layar dari entri `docs/design/SCREENS.md` dan PNG di `docs/design/mockups/`.
+  - Coding agent memakai `docs/design/prompts/04_AGENT_LARAVEL_LIVEWIRE_BUILDER.md`; hasil tampilan dicek dengan `01_STITCH_AUDITOR.md` (mode AUDIT).
+  - Tool yang punya skill desain (mis. `impeccable`) boleh memakainya untuk audit dan polish, selama hasilnya tetap mengikuti `DESIGN.md`.
 - Jangan menambah paket Composer/NPM tanpa persetujuan PM.
 
 ## 8. Alur kerja agen (ikuti urutannya)
 
-1. **Pahami tugas.** Baca issue/PBI (ID, SP, acceptance criteria), bagian terkait proposal, dan skema tabel di DDL.
+1. **Pahami tugas.** Baca issue/PBI (ID, SP, acceptance criteria), bagian terkait proposal, dan skema tabel di DDL. Untuk tugas UI, baca juga `docs/design/prompts/00_BACA_INI.md`; untuk status, `03_STATUS_MAP.md` (fitur bertanda ⏳ menunggu migrasi di `91_USULAN_PERUBAHAN_SKEMA.md`).
 2. **Sinkronkan.** `git fetch origin && git rebase origin/staging` pada branch Anda (lihat bagian 9). Lakukan **setiap hari sebelum mulai**.
 3. **Rencanakan.** Tulis rencana singkat (maksimal 10 baris): berkas yang akan dibuat/diubah dan risikonya. Tanyakan bila ambigu; jangan menebak aturan bisnis.
 4. **Kerjakan kecil-kecil.** Urutan per PBI: Migration/Model → Form Request dan Policy → Service → Controller/Livewire → View → Test.
-5. **Uji.** Tulis Pest test untuk jalur normal, validasi gagal, dan akses tidak sah (minimal satu feature test per PBI). Jalankan `php artisan test`.
+5. **Uji.** Tulis feature test PHPUnit untuk jalur normal, validasi gagal, dan akses tidak sah (minimal satu feature test per PBI). Jalankan `php artisan test`.
 6. **Rapikan.** `./vendor/bin/pint` dan `./vendor/bin/phpstan analyse` harus bersih.
 7. **Commit** dengan Conventional Commits dan ID PBI: `feat(PBI-04): add counter-offer negotiation logic`, `fix(PBI-12): adjust weight tolerance calculation`, `test(PBI-05): cover stock reservation lock`.
 8. **PR** ke `staging` memakai templat PR. Isi tool AI yang dipakai dan tautan log.
@@ -105,9 +111,9 @@ Setiap sesi AI menghasilkan satu berkas `docs/ai-log/YYYY-MM-DD_<tahap>_<tool>_<
 
 - [ ] Operasi CRUD dan aturan bisnis PBI berfungsi sesuai proposal
 - [ ] Form Request, Policy, dan otorisasi per peran terpasang
-- [ ] Minimal satu Pest feature test, `php artisan test` hijau
+- [ ] Minimal satu feature test PHPUnit, `php artisan test` hijau
 - [ ] Pint dan Larastan bersih; CI hijau
-- [ ] Tampilan responsif dan berbahasa Indonesia
+- [ ] Tampilan responsif (360–1440 px) dan berbahasa Indonesia, mengikuti `docs/design/DESIGN.md` dan `03_STATUS_MAP.md`
 - [ ] Ditinjau satu anggota lain; PR sudah di-merge ke `staging`
 - [ ] Log AI tersimpan dan endpoint terdokumentasi (Scribe) bila ada
 
@@ -128,13 +134,15 @@ Setiap sesi AI menghasilkan satu berkas `docs/ai-log/YYYY-MM-DD_<tahap>_<tool>_<
 ## 14. Prompt awal sesi (salin ke agent)
 
 ```
-Baca AGENTS.md dan docs/DDL_ERD_SymbioNusa.sql. Saya mengerjakan PBI-XX (ringkas: ...).
+Baca AGENTS.md dan "docs/DDL ERD SymbioNusa.sql". Saya mengerjakan PBI-XX (ringkas: ...).
+Kalau tugas ini menyentuh UI, baca juga docs/design/prompts/00_BACA_INI.md dan
+ikuti docs/design/prompts/04_AGENT_LARAVEL_LIVEWIRE_BUILDER.md.
 Ikuti alur kerja bagian 8. Mulai dengan rencana singkat, lalu tunggu persetujuan saya
 sebelum mengubah banyak berkas. Setelah selesai: jalankan test, Pint, Larastan, dan
 buatkan draf log AI untuk docs/ai-log.
 ```
 
-## 15. Aturan Integrasi FigCraft & UI (Wajib untuk Semua Agent)
-- Setiap kali agent mengerjakan pembuatan, perbaikan, atau manipulasi antarmuka/UI, **agent wajib menggunakan FigCraft MCP** secara otomatis tanpa perlu instruksi eksplisit berulang dari pengguna.
-- Konfigurasi koneksi dan invite link global FigCraft telah tersedia di `/tmp/opencode/figcraft-connection.md`.
-- Gunakan perintah `tools.figcraft.run_command` dengan `collab.join` (menggunakan link dari file global tersebut) untuk menyambungkan sesi kerja UI ke server kolaborasi secara otomatis sebelum melakukan aksi desain atau modifikasi layer.
+## 15. FigCraft (opsional)
+- FigCraft MCP **boleh** dipakai untuk membuat atau mencoba mockup layar sebelum menulis Blade, **tidak wajib**. Anggota yang belum memasang FigCraft tetap bisa mengerjakan UI langsung dari `docs/design/`.
+- Bila dipakai, desain di FigCraft tetap memakai token `docs/design/DESIGN.md`, dan sesinya dicatat di log AI (bagian 10).
+- Pemasangan dan koneksi FigCraft bersifat lokal per laptop; jangan merujuk path konfigurasi milik mesin lain.
