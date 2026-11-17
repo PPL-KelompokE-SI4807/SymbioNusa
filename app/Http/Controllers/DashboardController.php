@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display the role-based main dashboard.
-     */
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -17,7 +15,11 @@ class DashboardController extends Controller
             return redirect()->route('login');
         }
 
-        $role = strtoupper($user->role ?? 'BUYER');
+        $role = $user->activeRole();
+        $company = $user->company;
+        $pendingCompaniesCount = $role === 'ADMIN'
+            ? Company::where('status_verifikasi', 'PENDING')->count()
+            : 0;
 
         $view = match ($role) {
             'ADMIN' => 'dashboard.admin',
@@ -27,6 +29,6 @@ class DashboardController extends Controller
             default => 'dashboard.generic',
         };
 
-        return view($view, compact('user', 'role'));
+        return view($view, compact('user', 'role', 'company', 'pendingCompaniesCount'));
     }
 }

@@ -28,23 +28,25 @@
 
     @php
         $user = Auth::user();
-        $role = strtoupper($user->role ?? '');
+        $role = $user ? $user->activeRole() : '';
         $dashboardUrl = route('dashboard');
 
-        // Navigasi modular per peran. Anchor (#...) menunjuk ke bagian di dasbor utama.
+        // Navigasi modular per peran aktif
         $navItems = match ($role) {
             'ADMIN' => [
-                ['label' => 'Perusahaan', 'href' => $dashboardUrl.'#perusahaan', 'active' => false],
+                ['label' => 'Verifikasi Perusahaan', 'href' => route('admin.companies.index'), 'active' => request()->routeIs('admin.companies.*')],
                 ['label' => 'Master Kategori', 'href' => route('admin.categories.index'), 'active' => request()->routeIs('admin.categories.*')],
                 ['label' => 'Sengketa', 'href' => $dashboardUrl.'#sengketa', 'active' => false],
             ],
             'SELLER' => [
                 ['label' => 'Listing Saya', 'href' => $dashboardUrl.'#katalog', 'active' => false],
                 ['label' => 'Pesanan Masuk', 'href' => $dashboardUrl.'#pesanan', 'active' => false],
+                ['label' => 'Profil Perusahaan', 'href' => route('companies.edit'), 'active' => request()->routeIs('companies.*')],
             ],
             'BUYER' => [
                 ['label' => 'Kebutuhan Bahan', 'href' => $dashboardUrl.'#kebutuhan', 'active' => false],
                 ['label' => 'Pesanan Pembelian', 'href' => $dashboardUrl.'#pesanan', 'active' => false],
+                ['label' => 'Profil Perusahaan', 'href' => route('companies.edit'), 'active' => request()->routeIs('companies.*')],
             ],
             'INSPECTOR' => [
                 ['label' => 'Tugas Inspeksi', 'href' => $dashboardUrl.'#tugas', 'active' => false],
@@ -107,6 +109,17 @@
                                 {{ $role }}
                             </span>
 
+                            @if ($user->company?->tipe === 'KEDUANYA')
+                                <form method="POST" action="{{ route('companies.switch-role') }}" class="hidden sm:inline">
+                                    @csrf
+                                    @php $nextRole = $role === 'SELLER' ? 'BUYER' : 'SELLER'; @endphp
+                                    <input type="hidden" name="role" value="{{ $nextRole }}">
+                                    <button type="submit" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 transition">
+                                        Mode {{ $nextRole }}
+                                    </button>
+                                </form>
+                            @endif
+
                             <form method="POST" action="{{ route('logout') }}" class="inline">
                                 @csrf
                                 <button type="submit" class="text-sm font-semibold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3.5 py-1.5 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-rose-500" aria-label="Keluar dari akun">
@@ -140,9 +153,21 @@
                             {{ $item['label'] }}
                         </a>
                     @endforeach
-                    <div class="sm:hidden px-3 pt-3 mt-2 border-t border-slate-100 text-sm text-slate-600">
-                        <span class="font-bold text-slate-800">{{ $user->nama }}</span>
-                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border {{ $roleBadgeClasses }}">{{ $role }}</span>
+                    <div class="sm:hidden px-3 pt-3 mt-2 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
+                        <div>
+                            <span class="font-bold text-slate-800">{{ $user->nama }}</span>
+                            <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border {{ $roleBadgeClasses }}">{{ $role }}</span>
+                        </div>
+                        @if ($user->company?->tipe === 'KEDUANYA')
+                            <form method="POST" action="{{ route('companies.switch-role') }}">
+                                @csrf
+                                @php $nextRole = $role === 'SELLER' ? 'BUYER' : 'SELLER'; @endphp
+                                <input type="hidden" name="role" value="{{ $nextRole }}">
+                                <button type="submit" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">
+                                    Mode {{ $nextRole }}
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </nav>
             @endauth

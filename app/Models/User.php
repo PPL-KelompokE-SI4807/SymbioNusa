@@ -54,13 +54,26 @@ class User extends Authenticatable
         return $this->password_hash;
     }
 
-    public function company(): BelongsTo
+   public function company()
     {
         return $this->belongsTo(Company::class, 'id_company', 'id_company');
     }
 
-    public function inspections(): HasMany
+    public function activeRole(): string
     {
-        return $this->hasMany(Inspection::class, 'users_id_user', 'id_user');
+        $baseRole = strtoupper($this->role ?? 'BUYER');
+
+        if (
+            in_array($baseRole, ['SELLER', 'BUYER'], true)
+            && $this->company?->tipe === Company::TYPE_BOTH
+            && session()->has('active_role')
+        ) {
+            $sessionRole = strtoupper((string) session('active_role'));
+            if (in_array($sessionRole, ['SELLER', 'BUYER'], true)) {
+                return $sessionRole;
+            }
+        }
+
+        return $baseRole;
     }
 }
