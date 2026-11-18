@@ -1,4 +1,4 @@
-<div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+<div class="space-y-8">
     @if($errorMessage)
         <div class="rounded-xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800 flex items-center justify-between shadow-xs">
             <div class="flex items-center space-x-3">
@@ -113,7 +113,7 @@
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-2xs text-slate-500">
                     <span>Status: Terverifikasi</span>
-                    <span class="font-medium text-emerald-600">Aktif &bull; SymbioNusa</span>
+                    <span class="font-medium text-primary">Aktif &bull; SymbioNusa</span>
                 </div>
             </div>
         @endforeach
@@ -133,7 +133,7 @@
                 </span>
             </div>
             @if(isset($tables['pending_companies']) && count($tables['pending_companies']) > 0)
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" tabindex="0" role="region" aria-label="Tabel, geser untuk melihat semua kolom">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="border-b border-slate-200 text-2xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50">
@@ -186,7 +186,7 @@
                 </span>
             </div>
             @if(isset($tables['active_disputes']) && count($tables['active_disputes']) > 0)
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" tabindex="0" role="region" aria-label="Tabel, geser untuk melihat semua kolom">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="border-b border-slate-200 text-2xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50">
@@ -235,7 +235,7 @@
                 </div>
             </div>
             @if(isset($tables['my_listings']) && count($tables['my_listings']) > 0)
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" tabindex="0" role="region" aria-label="Tabel, geser untuk melihat semua kolom">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="border-b border-slate-200 text-2xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50">
@@ -281,7 +281,7 @@
                 </div>
             </div>
             @if(isset($tables['my_orders']) && count($tables['my_orders']) > 0)
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" tabindex="0" role="region" aria-label="Tabel, geser untuk melihat semua kolom">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="border-b border-slate-200 text-2xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50">
@@ -327,7 +327,7 @@
                 </div>
             </div>
             @if(isset($tables['my_demands']) && count($tables['my_demands']) > 0)
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" tabindex="0" role="region" aria-label="Tabel, geser untuk melihat semua kolom">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="border-b border-slate-200 text-2xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50">
@@ -372,7 +372,7 @@
                 </div>
             </div>
             @if(isset($tables['my_orders']) && count($tables['my_orders']) > 0)
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" tabindex="0" role="region" aria-label="Tabel, geser untuk melihat semua kolom">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="border-b border-slate-200 text-2xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50">
@@ -418,7 +418,7 @@
                 </div>
             </div>
             @if(isset($tables['assigned_inspections']) && count($tables['assigned_inspections']) > 0)
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" tabindex="0" role="region" aria-label="Tabel, geser untuk melihat semua kolom">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="border-b border-slate-200 text-2xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50">

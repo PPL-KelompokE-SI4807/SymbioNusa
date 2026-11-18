@@ -1,17 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Kategori ' . $category->nama . ' - SymbioNusa')
+@section('title', 'Detail Kategori ' . $category->nama)
+
+@section('breadcrumb')
+    <a href="{{ route('dashboard') }}" class="hover:text-on-surface hover:underline">Dashboard</a>
+    <span class="mx-2" aria-hidden="true">/</span>
+    <a href="{{ route('admin.categories.index') }}" class="hover:text-on-surface hover:underline">Master Kategori</a>
+    <span class="mx-2" aria-hidden="true">/</span>
+    <span class="text-on-surface" aria-current="page">{{ $category->nama }}</span>
+@endsection
 
 @section('content')
-<div class="py-6 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="max-w-5xl">
     <!-- Breadcrumb -->
-    <nav class="flex items-center text-xs font-medium text-gray-500 mb-2" aria-label="Breadcrumb">
-        <a href="{{ route('dashboard') }}" class="hover:text-emerald-600 transition">Dashboard</a>
-        <span class="mx-2 text-gray-400">/</span>
-        <a href="{{ route('admin.categories.index') }}" class="hover:text-emerald-600 transition">Master Kategori</a>
-        <span class="mx-2 text-gray-400">/</span>
-        <span class="text-gray-800 font-semibold" aria-current="page">{{ $category->nama }}</span>
-    </nav>
 
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -131,7 +132,7 @@
         @endphp
 
         @if(!empty($schema) && is_array($schema))
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" tabindex="0" role="region" aria-label="Tabel, geser untuk melihat semua kolom">
                 <table class="min-w-full divide-y divide-gray-200 text-left">
                     <thead class="bg-gray-50 text-xs font-bold text-gray-600 uppercase tracking-wider">
                         <tr>

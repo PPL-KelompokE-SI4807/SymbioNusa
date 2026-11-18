@@ -1,17 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Kategori Material - SymbioNusa')
+@section('title', 'Tambah Kategori Material')
+
+@section('breadcrumb')
+    <a href="{{ route('dashboard') }}" class="hover:text-on-surface hover:underline">Dashboard</a>
+    <span class="mx-2" aria-hidden="true">/</span>
+    <a href="{{ route('admin.categories.index') }}" class="hover:text-on-surface hover:underline">Master Kategori</a>
+    <span class="mx-2" aria-hidden="true">/</span>
+    <span class="text-on-surface" aria-current="page">Tambah Baru</span>
+@endsection
 
 @section('content')
-<div class="py-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="max-w-4xl">
     <!-- Breadcrumb -->
-    <nav class="flex items-center text-xs font-medium text-gray-500 mb-2" aria-label="Breadcrumb">
-        <a href="{{ route('dashboard') }}" class="hover:text-emerald-600 transition">Dashboard</a>
-        <span class="mx-2 text-gray-400">/</span>
-        <a href="{{ route('admin.categories.index') }}" class="hover:text-emerald-600 transition">Master Kategori</a>
-        <span class="mx-2 text-gray-400">/</span>
-        <span class="text-gray-800 font-semibold" aria-current="page">Tambah Baru</span>
-    </nav>
 
     <!-- Header Section -->
     <div class="mb-6">
@@ -74,7 +75,7 @@
                     </label>
                     <div class="relative">
                         <input type="number" id="toleransi_susut_persen" name="toleransi_susut_persen" value="{{ old('toleransi_susut_persen', '2.00') }}" required min="0" max="100" step="0.01" class="w-full text-sm rounded-xl border border-gray-300 px-3.5 py-2.5 pr-8 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
-                        <span class="absolute right-3 top-2.5 text-sm text-gray-400 font-semibold">%</span>
+                        <span class="absolute right-3 top-2.5 text-sm text-on-surface-muted font-semibold" aria-hidden="true">%</span>
                     </div>
                     <span class="text-xs text-gray-500 mt-1 block">Disalin saat PO dibuat (rentang 0 - 100%).</span>
                     @error('toleransi_susut_persen')
@@ -89,7 +90,7 @@
                     </label>
                     <div class="relative">
                         <input type="number" id="kadar_air_maks_persen" name="kadar_air_maks_persen" value="{{ old('kadar_air_maks_persen') }}" min="0" max="100" step="0.01" placeholder="Opsional (mis. 5.00)" class="w-full text-sm rounded-xl border border-gray-300 px-3.5 py-2.5 pr-8 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
-                        <span class="absolute right-3 top-2.5 text-sm text-gray-400 font-semibold">%</span>
+                        <span class="absolute right-3 top-2.5 text-sm text-on-surface-muted font-semibold" aria-hidden="true">%</span>
                     </div>
                     <span class="text-xs text-gray-500 mt-1 block">Batas maksimum kadar air diperbolehkan.</span>
                     @error('kadar_air_maks_persen')
@@ -104,7 +105,7 @@
                     </label>
                     <div class="relative">
                         <input type="number" id="toleransi_kadar_air_poin" name="toleransi_kadar_air_poin" value="{{ old('toleransi_kadar_air_poin') }}" min="0" max="100" step="0.01" placeholder="Opsional (mis. 0.50)" class="w-full text-sm rounded-xl border border-gray-300 px-3.5 py-2.5 pr-8 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
-                        <span class="absolute right-3 top-2.5 text-sm text-gray-400 font-semibold">pt</span>
+                        <span class="absolute right-3 top-2.5 text-sm text-on-surface-muted font-semibold" aria-hidden="true">pt</span>
                     </div>
                     <span class="text-xs text-gray-500 mt-1 block">Toleransi poin selisih kadar air aktual.</span>
                     @error('toleransi_kadar_air_poin')
@@ -139,7 +140,7 @@
                     <!-- Wajib Sertifikat Lab -->
                     <div class="flex items-start">
                         <div class="flex items-center h-5">
-                            <input type="checkbox" id="wajib_sertifikat_lab" name="wajib_sertifikat_lab" value="1" {{ old('wajib_sertifikat_lab') ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                            <input type="checkbox" id="wajib_sertifikat_lab" name="wajib_sertifikat_lab" value="1" {{ old('wajib_sertifikat_lab') ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-emerald-500">
                         </div>
                         <div class="ml-3 text-xs">
                             <label for="wajib_sertifikat_lab" class="font-bold text-gray-700">Wajib Sertifikat Hasil Uji Laboratorium</label>
@@ -181,7 +182,7 @@
             <!-- Fallback Raw JSON Textarea (Hidden or Collapsible) -->
             <div class="pt-3 border-t border-gray-100">
                 <details class="text-xs text-gray-500">
-                    <summary class="cursor-pointer font-semibold text-gray-700 hover:text-emerald-600 transition">
+                    <summary class="cursor-pointer font-semibold text-gray-700 hover:text-primary transition">
                         Mode Lanjutan: Editor Raw JSON (spec_schema)
                     </summary>
                     <div class="mt-2">
@@ -247,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
             <div class="sm:col-span-3">
                 <label class="sr-only">Tipe Data</label>
-                <select class="param-tipe w-full text-xs rounded-lg border border-gray-300 px-2 py-1.5 bg-white">
+                <select aria-label="Tipe parameter" class="param-tipe w-full text-xs rounded-lg border border-gray-300 px-2 py-1.5 bg-white">
                     <option value="text" ${param.tipe === 'text' ? 'selected' : ''}>Teks</option>
                     <option value="number" ${param.tipe === 'number' ? 'selected' : ''}>Angka (Number)</option>
                     <option value="select" ${param.tipe === 'select' ? 'selected' : ''}>Pilihan (Select)</option>
@@ -260,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
             <div class="sm:col-span-2 flex items-center">
                 <label class="flex items-center text-xs text-gray-700 cursor-pointer">
-                    <input type="checkbox" class="param-wajib h-4 w-4 rounded border-gray-300 text-emerald-600 mr-1.5" ${param.wajib ? 'checked' : ''}>
+                    <input type="checkbox" class="param-wajib h-4 w-4 rounded border-gray-300 text-primary mr-1.5" ${param.wajib ? 'checked' : ''}>
                     <span class="font-semibold">Wajib</span>
                 </label>
             </div>
