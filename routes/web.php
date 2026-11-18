@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DemandRequestController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RfqController;
 use Illuminate\Support\Facades\Route;
@@ -53,6 +54,22 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/payments/{payment}/bukti', [PaymentController::class, 'streamProof'])->name('payments.proof');
+
+    // PBI-14: Kebutuhan Bahan Baku Sekunder (Buyer & Seller)
+    Route::prefix('buyer/kebutuhan')->name('buyer.demands.')->group(function () {
+        Route::get('/', [DemandRequestController::class, 'buyerIndex'])->name('index');
+        Route::get('/buat', [DemandRequestController::class, 'create'])->name('create');
+        Route::post('/', [DemandRequestController::class, 'store'])->name('store');
+        Route::get('/{demand}/edit', [DemandRequestController::class, 'edit'])->name('edit');
+        Route::put('/{demand}', [DemandRequestController::class, 'update'])->name('update');
+        Route::patch('/{demand}/tutup', [DemandRequestController::class, 'close'])->name('close');
+        Route::delete('/{demand}', [DemandRequestController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('seller/papan-kebutuhan')->name('seller.demands.')->group(function () {
+        Route::get('/', [DemandRequestController::class, 'sellerIndex'])->name('index');
+        Route::get('/{demand}', [DemandRequestController::class, 'sellerShow'])->name('show');
+    });
 });
 
 require __DIR__.'/auth.php';
