@@ -79,7 +79,7 @@
                         Notifikasi
                     </span>
                     <span class="flex size-9 items-center justify-center rounded-full bg-primary-container text-label-sm text-on-primary-container"
-                          title="{{ $user->nama }}" aria-label="{{ $user->nama }}">{{ $initials }}</span>
+                          title="{{ $user->nama }}" role="img" aria-label="{{ $user->nama }}">{{ $initials }}</span>
                 </div>
             </header>
 
