@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Services\Payment\PaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -56,7 +57,7 @@ class PaymentController extends Controller
      */
     public function store(StorePaymentRequest $request, Invoice $invoice): RedirectResponse
     {
-        /** @var \Illuminate\Http\UploadedFile $buktiFile */
+        /** @var UploadedFile $buktiFile */
         $buktiFile = $request->file('bukti');
 
         $this->paymentService->createPayment(

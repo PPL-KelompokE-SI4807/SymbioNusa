@@ -21,15 +21,11 @@ class PaymentService
     /**
      * Menyimpan unggahan bukti pembayaran baru dari Buyer.
      *
-     * @param  Invoice  $invoice
      * @param  array<string, mixed>  $data
-     * @param  UploadedFile  $file
-     * @param  User|null  $actor
-     * @return Payment
      */
     public function createPayment(Invoice $invoice, array $data, UploadedFile $file, ?User $actor = null): Payment
     {
-        return DB::transaction(function () use ($invoice, $data, $file, $actor) {
+        return DB::transaction(function () use ($invoice, $data, $file) {
             // Simpan berkas bukti transfer ke disk privat 'local'
             $path = Storage::disk('local')->putFile('payments', $file);
             if (! $path) {
@@ -81,11 +77,7 @@ class PaymentService
     /**
      * Memverifikasi bukti pembayaran (VALID atau DITOLAK) oleh Seller.
      *
-     * @param  Payment  $payment
      * @param  string  $status  'VALID' atau 'DITOLAK'
-     * @param  string|null  $alasanTolak
-     * @param  User|null  $actor
-     * @return Payment
      */
     public function verifyPayment(Payment $payment, string $status, ?string $alasanTolak = null, ?User $actor = null): Payment
     {
@@ -125,7 +117,7 @@ class PaymentService
                     ]);
                 }
 
-                if ($buyerUser && $invoice) {
+                if ($buyerUser) {
                     $this->notificationService->send(
                         $buyerUser->id_user,
                         'pembayaran.diverifikasi',
@@ -139,7 +131,7 @@ class PaymentService
                 }
             } else {
                 // Status DITOLAK
-                if ($buyerUser && $invoice) {
+                if ($buyerUser) {
                     $this->notificationService->send(
                         $buyerUser->id_user,
                         'pembayaran.ditolak',

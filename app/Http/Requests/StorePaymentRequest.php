@@ -86,7 +86,7 @@ class StorePaymentRequest extends FormRequest
                     $formattedTotal = number_format($totalFloat, 0, ',', '.');
                     $validator->errors()->add(
                         'nominal',
-                        "Nominal transfer (Rp " . number_format($nominalFloat, 0, ',', '.') . ") harus sama persis dengan total tagihan invoice (Rp {$formattedTotal})."
+                        'Nominal transfer (Rp '.number_format($nominalFloat, 0, ',', '.').") harus sama persis dengan total tagihan invoice (Rp {$formattedTotal})."
                     );
                 }
             }

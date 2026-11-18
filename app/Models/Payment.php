@@ -6,18 +6,20 @@ use App\Enums\PaymentVerificationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * Model untuk tabel `payments` sesuai skema DDL.
  *
  * @property int $id_payment
  * @property string|null $bukti_url
- * @property \Illuminate\Support\Carbon|null $tgl_transfer
+ * @property Carbon|null $tgl_transfer
  * @property string $nominal
  * @property string|null $rekening_asal
  * @property PaymentVerificationStatus|string $status_verifikasi
  * @property string|null $alasan_tolak
  * @property int $invoices_id_invoice
+ * @property-read Invoice|null $invoice
  */
 class Payment extends Model
 {
@@ -49,6 +51,9 @@ class Payment extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<Invoice, $this>
+     */
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class, 'invoices_id_invoice', 'id_invoice');

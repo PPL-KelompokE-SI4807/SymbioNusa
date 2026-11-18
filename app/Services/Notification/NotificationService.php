@@ -9,8 +9,6 @@ class NotificationService
     /**
      * Mengirim notifikasi dalam aplikasi ke pengguna dan mencatatnya di tabel `notifications`.
      *
-     * @param  int  $userId
-     * @param  string  $jenis
      * @param  array<string, mixed>  $payload
      * @return int ID notifikasi yang dibuat
      */
