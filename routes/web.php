@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InspectorProfileController;
 use App\Http\Controllers\RfqController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,22 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{category}/arsip', [CategoryController::class, 'archive'])->name('archive');
         Route::post('/{category}/pulihkan', [CategoryController::class, 'unarchive'])->name('unarchive');
     });
+
+    // PBI-01 (SYM-5): Registri Inspector & Sertifikasi Kompetensi
+    Route::prefix('admin/inspector')->name('admin.inspectors.')->group(function () {
+        Route::get('/', [InspectorProfileController::class, 'index'])->name('index');
+        Route::get('/daftarkan', [InspectorProfileController::class, 'create'])->name('create');
+        Route::post('/', [InspectorProfileController::class, 'store'])->name('store');
+        Route::get('/{inspector}', [InspectorProfileController::class, 'show'])->name('show');
+        Route::get('/{inspector}/ubah', [InspectorProfileController::class, 'edit'])->name('edit');
+        Route::put('/{inspector}', [InspectorProfileController::class, 'update'])->name('update');
+        Route::get('/{inspector}/perpanjang', [InspectorProfileController::class, 'renewForm'])->name('renew.form');
+        Route::post('/{inspector}/perpanjang', [InspectorProfileController::class, 'renew'])->name('renew');
+        Route::post('/{inspector}/keluarkan', [InspectorProfileController::class, 'deactivate'])->name('deactivate');
+    });
+    Route::get('/inspector/{inspector}/sertifikat', [InspectorProfileController::class, 'certificate'])->name('inspectors.certificate');
+    Route::get('/profil-kompetensi', [InspectorProfileController::class, 'mine'])->name('inspector.profile');
+    Route::post('/profil-kompetensi/sertifikat', [InspectorProfileController::class, 'uploadMine'])->name('inspector.profile.certificate');
 
     Route::prefix('rfq')->name('rfq.')->group(function () {
         Route::get('/', [RfqController::class, 'index'])->name('index');
