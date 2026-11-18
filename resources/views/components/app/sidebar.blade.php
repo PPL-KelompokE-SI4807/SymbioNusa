@@ -15,7 +15,7 @@
                 ['label' => 'Dashboard', 'route' => 'dashboard'],
             ],
             'MASTER DATA' => [
-                ['label' => 'Registri Inspector', 'route' => null],
+                ['label' => 'Registri Inspector', 'route' => 'admin.inspectors.index', 'active' => 'admin.inspectors.*'],
                 ['label' => 'Kategori Material', 'route' => 'admin.categories.index', 'active' => 'admin.categories.*'],
                 ['label' => 'Parameter Dampak', 'route' => null],
             ],
@@ -82,7 +82,7 @@
                 ['label' => 'Laporan Mutu', 'route' => null],
             ],
             'AKUN' => [
-                ['label' => 'Profil Kompetensi', 'route' => null],
+                ['label' => 'Profil Kompetensi', 'route' => 'inspector.profile', 'active' => 'inspector.profile*'],
             ],
         ],
     ];

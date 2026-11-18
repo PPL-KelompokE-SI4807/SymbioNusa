@@ -8,6 +8,7 @@ use App\Models\DemandRequest;
 use App\Models\Dispute;
 use App\Models\ImpactLog;
 use App\Models\Inspection;
+use App\Models\InspectorProfile;
 use App\Models\Invoice;
 use App\Models\Listing;
 use App\Models\PurchaseOrder;
@@ -224,6 +225,40 @@ class SymbioNusaDemoSeeder extends Seeder
                 'co2e_angkutan_kg' => 30.5000,
                 'co2e_net_kg' => 420.0000,
                 'versi_faktor' => 1,
+            ]
+        );
+
+        // 10. Registri Inspector (PBI-01 / SYM-5): satu aktif, satu segera berakhir, satu kedaluwarsa.
+        $today = InspectorProfile::today();
+        $inspectors = [
+            [$inspectorUser, [$cat1->id_categories, $cat2->id_categories], 'Jawa Barat', 'INS-PLS-2025-017', $today->copy()->addMonths(16)],
+            [$this->inspectorUser('rina.inspector@symbionusa.test', 'Rina Maharani'), [$cat1->id_categories], 'Banten', 'INS-PLS-2025-021', $today->copy()->addDays(18)],
+            [$this->inspectorUser('budi.inspector@symbionusa.test', 'Budi Santoso'), [$cat2->id_categories], 'Jawa Tengah', 'INS-LGM-2022-004', $today->copy()->subDays(12)],
+        ];
+
+        foreach ($inspectors as [$user, $keahlian, $wilayah, $noSertifikat, $berlaku]) {
+            InspectorProfile::firstOrCreate(
+                ['id_user' => $user->id_user],
+                [
+                    'bidang_keahlian' => $keahlian,
+                    'wilayah_tugas' => $wilayah,
+                    'no_sertifikat' => $noSertifikat,
+                    'berlaku_sampai' => $berlaku->toDateString(),
+                    'status_aktif' => $berlaku->gte($today) ? 1 : 0,
+                ]
+            );
+        }
+    }
+
+    private function inspectorUser(string $email, string $nama): User
+    {
+        return User::firstOrCreate(
+            ['email' => $email],
+            [
+                'nama' => $nama,
+                'role' => 'INSPECTOR',
+                'password_hash' => Hash::make('password'),
+                'status' => 'AKTIF',
             ]
         );
     }
