@@ -87,6 +87,12 @@ final class StatusMap
             'RENDAH' => ['Risiko Rendah', 'neutral'],
             'TINGGI' => ['Risiko Tinggi', 'warning'],
         ],
+        // Status turunan (bukan ENUM DDL), lihat App\Enums\InspectorStatus.
+        'inspector_profiles.status' => [
+            'AKTIF' => ['Aktif', 'success'],
+            'SEGERA_BERAKHIR' => ['Segera Berakhir', 'warning'],
+            'NONAKTIF' => ['Nonaktif', 'neutral'],
+        ],
     ];
 
     public static function label(string $field, ?string $value): string
