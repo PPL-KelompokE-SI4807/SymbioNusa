@@ -57,6 +57,11 @@ final class StatusMap
             'DIBAYAR' => ['Dibayar', 'success'],
             'VOID' => ['Void', 'neutral'],
         ],
+        'payments.status_verifikasi' => [
+            'MENUNGGU' => ['Menunggu Verifikasi', 'warning'],
+            'VALID' => ['Terverifikasi', 'success'],
+            'DITOLAK' => ['Ditolak', 'danger'],
+        ],
         'disputes.status' => [
             'DIBUKA' => ['Dibuka', 'danger'],
             'DIPROSES' => ['Diproses', 'info'],
