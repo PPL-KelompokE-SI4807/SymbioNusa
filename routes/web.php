@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RfqController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,24 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{rfq}/reject', [RfqController::class, 'reject'])->name('reject');
         Route::post('/{rfq}/withdraw', [RfqController::class, 'withdraw'])->name('withdraw');
     });
+
+    // PBI-07: Verifikasi Pembayaran (Buyer & Seller)
+    Route::prefix('buyer/invoices')->name('buyer.invoices.')->group(function () {
+        Route::get('/', [PaymentController::class, 'buyerInvoices'])->name('index');
+        Route::get('/{invoice}/bayar', [PaymentController::class, 'create'])->name('pay');
+        Route::post('/{invoice}/bayar', [PaymentController::class, 'store'])->name('store');
+    });
+
+    Route::prefix('seller/invoices')->name('seller.invoices.')->group(function () {
+        Route::get('/', [PaymentController::class, 'sellerInvoices'])->name('index');
+    });
+
+    Route::prefix('seller/payments')->name('seller.payments.')->group(function () {
+        Route::get('/{payment}/verifikasi', [PaymentController::class, 'showVerify'])->name('verify');
+        Route::post('/{payment}/verifikasi', [PaymentController::class, 'processVerify'])->name('processVerify');
+    });
+
+    Route::get('/payments/{payment}/bukti', [PaymentController::class, 'streamProof'])->name('payments.proof');
 });
 
 require __DIR__.'/auth.php';

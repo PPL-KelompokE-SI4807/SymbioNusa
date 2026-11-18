@@ -42,7 +42,7 @@
             'TRANSAKSI' => [
                 ['label' => 'RFQ Masuk', 'route' => 'rfq.index', 'active' => 'rfq.*'],
                 ['label' => 'Purchase Order', 'route' => null],
-                ['label' => 'Invoice', 'route' => null],
+                ['label' => 'Invoice', 'route' => 'seller.invoices.index', 'active' => 'seller.*'],
                 ['label' => 'Pengiriman', 'route' => null],
                 ['label' => 'Sengketa', 'route' => null],
             ],
@@ -63,7 +63,7 @@
             'TRANSAKSI' => [
                 ['label' => 'RFQ & Negosiasi', 'route' => 'rfq.index', 'active' => 'rfq.*'],
                 ['label' => 'Purchase Order', 'route' => null],
-                ['label' => 'Invoice & Pembayaran', 'route' => null],
+                ['label' => 'Invoice & Pembayaran', 'route' => 'buyer.invoices.index', 'active' => 'buyer.*'],
                 ['label' => 'Penerimaan Barang', 'route' => null],
                 ['label' => 'Sengketa', 'route' => null],
             ],
