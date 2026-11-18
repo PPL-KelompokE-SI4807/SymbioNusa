@@ -7,6 +7,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Kolom sesuai DDL tabel `companies`.
+ *
+ * @property int $id_company
+ * @property string $nama
+ * @property string $tipe
+ * @property string|null $nib
+ * @property string|null $alamat
+ * @property string|null $kontak
+ * @property string $status_verifikasi
+ */
 class Company extends Model
 {
     use HasFactory;

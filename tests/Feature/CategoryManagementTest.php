@@ -201,7 +201,7 @@ class CategoryManagementTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Plastik Polimer');
         $response->assertSee('PET Flakes Bening');
-        $response->assertSee('Master Kategori');
+        $response->assertSee('Kategori Material');
     }
 
     public function test_admin_can_create_root_category_with_tolerances_and_spec_schema(): void
