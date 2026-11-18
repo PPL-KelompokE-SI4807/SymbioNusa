@@ -99,13 +99,17 @@ final class StatusMap
         ],
     ];
 
-    public static function label(string $field, ?string $value): string
+    public static function label(string $field, string|\BackedEnum|null $value): string
     {
-        return self::MAP[$field][$value ?? ''][0] ?? ($value ?? '–');
+        $val = $value instanceof \BackedEnum ? (string) $value->value : $value;
+
+        return self::MAP[$field][$val ?? ''][0] ?? ($val ?? '–');
     }
 
-    public static function badge(string $field, ?string $value): string
+    public static function badge(string $field, string|\BackedEnum|null $value): string
     {
-        return self::MAP[$field][$value ?? ''][1] ?? 'neutral';
+        $val = $value instanceof \BackedEnum ? (string) $value->value : $value;
+
+        return self::MAP[$field][$val ?? ''][1] ?? 'neutral';
     }
 }
