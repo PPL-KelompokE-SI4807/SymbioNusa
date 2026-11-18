@@ -52,9 +52,11 @@ Jangan push sebelum saya setuju.
 
 ## Penilaian
 - Dipakai: Seluruh kode model, request, policy, service, controller, view, dan test.
-- Ditolak/diperbaiki dan alasannya: Memperbaiki PHPDoc types pada model `Invoice` dan `Payment` agar Larastan membaca properti Eloquent tanpa error.
-- Kesalahan AI yang ditemukan: -
+- Ditolak/diperbaiki dan alasannya:
+  - Memperbaiki PHPDoc types pada model `Invoice` dan `Payment` agar Larastan membaca properti Eloquent tanpa error.
+  - Memperbaiki komponen `<x-ui.table>` pada `resources/views/payments/buyer/index.blade.php` dan `seller/index.blade.php` dengan `<x-slot:head>` named slot syntax untuk mengatasi error `Undefined variable $head`, serta memindahkan agregasi KPI invoice ke controller agar tidak crash pada paginator.
+- Kesalahan AI yang ditemukan: Salah menuliskan tag `<thead>` langsung di slot default `<x-ui.table>` yang mengharapkan named slot `<x-slot:head>`. Sudah diperbaiki dan diverifikasi di browser serta test.
 
 ## Bukti
-- Commit/PR: Commits `3b59be7`, `a89a505`, `25d849d`, `c39face`, `2059956`, `6b9f99a` di branch `zacky`.
+- Commit/PR: Commits `3b59be7`, `a89a505`, `25d849d`, `c39face`, `2059956`, `6b9f99a`, `8c5d96b`, `970cae7` di branch `zacky`.
 - Test: 12 passed di grup SYM-11, seluruh 79 test aplikasi hijau, Pint bersih, Larastan 0 errors.
