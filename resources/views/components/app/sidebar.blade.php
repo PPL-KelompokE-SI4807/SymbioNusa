@@ -7,7 +7,11 @@
 --}}
 @php
     $user = auth()->user();
-    $role = strtoupper($user->role ?? '');
+    // PBI-08 (SYM-12): perusahaan KEDUANYA bisa berganti peran aktif Seller/Buyer.
+    $role = $user ? $user->activeRole() : '';
+    $nextRole = $user?->company?->tipe === \App\Models\Company::TYPE_BOTH
+        ? ($role === 'SELLER' ? 'BUYER' : 'SELLER')
+        : null;
 
     $menus = [
         'ADMIN' => [
@@ -20,7 +24,7 @@
                 ['label' => 'Parameter Dampak', 'route' => null],
             ],
             'VERIFIKASI & TRANSAKSI' => [
-                ['label' => 'Verifikasi Mitra', 'route' => null],
+                ['label' => 'Verifikasi Mitra', 'route' => 'admin.companies.index', 'active' => 'admin.companies.*'],
                 ['label' => 'Moderasi Listing', 'route' => null],
                 ['label' => 'Penugasan Inspeksi', 'route' => null],
                 ['label' => 'Sengketa & Klaim', 'route' => null],
@@ -47,7 +51,7 @@
                 ['label' => 'Sengketa', 'route' => null],
             ],
             'AKUN' => [
-                ['label' => 'Profil Perusahaan', 'route' => null],
+                ['label' => 'Profil Perusahaan', 'route' => 'companies.edit', 'active' => 'companies.*'],
                 ['label' => 'Ulasan', 'route' => null],
             ],
         ],
@@ -68,7 +72,7 @@
                 ['label' => 'Sengketa', 'route' => null],
             ],
             'AKUN' => [
-                ['label' => 'Profil Perusahaan', 'route' => null],
+                ['label' => 'Profil Perusahaan', 'route' => 'companies.edit', 'active' => 'companies.*'],
                 ['label' => 'Ulasan', 'route' => null],
             ],
         ],
@@ -149,6 +153,16 @@
         <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-container text-label-sm text-on-primary-container" aria-hidden="true">{{ $initials }}</span>
         <div class="min-w-0 flex-1">
             <p class="truncate text-label-md">{{ $user->nama }}</p>
+            @if ($nextRole)
+                <form method="POST" action="{{ route('companies.switch-role') }}">
+                    @csrf
+                    <input type="hidden" name="role" value="{{ $nextRole }}">
+                    <button type="submit"
+                            class="text-label-sm text-on-secondary-muted underline-offset-2 hover:text-on-secondary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                        Beralih ke mode {{ ucfirst(strtolower($nextRole)) }}
+                    </button>
+                </form>
+            @endif
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"

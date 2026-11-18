@@ -66,6 +66,9 @@ class User extends Authenticatable
         $this->notify(new ResetPasswordNotification($token));
     }
 
+    /**
+     * @return BelongsTo<Company, $this>
+     */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'id_company', 'id_company');
@@ -74,6 +77,24 @@ class User extends Authenticatable
     public function inspections(): HasMany
     {
         return $this->hasMany(Inspection::class, 'users_id_user', 'id_user');
+    }
+
+    public function activeRole(): string
+    {
+        $baseRole = strtoupper($this->role ?? 'BUYER');
+
+        if (
+            in_array($baseRole, ['SELLER', 'BUYER'], true)
+            && $this->company?->tipe === Company::TYPE_BOTH
+            && session()->has('active_role')
+        ) {
+            $sessionRole = strtoupper((string) session('active_role'));
+            if (in_array($sessionRole, ['SELLER', 'BUYER'], true)) {
+                return $sessionRole;
+            }
+        }
+
+        return $baseRole;
     }
 
     /**

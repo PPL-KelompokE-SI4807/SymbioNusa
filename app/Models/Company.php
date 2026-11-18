@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +21,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Company extends Model
 {
     use HasFactory;
+
+    public const STATUS_PENDING = 'PENDING';
+
+    public const STATUS_VERIFIED = 'TERVERIFIKASI';
+
+    public const STATUS_REJECTED = 'DITOLAK';
+
+    public const TYPE_SELLER = 'SELLER';
+
+    public const TYPE_BUYER = 'BUYER';
+
+    public const TYPE_BOTH = 'KEDUANYA';
 
     protected $table = 'companies';
 
@@ -48,6 +61,31 @@ class Company extends Model
             'lng' => 'double',
             'tos_disetujui_pada' => 'datetime',
         ];
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->status_verifikasi === self::STATUS_VERIFIED;
+    }
+
+    public function canActAsSeller(): bool
+    {
+        return in_array($this->tipe, [self::TYPE_SELLER, self::TYPE_BOTH], true);
+    }
+
+    public function canActAsBuyer(): bool
+    {
+        return in_array($this->tipe, [self::TYPE_BUYER, self::TYPE_BOTH], true);
+    }
+
+    public function scopePendingVerification(Builder $query): Builder
+    {
+        return $query->where('status_verifikasi', self::STATUS_PENDING);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(CompanyDocument::class, 'id_company', 'id_company');
     }
 
     public function users(): HasMany

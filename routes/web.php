@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\CompanyVerificationController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CompanyDocumentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemandRequestController;
 use App\Http\Controllers\InspectorProfileController;
@@ -14,6 +17,22 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::prefix('perusahaan')->name('companies.')->group(function () {
+        Route::get('/profil', [CompanyController::class, 'edit'])->name('edit');
+        Route::put('/profil', [CompanyController::class, 'update'])->name('update');
+        Route::post('/ganti-peran', [CompanyController::class, 'switchRole'])->name('switch-role');
+
+        Route::post('/dokumen', [CompanyDocumentController::class, 'store'])->name('documents.store');
+        Route::delete('/dokumen/{document}', [CompanyDocumentController::class, 'destroy'])->name('documents.destroy');
+    });
+
+    Route::prefix('admin/verifikasi-perusahaan')->name('admin.companies.')->group(function () {
+        Route::get('/', [CompanyVerificationController::class, 'index'])->name('index');
+        Route::get('/{company}', [CompanyVerificationController::class, 'show'])->name('show');
+        Route::post('/{company}/setujui', [CompanyVerificationController::class, 'approve'])->name('approve');
+        Route::post('/{company}/tolak', [CompanyVerificationController::class, 'reject'])->name('reject');
+    });
 
     Route::prefix('admin/kategori')->name('admin.categories.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('index');
