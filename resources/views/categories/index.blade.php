@@ -1,256 +1,239 @@
 @extends('layouts.app')
+@use('App\Support\Format')
+@use('App\Support\StatusMap')
 
-@section('title', 'Master Kategori Material')
+@section('title', 'Kategori Material')
 
 @section('breadcrumb')
     <a href="{{ route('dashboard') }}" class="hover:text-on-surface hover:underline">Dashboard</a>
     <span class="mx-2" aria-hidden="true">/</span>
-    <span class="text-on-surface" aria-current="page">Master Kategori</span>
+    <span class="text-on-surface" aria-current="page">Kategori Material</span>
 @endsection
 
+@php
+    $filtered = request()->hasAny(['q', 'status', 'tingkat_risiko', 'is_b3_prohibited']);
+@endphp
+
 @section('content')
-<div>
-    <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Master Kategori Material</h1>
-            <p class="mt-1 text-sm text-gray-600">
-                Kelola kategori material sisa produksi, templat spesifikasi teknis, toleransi tonase, dan penanda risiko Non-B3.
-            </p>
-        </div>
-        <div class="flex items-center">
-            <a href="{{ route('admin.categories.create') }}" class="inline-flex items-center justify-center px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-xs hover:shadow-md transition focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
-                <svg class="w-5 h-5 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
+    <x-ui.page-header title="Kategori Material"
+        subtitle="Kelola kategori material sisa produksi, templat spesifikasi, toleransi tonase, dan penanda B3.">
+        <x-slot:actions>
+            <x-ui.button href="{{ route('admin.categories.create') }}">
+                <x-ui.icon name="plus" />
                 Tambah Kategori
-            </a>
-        </div>
+            </x-ui.button>
+        </x-slot:actions>
+    </x-ui.page-header>
+
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <x-ui.kpi label="Total kategori" :value="Format::number($stats['total'])" />
+        <x-ui.kpi label="Aktif" :value="Format::number($stats['aktif'])" />
+        <x-ui.kpi label="Diarsipkan" :value="Format::number($stats['arsip'])" />
+        <x-ui.kpi label="Dilarang (B3)" :value="Format::number($stats['b3_prohibited'])" caption="Ditolak saat membuat listing" />
     </div>
 
-    <!-- Summary Stats -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-xs">
-            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Total Kategori</span>
-            <span class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1 block">{{ $stats['total'] }}</span>
-        </div>
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-xs">
-            <span class="text-xs font-semibold text-emerald-700 uppercase tracking-wider block">Kategori Aktif</span>
-            <span class="text-2xl sm:text-3xl font-extrabold text-primary mt-1 block">{{ $stats['aktif'] }}</span>
-        </div>
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-xs">
-            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Diarsipkan</span>
-            <span class="text-2xl sm:text-3xl font-extrabold text-gray-600 mt-1 block">{{ $stats['arsip'] }}</span>
-        </div>
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-xs">
-            <span class="text-xs font-semibold text-rose-700 uppercase tracking-wider block">Terlarang B3</span>
-            <span class="text-2xl sm:text-3xl font-extrabold text-rose-600 mt-1 block">{{ $stats['b3_prohibited'] }}</span>
-        </div>
-    </div>
+    <x-ui.card class="mb-6">
+        <form method="GET" action="{{ route('admin.categories.index') }}" role="search" aria-label="Saring kategori"
+            class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end">
+            <x-ui.field label="Cari kategori" for="search-input" class="sm:col-span-2 lg:col-span-1">
+                <x-ui.input id="search-input" name="q" type="search" :value="request('q')" placeholder="Cari nama kategori…" />
+            </x-ui.field>
 
-    <!-- Search & Filter Card -->
-    <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 mb-6 shadow-xs">
-        <form method="GET" action="{{ route('admin.categories.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            <!-- Search Keyword -->
-            <div class="lg:col-span-2">
-                <label for="search-input" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Cari Kategori</label>
-                <div class="relative">
-                    <input type="text" id="search-input" name="q" value="{{ request('q') }}" placeholder="Cari nama kategori..." class="w-full text-sm rounded-xl border border-gray-300 px-3.5 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
-                </div>
-            </div>
+            <x-ui.field label="Status" for="status-filter">
+                <x-ui.select id="status-filter" name="status">
+                    <option value="">Semua status</option>
+                    <option value="AKTIF" @selected(request('status') === 'AKTIF')>Aktif</option>
+                    <option value="ARSIP" @selected(request('status') === 'ARSIP')>Diarsipkan</option>
+                </x-ui.select>
+            </x-ui.field>
 
-            <!-- Status Filter -->
-            <div>
-                <label for="status-filter" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Status</label>
-                <select id="status-filter" name="status" class="w-full text-sm rounded-xl border border-gray-300 px-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
-                    <option value="">Semua Status</option>
-                    <option value="AKTIF" {{ request('status') === 'AKTIF' ? 'selected' : '' }}>Aktif</option>
-                    <option value="ARSIP" {{ request('status') === 'ARSIP' ? 'selected' : '' }}>Arsip</option>
-                </select>
-            </div>
+            <x-ui.field label="Tingkat risiko" for="risiko-filter">
+                <x-ui.select id="risiko-filter" name="tingkat_risiko">
+                    <option value="">Semua risiko</option>
+                    <option value="RENDAH" @selected(request('tingkat_risiko') === 'RENDAH')>Risiko Rendah</option>
+                    <option value="TINGGI" @selected(request('tingkat_risiko') === 'TINGGI')>Risiko Tinggi</option>
+                </x-ui.select>
+            </x-ui.field>
 
-            <!-- Risk Level Filter -->
-            <div>
-                <label for="risiko-filter" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Tingkat Risiko</label>
-                <select id="risiko-filter" name="tingkat_risiko" class="w-full text-sm rounded-xl border border-gray-300 px-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
-                    <option value="">Semua Risiko</option>
-                    <option value="RENDAH" {{ request('tingkat_risiko') === 'RENDAH' ? 'selected' : '' }}>Rendah</option>
-                    <option value="TINGGI" {{ request('tingkat_risiko') === 'TINGGI' ? 'selected' : '' }}>Tinggi</option>
-                </select>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex items-end gap-2">
-                <button type="submit" class="flex-1 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-xl transition focus:outline-none focus:ring-2 focus:ring-gray-900">
-                    Saring
-                </button>
-                @if(request()->hasAny(['q', 'status', 'tingkat_risiko', 'is_b3_prohibited']))
-                    <a href="{{ route('admin.categories.index') }}" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl transition" title="Reset filter">
-                        Reset
-                    </a>
+            <div class="flex items-center gap-2 sm:col-span-2 lg:col-span-1">
+                <x-ui.button type="submit" variant="secondary">Terapkan</x-ui.button>
+                @if ($filtered)
+                    <x-ui.button variant="text" href="{{ route('admin.categories.index') }}" class="h-10 px-2">Reset</x-ui.button>
                 @endif
             </div>
         </form>
-    </div>
+    </x-ui.card>
 
-    <!-- Category Table / Hierarchy View -->
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
-            <h2 class="text-base font-bold text-gray-900">Daftar & Hierarki Kategori</h2>
-            <span class="text-xs text-gray-500 font-medium">Menampilkan {{ $categories->total() }} kategori</span>
-        </div>
+    <x-ui.card title="Daftar & hierarki kategori" :padding="false">
+        <x-slot:actions>
+            <span class="text-body-sm text-on-surface-muted">{{ Format::number($categories->total()) }} kategori</span>
+        </x-slot:actions>
 
-        @if($categories->count() > 0)
-            <div class="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" tabindex="0" role="region" aria-label="Tabel, geser untuk melihat semua kolom">
-                <table class="min-w-full divide-y divide-gray-200 text-left">
-                    <thead class="bg-gray-50 text-xs font-bold text-gray-600 uppercase tracking-wider">
-                        <tr>
-                            <th scope="col" class="px-6 py-3.5">Nama & Hierarki</th>
-                            <th scope="col" class="px-4 py-3.5">Toleransi Susut</th>
-                            <th scope="col" class="px-4 py-3.5">Kadar Air Maks</th>
-                            <th scope="col" class="px-4 py-3.5">Tingkat Risiko</th>
-                            <th scope="col" class="px-4 py-3.5">Status B3</th>
-                            <th scope="col" class="px-4 py-3.5">Status</th>
-                            <th scope="col" class="px-6 py-3.5 text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white text-sm">
-                        @foreach($categories as $cat)
-                            <tr class="hover:bg-gray-50/70 transition">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        @if($cat->categories_id_categories)
-                                            <!-- Subcategory indent indicator -->
-                                            <div class="mr-2 text-gray-400 pl-4" aria-hidden="true">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                                </svg>
-                                            </div>
-                                        @endif
-                                        <div>
-                                            <a href="{{ route('admin.categories.show', $cat) }}" class="font-bold text-gray-900 hover:text-emerald-700 transition">
-                                                {{ $cat->nama }}
-                                            </a>
-                                            @if($cat->parent)
-                                                <span class="block text-xs text-gray-500 mt-0.5">
-                                                    Induk: <strong class="text-gray-700">{{ $cat->parent->nama }}</strong>
-                                                </span>
-                                            @else
-                                                <span class="inline-block px-2 py-0.5 mt-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
-                                                    Kategori Induk
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-4 text-gray-700 whitespace-nowrap">
-                                    <span class="font-semibold">{{ number_format((float) $cat->toleransi_susut_persen, 2) }}%</span>
-                                </td>
-                                <td class="px-4 py-4 text-gray-700 whitespace-nowrap">
-                                    @if($cat->kadar_air_maks_persen !== null)
-                                        <span class="font-medium">{{ number_format((float) $cat->kadar_air_maks_persen, 2) }}%</span>
-                                        @if($cat->toleransi_kadar_air_poin !== null)
-                                            <span class="text-xs text-gray-500 block">&plusmn;{{ number_format((float) $cat->toleransi_kadar_air_poin, 2) }} poin</span>
-                                        @endif
-                                    @else
-                                        <span class="text-gray-400 text-xs italic">Tidak diatur</span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    @if($cat->tingkat_risiko === 'TINGGI')
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
-                                            Risiko Tinggi
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800">
-                                            Risiko Rendah
-                                        </span>
-                                    @endif
-                                    @if($cat->wajib_sertifikat_lab)
-                                        <span class="block text-[11px] text-indigo-700 font-semibold mt-0.5">Wajib Lab</span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    @if($cat->is_b3_prohibited)
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800" title="Ditolak untuk pembuatan listing baru">
-                                            Terlarang B3
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-                                            Non-B3 Aman
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    @if($cat->status === 'AKTIF')
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            Aktif
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700 border border-gray-300">
-                                            Arsip
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 text-right whitespace-nowrap">
-                                    <div class="flex items-center justify-end space-x-2">
-                                        <a href="{{ route('admin.categories.show', $cat) }}" class="p-1.5 text-gray-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition" title="Lihat Detail & Templat Spesifikasi" aria-label="Lihat detail {{ $cat->nama }}">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                        </a>
-                                        <a href="{{ route('admin.categories.edit', $cat) }}" class="p-1.5 text-gray-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition" title="Edit Kategori" aria-label="Edit {{ $cat->nama }}">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </a>
+        @if ($categories->count() > 0)
+            {{-- Di bawah 1280 px tabel 7 kolom tidak muat tanpa digeser, jadi tampil sebagai daftar kartu. --}}
+            <ul class="grid grid-cols-1 gap-4 border-t border-outline p-4 sm:grid-cols-2 sm:p-6 xl:hidden" aria-label="Daftar kategori material">
+                @foreach ($categories as $cat)
+                    <li class="flex flex-col gap-3 rounded-md border border-outline p-4">
+                        <div class="min-w-0">
+                            <a href="{{ route('admin.categories.show', $cat) }}"
+                                class="text-label-md text-on-surface hover:text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
+                                {{ $cat->nama }}
+                            </a>
+                            <p class="text-body-sm text-on-surface-muted">
+                                {{ $cat->parent ? 'Subkategori dari '.$cat->parent->nama : 'Kategori induk' }}
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <x-ui.badge :variant="StatusMap::badge('categories.status', $cat->status)">
+                                {{ StatusMap::label('categories.status', $cat->status) }}
+                            </x-ui.badge>
+                            <x-ui.badge :variant="StatusMap::badge('categories.tingkat_risiko', $cat->tingkat_risiko)">
+                                {{ StatusMap::label('categories.tingkat_risiko', $cat->tingkat_risiko) }}
+                            </x-ui.badge>
+                            @if ($cat->is_b3_prohibited)
+                                <x-ui.badge variant="danger">Dilarang (B3)</x-ui.badge>
+                            @endif
+                        </div>
+                        <dl class="grid grid-cols-2 gap-x-4 gap-y-1 text-body-sm">
+                            <dt class="text-on-surface-muted">Toleransi susut</dt>
+                            <dd class="text-right tabular-nums text-on-surface">{{ Format::number($cat->toleransi_susut_persen, 2) }}%</dd>
+                            <dt class="text-on-surface-muted">Kadar air maks.</dt>
+                            <dd class="text-right tabular-nums text-on-surface">
+                                @if ($cat->kadar_air_maks_persen !== null)
+                                    {{ Format::number($cat->kadar_air_maks_persen, 2) }}%@if ($cat->toleransi_kadar_air_poin !== null) <span class="text-on-surface-muted">±{{ Format::number($cat->toleransi_kadar_air_poin, 2) }}</span>@endif
+                                @else
+                                    <span class="text-on-surface-muted">Tidak diatur</span>
+                                @endif
+                            </dd>
+                            @if ($cat->wajib_sertifikat_lab)
+                                <dt class="text-on-surface-muted">Uji lab</dt>
+                                <dd class="text-right text-on-surface">Wajib</dd>
+                            @endif
+                        </dl>
+                        <div class="mt-auto flex items-center gap-4 border-t border-outline pt-3">
+                            <x-ui.button variant="text" href="{{ route('admin.categories.edit', $cat) }}" class="min-h-10" aria-label="Edit {{ $cat->nama }}">Edit</x-ui.button>
+                            @if ($cat->status === 'AKTIF')
+                                <form method="POST" action="{{ route('admin.categories.archive', $cat) }}"
+                                    onsubmit="return confirm(@js('Arsipkan kategori '.$cat->nama.'?'))">
+                                    @csrf
+                                    <x-ui.button type="submit" variant="text-danger" class="min-h-10" aria-label="Arsipkan {{ $cat->nama }}">Arsipkan</x-ui.button>
+                                </form>
+                            @else
+                                <form method="POST" action="{{ route('admin.categories.unarchive', $cat) }}">
+                                    @csrf
+                                    <x-ui.button type="submit" variant="text" class="min-h-10" aria-label="Aktifkan kembali {{ $cat->nama }}">Aktifkan</x-ui.button>
+                                </form>
+                            @endif
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
 
-                                        @if($cat->status === 'AKTIF')
-                                            <form method="POST" action="{{ route('admin.categories.archive', $cat) }}" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin mengarsipkan kategori {{ $cat->nama }}?');">
-                                                @csrf
-                                                <button type="submit" class="p-1.5 text-gray-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition" title="Arsipkan Kategori" aria-label="Arsipkan {{ $cat->nama }}">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        @else
-                                            <form method="POST" action="{{ route('admin.categories.unarchive', $cat) }}" class="inline">
-                                                @csrf
-                                                <button type="submit" class="p-1.5 text-gray-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition" title="Aktifkan Kembali Kategori" aria-label="Aktifkan {{ $cat->nama }}">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+            <x-ui.table label="Daftar kategori material" class="hidden xl:block">
+                <x-slot:head>
+                    <th scope="col" class="px-6">Nama & hierarki</th>
+                    <th scope="col" class="px-4 text-right">Toleransi susut</th>
+                    <th scope="col" class="px-4 text-right">Kadar air maks.</th>
+                    <th scope="col" class="px-4">Risiko</th>
+                    <th scope="col" class="px-4">B3</th>
+                    <th scope="col" class="px-4">Status</th>
+                    <th scope="col" class="px-6 text-right">Aksi</th>
+                </x-slot:head>
 
-            <!-- Pagination -->
-            <div class="px-6 py-4 border-t border-gray-200">
-                {{ $categories->links() }}
-            </div>
-        @else
-            <div class="text-center py-12 px-4">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                <h3 class="mt-2 text-sm font-bold text-gray-900">Belum ada kategori material</h3>
-                <p class="mt-1 text-xs text-gray-500">Mulai dengan menambahkan kategori baru untuk katalog sisa produksi industri.</p>
-                <div class="mt-4">
-                    <a href="{{ route('admin.categories.create') }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-xs transition">
-                        Tambah Kategori Pertama
-                    </a>
+                @foreach ($categories as $cat)
+                    <tr class="h-13 border-t border-outline align-middle hover:bg-background">
+                        <td class="px-6 py-3">
+                            <div @class(['flex items-start gap-2', 'pl-4' => $cat->categories_id_categories])>
+                                @if ($cat->categories_id_categories)
+                                    <x-ui.icon name="chevron-right" class="mt-0.5 size-4 shrink-0 text-on-surface-muted" />
+                                @endif
+                                <div class="min-w-0">
+                                    <a href="{{ route('admin.categories.show', $cat) }}"
+                                        class="font-medium text-on-surface hover:text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
+                                        {{ $cat->nama }}
+                                    </a>
+                                    <p class="text-body-sm text-on-surface-muted">
+                                        {{ $cat->parent ? 'Subkategori dari '.$cat->parent->nama : 'Kategori induk' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-right tabular-nums whitespace-nowrap">
+                            {{ Format::number($cat->toleransi_susut_persen, 2) }}%
+                        </td>
+                        <td class="px-4 py-3 text-right tabular-nums whitespace-nowrap">
+                            @if ($cat->kadar_air_maks_persen !== null)
+                                {{ Format::number($cat->kadar_air_maks_persen, 2) }}%
+                                @if ($cat->toleransi_kadar_air_poin !== null)
+                                    <span class="block text-body-sm text-on-surface-muted">±{{ Format::number($cat->toleransi_kadar_air_poin, 2) }} poin</span>
+                                @endif
+                            @else
+                                <span class="text-on-surface-muted">Tidak diatur</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <x-ui.badge :variant="StatusMap::badge('categories.tingkat_risiko', $cat->tingkat_risiko)">
+                                {{ StatusMap::label('categories.tingkat_risiko', $cat->tingkat_risiko) }}
+                            </x-ui.badge>
+                            @if ($cat->wajib_sertifikat_lab)
+                                <span class="mt-1 block text-body-sm text-on-surface-muted">Wajib uji lab</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            @if ($cat->is_b3_prohibited)
+                                <x-ui.badge variant="danger" title="Ditolak saat membuat listing baru">Dilarang (B3)</x-ui.badge>
+                            @else
+                                <span class="text-on-surface-muted">Non-B3</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <x-ui.badge :variant="StatusMap::badge('categories.status', $cat->status)">
+                                {{ StatusMap::label('categories.status', $cat->status) }}
+                            </x-ui.badge>
+                        </td>
+                        <td class="px-6 py-3 whitespace-nowrap">
+                            <div class="flex items-center justify-end gap-4">
+                                <x-ui.button variant="text" href="{{ route('admin.categories.show', $cat) }}" aria-label="Lihat {{ $cat->nama }}">Lihat</x-ui.button>
+                                <x-ui.button variant="text" href="{{ route('admin.categories.edit', $cat) }}" aria-label="Edit {{ $cat->nama }}">Edit</x-ui.button>
+                                @if ($cat->status === 'AKTIF')
+                                    <form method="POST" action="{{ route('admin.categories.archive', $cat) }}"
+                                        onsubmit="return confirm(@js('Arsipkan kategori '.$cat->nama.'?'))">
+                                        @csrf
+                                        <x-ui.button type="submit" variant="text-danger" aria-label="Arsipkan {{ $cat->nama }}">Arsipkan</x-ui.button>
+                                    </form>
+                                @else
+                                    <form method="POST" action="{{ route('admin.categories.unarchive', $cat) }}">
+                                        @csrf
+                                        <x-ui.button type="submit" variant="text" aria-label="Aktifkan kembali {{ $cat->nama }}">Aktifkan</x-ui.button>
+                                    </form>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </x-ui.table>
+
+            @if ($categories->hasPages())
+                <div class="border-t border-outline px-6 py-4">
+                    {{ $categories->links() }}
                 </div>
+            @endif
+        @else
+            <div class="px-6 pb-10 pt-4 text-center">
+                @if ($filtered)
+                    <p class="text-label-md text-on-surface">Tidak ada kategori yang cocok dengan saringan.</p>
+                    <p class="mt-1 text-body-sm text-on-surface-muted">Ubah kata kunci atau saringan, atau tampilkan semua kategori.</p>
+                    <div class="mt-4">
+                        <x-ui.button variant="secondary" href="{{ route('admin.categories.index') }}">Tampilkan semua</x-ui.button>
+                    </div>
+                @else
+                    <p class="text-label-md text-on-surface">Belum ada kategori material.</p>
+                    <p class="mt-1 text-body-sm text-on-surface-muted">Tambahkan kategori pertama untuk katalog sisa produksi industri.</p>
+                    <div class="mt-4">
+                        <x-ui.button href="{{ route('admin.categories.create') }}">Tambah Kategori</x-ui.button>
+                    </div>
+                @endif
             </div>
         @endif
-    </div>
-</div>
+    </x-ui.card>
 @endsection
