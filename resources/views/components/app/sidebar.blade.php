@@ -37,12 +37,12 @@
             'KATALOG' => [
                 ['label' => 'Listing Saya', 'route' => null],
                 ['label' => 'Jadwal Pasokan', 'route' => null],
-                ['label' => 'Papan Kebutuhan', 'route' => null],
+                ['label' => 'Papan Kebutuhan', 'route' => 'seller.demands.index', 'active' => 'seller.demands.*'],
             ],
             'TRANSAKSI' => [
                 ['label' => 'RFQ Masuk', 'route' => 'rfq.index', 'active' => 'rfq.*'],
                 ['label' => 'Purchase Order', 'route' => null],
-                ['label' => 'Invoice', 'route' => null],
+                ['label' => 'Invoice', 'route' => 'seller.invoices.index', 'active' => 'seller.*'],
                 ['label' => 'Pengiriman', 'route' => null],
                 ['label' => 'Sengketa', 'route' => null],
             ],
@@ -57,13 +57,13 @@
             ],
             'PASAR' => [
                 ['label' => 'Katalog Material', 'route' => null],
-                ['label' => 'Papan Kebutuhan', 'route' => null],
+                ['label' => 'Kebutuhan Saya', 'route' => 'buyer.demands.index', 'active' => 'buyer.demands.*'],
                 ['label' => 'Daftar Pantau', 'route' => null],
             ],
             'TRANSAKSI' => [
                 ['label' => 'RFQ & Negosiasi', 'route' => 'rfq.index', 'active' => 'rfq.*'],
                 ['label' => 'Purchase Order', 'route' => null],
-                ['label' => 'Invoice & Pembayaran', 'route' => null],
+                ['label' => 'Invoice & Pembayaran', 'route' => 'buyer.invoices.index', 'active' => 'buyer.*'],
                 ['label' => 'Penerimaan Barang', 'route' => null],
                 ['label' => 'Sengketa', 'route' => null],
             ],

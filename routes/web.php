@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DemandRequestController;
 use App\Http\Controllers\InspectorProfileController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RfqController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +52,40 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{rfq}/accept', [RfqController::class, 'accept'])->name('accept');
         Route::post('/{rfq}/reject', [RfqController::class, 'reject'])->name('reject');
         Route::post('/{rfq}/withdraw', [RfqController::class, 'withdraw'])->name('withdraw');
+    });
+
+    // PBI-07: Verifikasi Pembayaran (Buyer & Seller)
+    Route::prefix('buyer/invoices')->name('buyer.invoices.')->group(function () {
+        Route::get('/', [PaymentController::class, 'buyerInvoices'])->name('index');
+        Route::get('/{invoice}/bayar', [PaymentController::class, 'create'])->name('pay');
+        Route::post('/{invoice}/bayar', [PaymentController::class, 'store'])->name('store');
+    });
+
+    Route::prefix('seller/invoices')->name('seller.invoices.')->group(function () {
+        Route::get('/', [PaymentController::class, 'sellerInvoices'])->name('index');
+    });
+
+    Route::prefix('seller/payments')->name('seller.payments.')->group(function () {
+        Route::get('/{payment}/verifikasi', [PaymentController::class, 'showVerify'])->name('verify');
+        Route::post('/{payment}/verifikasi', [PaymentController::class, 'processVerify'])->name('processVerify');
+    });
+
+    Route::get('/payments/{payment}/bukti', [PaymentController::class, 'streamProof'])->name('payments.proof');
+
+    // PBI-14: Kebutuhan Bahan Baku Sekunder (Buyer & Seller)
+    Route::prefix('buyer/kebutuhan')->name('buyer.demands.')->group(function () {
+        Route::get('/', [DemandRequestController::class, 'buyerIndex'])->name('index');
+        Route::get('/buat', [DemandRequestController::class, 'create'])->name('create');
+        Route::post('/', [DemandRequestController::class, 'store'])->name('store');
+        Route::get('/{demand}/edit', [DemandRequestController::class, 'edit'])->name('edit');
+        Route::put('/{demand}', [DemandRequestController::class, 'update'])->name('update');
+        Route::patch('/{demand}/tutup', [DemandRequestController::class, 'close'])->name('close');
+        Route::delete('/{demand}', [DemandRequestController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('seller/papan-kebutuhan')->name('seller.demands.')->group(function () {
+        Route::get('/', [DemandRequestController::class, 'sellerIndex'])->name('index');
+        Route::get('/{demand}', [DemandRequestController::class, 'sellerShow'])->name('show');
     });
 });
 
