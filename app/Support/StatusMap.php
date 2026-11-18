@@ -79,6 +79,14 @@ final class StatusMap
             'DESK' => ['Desk', 'neutral'],
             'LAPANGAN' => ['Lapangan', 'neutral'],
         ],
+        'categories.status' => [
+            'AKTIF' => ['Aktif', 'success'],
+            'ARSIP' => ['Diarsipkan', 'neutral'],
+        ],
+        'categories.tingkat_risiko' => [
+            'RENDAH' => ['Risiko Rendah', 'neutral'],
+            'TINGGI' => ['Risiko Tinggi', 'warning'],
+        ],
     ];
 
     public static function label(string $field, ?string $value): string
