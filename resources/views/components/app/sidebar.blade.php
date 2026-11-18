@@ -40,7 +40,7 @@
                 ['label' => 'Papan Kebutuhan', 'route' => null],
             ],
             'TRANSAKSI' => [
-                ['label' => 'RFQ Masuk', 'route' => null],
+                ['label' => 'RFQ Masuk', 'route' => 'rfq.index', 'active' => 'rfq.*'],
                 ['label' => 'Purchase Order', 'route' => null],
                 ['label' => 'Invoice', 'route' => null],
                 ['label' => 'Pengiriman', 'route' => null],
@@ -61,7 +61,7 @@
                 ['label' => 'Daftar Pantau', 'route' => null],
             ],
             'TRANSAKSI' => [
-                ['label' => 'RFQ & Negosiasi', 'route' => null],
+                ['label' => 'RFQ & Negosiasi', 'route' => 'rfq.index', 'active' => 'rfq.*'],
                 ['label' => 'Purchase Order', 'route' => null],
                 ['label' => 'Invoice & Pembayaran', 'route' => null],
                 ['label' => 'Penerimaan Barang', 'route' => null],
