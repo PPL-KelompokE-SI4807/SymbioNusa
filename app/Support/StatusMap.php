@@ -52,6 +52,11 @@ final class StatusMap
             'TERPENUHI' => ['Terpenuhi', 'success'],
             'KEDALUWARSA' => ['Kedaluwarsa', 'neutral'],
         ],
+        'demand_requests.frekuensi' => [
+            'SEKALI' => ['Sekali', 'neutral'],
+            'MINGGUAN' => ['Mingguan', 'info'],
+            'BULANAN' => ['Bulanan', 'info'],
+        ],
         'invoices.status' => [
             'TERBIT' => ['Menunggu Pembayaran', 'warning'],
             'DIBAYAR' => ['Dibayar', 'success'],
