@@ -6,6 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Kolom sesuai DDL tabel `disputes`.
+ *
+ * @property int $id_dispute
+ * @property string $jenis
+ * @property string|null $deskripsi
+ * @property string|null $bukti_url
+ * @property string $status
+ * @property string|null $putusan
+ * @property int $purchase_orders_id_purchase_order
+ * @property int $companies_id_company
+ */
 class Dispute extends Model
 {
     use HasFactory;

@@ -44,10 +44,11 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($admin)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Hak Akses: ADMIN');
-        $response->assertSee('Selamat Datang, Super Admin DLH!');
-        $response->assertSee('Akumulasi Dampak Lingkungan');
-        $response->assertSee('Antrean Verifikasi Perusahaan');
+        $response->assertSee('Ringkasan aliran material, dampak, dan antrean tindakan platform.');
+        $response->assertSee('Tonase terdaur ulang');
+        $response->assertSee('Alur Order');
+        $response->assertSee('Antrean tindakan');
+        $response->assertSee('Modul');
     }
 
     public function test_seller_can_access_dashboard_and_view_metrics(): void
@@ -77,10 +78,10 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($seller)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Hak Akses: SELLER');
-        $response->assertSee('Selamat Datang, Budi Seller Mandiri!');
-        $response->assertSee('Katalog Listing Sisa Produksi Saya');
-        $response->assertSee('Listing Aktif Saya');
+        $response->assertSee('Budi Seller Mandiri');
+        $response->assertSee('Listing dipublikasikan');
+        $response->assertSee('Order masuk terbaru');
+        $response->assertSee('Listing terbaru');
     }
 
     public function test_buyer_can_access_dashboard_and_view_metrics(): void
@@ -110,10 +111,10 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($buyer)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Hak Akses: BUYER');
-        $response->assertSee('Selamat Datang, Rina Buyer Sekunder!');
-        $response->assertSee('Kebutuhan Bahan Baku Aktif');
-        $response->assertSee('Pesanan Pembelian Saya');
+        $response->assertSee('Rina Buyer Sekunder');
+        $response->assertSee('Kebutuhan terbuka');
+        $response->assertSee('Order pembelian terbaru');
+        $response->assertSee('Kebutuhan saya');
     }
 
     public function test_inspector_can_access_dashboard_and_view_metrics(): void
@@ -131,10 +132,9 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($inspector)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Hak Akses: INSPECTOR');
-        $response->assertSee('Selamat Datang, Dr. Hendra Inspector Mutu!');
-        $response->assertSee('Penugasan Verifikasi Mutu');
-        $response->assertSee('Inspeksi Ditugaskan');
+        $response->assertSee('Dr. Hendra Inspector Mutu');
+        $response->assertSee('Ditugaskan');
+        $response->assertSee('Tugas inspeksi aktif');
     }
 
     public function test_dashboard_renders_livewire_component_correctly(): void
@@ -152,8 +152,38 @@ class DashboardTest extends TestCase
         $this->actingAs($admin);
 
         Livewire::test(DashboardOverview::class)
-            ->assertSee('Hak Akses: ADMIN')
-            ->assertSee('Selamat Datang, Super Admin DLH!')
+            ->assertSee('Alur Order')
+            ->assertSee('Antrean tindakan')
             ->assertStatus(200);
+    }
+
+    public function test_admin_queue_lists_company_waiting_for_verification(): void
+    {
+        $admin = User::firstOrCreate(
+            ['email' => 'admin_test@symbionusa.test'],
+            ['nama' => 'Super Admin DLH', 'role' => 'ADMIN', 'password_hash' => Hash::make('password'), 'status' => 'AKTIF']
+        );
+        Company::firstOrCreate(
+            ['nib' => '1212343456567'],
+            ['nama' => 'CV Antre Verifikasi', 'tipe' => 'SELLER', 'alamat' => 'Bandung', 'kontak' => '022111', 'status_verifikasi' => 'PENDING']
+        );
+
+        $this->actingAs($admin)->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Verifikasi CV Antre Verifikasi')
+            ->assertSee('Verifikasi Mitra');
+    }
+
+    public function test_seller_without_company_sees_profile_hint_instead_of_data(): void
+    {
+        $seller = User::firstOrCreate(
+            ['email' => 'seller_no_company@symbionusa.test'],
+            ['nama' => 'Seller Tanpa Perusahaan', 'role' => 'SELLER', 'password_hash' => Hash::make('password'), 'status' => 'AKTIF']
+        );
+
+        $this->actingAs($seller)->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Akun belum terhubung ke perusahaan')
+            ->assertDontSee('Order masuk terbaru');
     }
 }
