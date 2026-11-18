@@ -24,7 +24,7 @@ class CompanyVerificationTest extends TestCase
         $user = User::where('email', 'seller@symbionusa.test')->firstOrFail();
         $user->forceFill(['id_company' => $company->id_company])->save();
 
-        $nibBaru = '912030' . random_int(1000000, 9999999);
+        $nibBaru = '912030'.random_int(1000000, 9999999);
 
         $response = $this->actingAs($user)->put(route('companies.update'), [
             'nama' => 'PT Plastik Makmur Baru',

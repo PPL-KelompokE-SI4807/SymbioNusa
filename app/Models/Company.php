@@ -23,11 +23,15 @@ class Company extends Model
     use HasFactory;
 
     public const STATUS_PENDING = 'PENDING';
+
     public const STATUS_VERIFIED = 'TERVERIFIKASI';
+
     public const STATUS_REJECTED = 'DITOLAK';
 
     public const TYPE_SELLER = 'SELLER';
+
     public const TYPE_BUYER = 'BUYER';
+
     public const TYPE_BOTH = 'KEDUANYA';
 
     protected $table = 'companies';
