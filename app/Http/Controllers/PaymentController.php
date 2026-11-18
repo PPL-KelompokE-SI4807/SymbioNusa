@@ -88,7 +88,17 @@ class PaymentController extends Controller
             ->orderByDesc('id_invoice')
             ->paginate(10);
 
-        return view('payments.seller.index', compact('invoices'));
+        // KPI counts — dihitung dari DB (bukan filter paginator)
+        $kpiBase = fn () => Invoice::whereHas('purchaseOrder', fn ($q) => $q->where('companies_id_seller', $user->id_company));
+
+        $kpi = [
+            'total' => $kpiBase()->count(),
+            'menunggu' => $kpiBase()->whereHas('latestPayment', fn ($q) => $q->where('status_verifikasi', 'MENUNGGU'))->count(),
+            'lunas' => $kpiBase()->where('status', 'DIBAYAR')->count(),
+            'ditolak' => $kpiBase()->whereHas('latestPayment', fn ($q) => $q->where('status_verifikasi', 'DITOLAK'))->count(),
+        ];
+
+        return view('payments.seller.index', compact('invoices', 'kpi'));
     }
 
     /**
