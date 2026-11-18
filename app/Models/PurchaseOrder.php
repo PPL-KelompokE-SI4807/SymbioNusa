@@ -7,6 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Kolom sesuai DDL tabel `purchase_orders` (kolom DECIMAL di-cast "decimal:2", jadi berupa string).
+ *
+ * @property int $id_purchase_order
+ * @property string|null $volume_kg
+ * @property string|null $harga_per_kg
+ * @property string|null $toleransi_persen
+ * @property string|null $kadar_air_maks_persen
+ * @property string|null $toleransi_kadar_air_poin
+ * @property string|null $jarak_km
+ * @property string $status
+ * @property int|null $rfq_contracts_id_rfq_contract
+ * @property int $companies_id_seller
+ * @property int $companies_id_buyer
+ */
 class PurchaseOrder extends Model
 {
     use HasFactory;

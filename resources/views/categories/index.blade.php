@@ -1,17 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Master Kategori Material - SymbioNusa')
+@section('title', 'Master Kategori Material')
+
+@section('breadcrumb')
+    <a href="{{ route('dashboard') }}" class="hover:text-on-surface hover:underline">Dashboard</a>
+    <span class="mx-2" aria-hidden="true">/</span>
+    <span class="text-on-surface" aria-current="page">Master Kategori</span>
+@endsection
 
 @section('content')
-<div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div>
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-            <nav class="flex items-center text-xs font-medium text-gray-500 mb-1" aria-label="Breadcrumb">
-                <a href="{{ route('dashboard') }}" class="hover:text-emerald-600 transition">Dashboard</a>
-                <span class="mx-2 text-gray-400">/</span>
-                <span class="text-gray-800 font-semibold" aria-current="page">Master Kategori</span>
-            </nav>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Master Kategori Material</h1>
             <p class="mt-1 text-sm text-gray-600">
                 Kelola kategori material sisa produksi, templat spesifikasi teknis, toleransi tonase, dan penanda risiko Non-B3.
@@ -35,7 +36,7 @@
         </div>
         <div class="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-xs">
             <span class="text-xs font-semibold text-emerald-700 uppercase tracking-wider block">Kategori Aktif</span>
-            <span class="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1 block">{{ $stats['aktif'] }}</span>
+            <span class="text-2xl sm:text-3xl font-extrabold text-primary mt-1 block">{{ $stats['aktif'] }}</span>
         </div>
         <div class="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-xs">
             <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Diarsipkan</span>
@@ -100,7 +101,7 @@
         </div>
 
         @if($categories->count() > 0)
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" tabindex="0" role="region" aria-label="Tabel, geser untuk melihat semua kolom">
                 <table class="min-w-full divide-y divide-gray-200 text-left">
                     <thead class="bg-gray-50 text-xs font-bold text-gray-600 uppercase tracking-wider">
                         <tr>
