@@ -21,6 +21,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $rfq_contracts_id_rfq_contract
  * @property int $companies_id_seller
  * @property int $companies_id_buyer
+ * @property-read RfqContract|null $rfqContract
+ * @property-read Company $seller
+ * @property-read Company $buyer
  */
 class PurchaseOrder extends Model
 {
@@ -68,6 +71,14 @@ class PurchaseOrder extends Model
         return $this->belongsTo(Company::class, 'companies_id_buyer', 'id_company');
     }
 
+    /**
+     * @return BelongsTo<RfqContract, $this>
+     */
+    public function rfqContract(): BelongsTo
+    {
+        return $this->belongsTo(RfqContract::class, 'rfq_contracts_id_rfq_contract', 'id_rfq_contract');
+    }
+
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class, 'purchase_orders_id_purchase_order', 'id_purchase_order');
@@ -76,6 +87,11 @@ class PurchaseOrder extends Model
     public function inspections(): HasMany
     {
         return $this->hasMany(Inspection::class, 'purchase_orders_id_purchase_order', 'id_purchase_order');
+    }
+
+    public function documentVerifications(): HasMany
+    {
+        return $this->hasMany(DocumentVerification::class, 'purchase_orders_id_purchase_order', 'id_purchase_order');
     }
 
     public function disputes(): HasMany

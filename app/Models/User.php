@@ -79,6 +79,11 @@ class User extends Authenticatable
         return $this->hasMany(Inspection::class, 'users_id_user', 'id_user');
     }
 
+    public function documentVerifications(): HasMany
+    {
+        return $this->hasMany(DocumentVerification::class, 'users_id_user', 'id_user');
+    }
+
     public function activeRole(): string
     {
         $baseRole = strtoupper($this->role ?? 'BUYER');
