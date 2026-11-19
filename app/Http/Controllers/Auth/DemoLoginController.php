@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Auth;
 /**
  * Masuk 1-klik ke akun demo hasil seeder.
  *
- * Rute ini HANYA didaftarkan saat APP_ENV=local (lihat routes/auth.php),
- * sehingga tidak pernah tersedia di server staging maupun produksi.
+ * Hanya berjalan bila config('app.demo_login') aktif: default saat APP_ENV=local,
+ * atau DEMO_LOGIN=true di .env (misalnya di staging untuk demo). Selain itu 404.
  */
 class DemoLoginController extends Controller
 {
@@ -30,7 +30,7 @@ class DemoLoginController extends Controller
 
     public function __invoke(Request $request, string $role): RedirectResponse
     {
-        abort_unless(app()->environment('local'), 404);
+        abort_unless(config('app.demo_login'), 404);
 
         $email = self::ACCOUNTS[strtolower($role)] ?? null;
         abort_if($email === null, 404);
