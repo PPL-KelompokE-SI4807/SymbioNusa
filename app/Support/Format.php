@@ -56,4 +56,18 @@ final class Format
 
         return $date->format('j').' '.$months[(int) $date->format('n') - 1].' '.$date->format('Y');
     }
+
+    /**
+     * Tanggal dan waktu Indonesia ringkas, mis. "27 Okt 2026 14:30 WIB".
+     */
+    public static function datetime(\DateTimeInterface|string|null $value): string
+    {
+        if ($value === null || $value === '') {
+            return '–';
+        }
+
+        $date = $value instanceof \DateTimeInterface ? $value : new \DateTimeImmutable($value);
+
+        return self::date($date).' '.$date->format('H:i').' WIB';
+    }
 }

@@ -20,6 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $status
  * @property int $companies_id_company
  * @property int $categories_id_categories
+ * @property-read Company|null $company
+ * @property-read Category|null $category
  */
 class Listing extends Model
 {
@@ -57,11 +59,17 @@ class Listing extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<Company, $this>
+     */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'companies_id_company', 'id_company');
     }
 
+    /**
+     * @return BelongsTo<Category, $this>
+     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'categories_id_categories', 'id_categories');
