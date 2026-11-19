@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="py-12 text-center">
-        <h2 class="text-2xl font-bold text-gray-900">Dashboard Pengguna</h2>
-        <p class="mt-2 text-gray-600">Halo, {{ $user->nama ?? 'Pengguna' }}. Peran Anda: {{ $user->role ?? '-' }}</p>
-    </div>
+    <x-ui.page-header :title="$user->nama ?? 'Pengguna'" subtitle="Dashboard · peran Anda belum punya ringkasan khusus" />
+
+    <x-ui.card>
+        <p class="text-body-md text-on-surface-muted">Peran: {{ $user->role ?? '–' }}. Gunakan menu di samping untuk membuka halaman yang tersedia.</p>
+    </x-ui.card>
 @endsection

@@ -32,8 +32,8 @@ class LoginTest extends TestCase
         $response = $this->get('/login');
 
         $response->assertOk();
-        $response->assertSee('Masuk ke Platform');
-        $response->assertDontSee('Akses cepat akun demo');
+        $response->assertSee('Gunakan email dan kata sandi akun perusahaan Anda.');
+        $response->assertDontSee('Akun demo');
         $response->assertDontSee('/login/demo/', false);
     }
 

@@ -3,59 +3,107 @@
 @source '../../storage/framework/views/*.php';
 
 /*
- * Token desain SymbioNusa. Nilai disalin persis dari docs/design/DESIGN.md.
+ * Token desain SymbioNusa. Nilai disalin persis dari docs/design/DESIGN.md (amandemen 19 Nov 2026, FND v8).
  * Pakai kelas token (bg-primary, text-on-surface-muted, rounded-md, text-headline-lg),
  * bukan hex mentah atau palet bawaan (emerald-*, slate-*).
  */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
 
   --color-primary: #15803d;
   --color-primary-hover: #166534;
   --color-on-primary: #ffffff;
   --color-primary-container: #dcfce7;
-  --color-on-primary-container: #166534;
+  --color-on-primary-container: #14532d;
   --color-secondary: #14532d;
-  --color-secondary-hover: #166534;
+  --color-secondary-hover: #1b5e37;
   --color-on-secondary: #ffffff;
-  --color-on-secondary-muted: #bbf7d0;
+  --color-on-secondary-muted: #cfeedd;
+  --color-secondary-label: #a7e0b8;
   --color-tertiary: #1e40af;
   --color-on-tertiary: #ffffff;
-  --color-neutral: #71717a;
-  --color-background: #f4f4f5;
+  --color-neutral: #5f6d64;
+  --color-background: #eef3ec;
   --color-surface: #ffffff;
-  --color-on-surface: #18181b;
-  --color-on-surface-muted: #52525b;
-  --color-outline: #e4e4e7;
-  --color-outline-input: #71717a;
+  --color-surface-muted: #eef3ec;
+  --color-on-surface: #16241b;
+  --color-on-surface-muted: #4b5a50;
+  --color-on-surface-subtle: #5f6d64;
+  --color-outline: #e2e8df;
+  --color-outline-control: #c9d3c6;
+  --color-outline-input: #7a8a7f;
   --color-focus-ring: #15803d;
   --color-error: #b91c1c;
-  --color-error-container: #fee2e2;
-  --color-on-error-container: #991b1b;
+  --color-error-container: #fef2f2;
+  --color-error-line: #fecaca;
+  --color-on-error-container: #7f1d1d;
   --color-warning: #b45309;
-  --color-warning-container: #fef3c7;
-  --color-on-warning-container: #92400e;
-  --color-success-container: #dcfce7;
-  --color-on-success-container: #166534;
+  --color-warning-container: #fff7e6;
+  --color-warning-line: #fde3a7;
+  --color-on-warning-container: #78350f;
+  --color-success: #15803d;
+  --color-success-container: #f0fdf4;
+  --color-success-line: #bbf7d0;
+  --color-on-success-container: #14532d;
+  --color-info: #1e40af;
   --color-info-container: #dbeafe;
+  --color-info-line: #bfdbfe;
   --color-on-info-container: #1e40af;
   --color-neutral-container: #e4e4e7;
   --color-on-neutral-container: #3f3f46;
 
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --color-tile-sun-from: #f59e0b;
+  --color-tile-sun-to: #fbbf24;
+  --color-on-tile-sun: #3d2600;
+  --color-tile-green-from: #166534;
+  --color-tile-green-to: #15803d;
+  --color-tile-sky-from: #075985;
+  --color-tile-sky-to: #0369a1;
+  --color-tile-forest-from: #0f3f22;
+  --color-tile-forest-to: #14532d;
+  --color-on-tile: #ffffff;
+  --color-on-tile-muted: #cfeedd;
+  --color-stage-stuck: #fbbf24;
+  --color-chart-lead: #15803d;
+  --color-chart-2: #3f3f46;
+  --color-chart-3: #52525b;
+  --color-chart-4: #71717a;
+  --color-chart-5: #8a8a93;
 
-  --text-headline-lg: 26px;
+  /* Monogram perusahaan: latar rona tipis + tinta gelap (kontras ≥ 4.5:1). */
+  --color-mono-green: #dbeee1;
+  --color-on-mono-green: #166534;
+  --color-mono-clay: #f6e2d9;
+  --color-on-mono-clay: #9a3412;
+  --color-mono-sky: #dbe9f2;
+  --color-on-mono-sky: #075985;
+  --color-mono-sun: #fdf0d0;
+  --color-on-mono-sun: #92400e;
+  --color-mono-zinc: #e4e7e4;
+  --color-on-mono-zinc: #3f3f46;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --shadow-card: 0 8px 24px -8px rgb(16 24 40 / 0.10), 0 1px 2px rgb(16 24 40 / 0.05);
+  --shadow-overlay: 0 16px 40px -12px rgb(16 24 40 / 0.22), 0 2px 6px rgb(16 24 40 / 0.08);
+
+  --text-hero: 40px;
+  --text-hero--line-height: 1.15;
+  --text-hero--font-weight: 600;
+  --text-hero-sm: 22px;
+  --text-hero-sm--line-height: 1.25;
+  --text-hero-sm--font-weight: 600;
+  --text-headline-lg: 28px;
   --text-headline-lg--line-height: 1.2;
-  --text-headline-lg--letter-spacing: -0.01em;
   --text-headline-lg--font-weight: 600;
   --text-headline-md: 18px;
   --text-headline-md--line-height: 1.3;
   --text-headline-md--font-weight: 600;
-  --text-display-metric: 28px;
+  --text-display-metric: 32px;
   --text-display-metric--line-height: 1.1;
-  --text-display-metric--font-weight: 700;
+  --text-display-metric--font-weight: 600;
   --text-body-lg: 16px;
   --text-body-lg--line-height: 1.5;
   --text-body-md: 14px;
@@ -68,12 +116,20 @@
   --text-label-sm: 12px;
   --text-label-sm--line-height: 1.3;
   --text-label-sm--font-weight: 500;
-  --text-label-caps: 12px;
+  /* label-caps dipertahankan untuk kompatibilitas; sejak FND v8 label grup ditulis huruf kalimat tanpa tracking. */
+  --text-label-caps: 13px;
   --text-label-caps--line-height: 1.2;
-  --text-label-caps--letter-spacing: 0.06em;
-  --text-label-caps--font-weight: 600;
+  --text-label-caps--font-weight: 500;
+  --text-label-group: 13px;
+  --text-label-group--line-height: 1.2;
+  --text-label-group--font-weight: 500;
   --text-data-tabular: 14px;
   --text-data-tabular--line-height: 1.4;
+}
+
+::selection {
+  background: #bbf7d0;
+  color: #14532d;
 }
 
 [x-cloak] {

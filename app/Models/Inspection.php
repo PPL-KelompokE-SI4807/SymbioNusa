@@ -5,7 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * Tabel inspections (DDL).
+ *
+ * @property int $id_inspection
+ * @property string $mode_verifikasi DESK | LAPANGAN
+ * @property string|null $alasan_mode
+ * @property Carbon|null $jadwal
+ * @property string $status DITUGASKAN | DIPROSES | SELESAI | DIBATALKAN
+ * @property int $purchase_orders_id_purchase_order
+ * @property int $users_id_user
+ * @property-read PurchaseOrder|null $purchaseOrder
+ * @property-read User|null $inspector
+ */
 class Inspection extends Model
 {
     use HasFactory;
