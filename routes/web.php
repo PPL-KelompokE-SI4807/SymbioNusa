@@ -118,7 +118,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [DemandRequestController::class, 'sellerIndex'])->name('index');
         Route::get('/{demand}', [DemandRequestController::class, 'sellerShow'])->name('show');
     });
-    });
 });
 
 require __DIR__.'/auth.php';
