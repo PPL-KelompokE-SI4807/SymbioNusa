@@ -47,11 +47,11 @@
         <x-ui.button type="submit" size="xl" class="w-full">Masuk</x-ui.button>
     </form>
 
-    @if (Route::has('login.demo'))
+    @if (config('app.demo_login'))
         <section class="mt-8" aria-labelledby="demo-login-title">
             <div class="flex items-center gap-3">
                 <span class="h-px flex-1 bg-outline" aria-hidden="true"></span>
-                <h2 id="demo-login-title" class="text-body-sm text-on-surface-subtle">Akun demo · hanya lokal</h2>
+                <h2 id="demo-login-title" class="text-body-sm text-on-surface-subtle">Akun demo · masuk tanpa sandi</h2>
                 <span class="h-px flex-1 bg-outline" aria-hidden="true"></span>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-2.5">

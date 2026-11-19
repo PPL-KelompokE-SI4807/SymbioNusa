@@ -11,12 +11,12 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
 
-    // Masuk 1-klik ke akun demo: hanya untuk pengembangan lokal.
-    if (app()->environment('local')) {
-        Route::post('/login/demo/{role}', DemoLoginController::class)
-            ->whereIn('role', array_keys(DemoLoginController::ACCOUNTS))
-            ->name('login.demo');
-    }
+    // Masuk 1-klik ke akun demo. Selalu didaftarkan agar route:cache tidak
+    // bergantung pada .env; controller menolak (404) bila config('app.demo_login') mati.
+    Route::post('/login/demo/{role}', DemoLoginController::class)
+        ->whereIn('role', array_keys(DemoLoginController::ACCOUNTS))
+        ->middleware('throttle:10,1')
+        ->name('login.demo');
 
     // FND-03 (SYM-3): Reset Password
     Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
