@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\DemandRequest;
 use App\Models\PurchaseOrder;
 use App\Models\RfqContract;
+use App\Policies\DemandPolicy;
 use App\Policies\PoPolicy;
 use App\Policies\RfqPolicy;
 use Illuminate\Support\Facades\Gate;
@@ -26,5 +28,6 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(RfqContract::class, RfqPolicy::class);
         Gate::policy(PurchaseOrder::class, PoPolicy::class);
+        Gate::policy(DemandRequest::class, DemandPolicy::class);
     }
 }

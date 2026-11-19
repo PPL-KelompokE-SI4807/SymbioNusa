@@ -52,10 +52,20 @@ final class StatusMap
             'TERPENUHI' => ['Terpenuhi', 'success'],
             'KEDALUWARSA' => ['Kedaluwarsa', 'neutral'],
         ],
+        'demand_requests.frekuensi' => [
+            'SEKALI' => ['Sekali', 'neutral'],
+            'MINGGUAN' => ['Mingguan', 'info'],
+            'BULANAN' => ['Bulanan', 'info'],
+        ],
         'invoices.status' => [
             'TERBIT' => ['Menunggu Pembayaran', 'warning'],
             'DIBAYAR' => ['Dibayar', 'success'],
             'VOID' => ['Void', 'neutral'],
+        ],
+        'payments.status_verifikasi' => [
+            'MENUNGGU' => ['Menunggu Verifikasi', 'warning'],
+            'VALID' => ['Terverifikasi', 'success'],
+            'DITOLAK' => ['Ditolak', 'danger'],
         ],
         'disputes.status' => [
             'DIBUKA' => ['Dibuka', 'danger'],
@@ -87,16 +97,22 @@ final class StatusMap
             'RENDAH' => ['Risiko Rendah', 'neutral'],
             'TINGGI' => ['Risiko Tinggi', 'warning'],
         ],
+        // Status turunan (bukan ENUM DDL), lihat App\Enums\InspectorStatus.
+        'inspector_profiles.status' => [
+            'AKTIF' => ['Aktif', 'success'],
+            'SEGERA_BERAKHIR' => ['Segera Berakhir', 'warning'],
+            'NONAKTIF' => ['Nonaktif', 'neutral'],
+        ],
     ];
 
-    public static function label(string $field, \BackedEnum|string|null $value): string
+    public static function label(string $field, string|\BackedEnum|null $value): string
     {
         $val = $value instanceof \BackedEnum ? (string) $value->value : $value;
 
         return self::MAP[$field][$val ?? ''][0] ?? ($val ?? '–');
     }
 
-    public static function badge(string $field, \BackedEnum|string|null $value): string
+    public static function badge(string $field, string|\BackedEnum|null $value): string
     {
         $val = $value instanceof \BackedEnum ? (string) $value->value : $value;
 

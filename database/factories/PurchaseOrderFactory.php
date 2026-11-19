@@ -65,4 +65,18 @@ class PurchaseOrderFactory extends Factory
             'status' => OrderStatus::DIBATALKAN,
         ]);
     }
+
+    public function invoiced(): static
+    {
+        return $this->state(fn () => [
+            'status' => OrderStatus::INVOICED,
+        ]);
+    }
+
+    public function dibayar(): static
+    {
+        return $this->state(fn () => [
+            'status' => OrderStatus::DIBAYAR,
+        ]);
+    }
 }

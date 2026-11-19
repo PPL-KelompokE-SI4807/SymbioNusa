@@ -6,6 +6,7 @@ use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -66,6 +67,9 @@ class User extends Authenticatable
         $this->notify(new ResetPasswordNotification($token));
     }
 
+    /**
+     * @return BelongsTo<Company, $this>
+     */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'id_company', 'id_company');
@@ -74,5 +78,33 @@ class User extends Authenticatable
     public function inspections(): HasMany
     {
         return $this->hasMany(Inspection::class, 'users_id_user', 'id_user');
+    }
+
+    public function activeRole(): string
+    {
+        $baseRole = strtoupper($this->role ?? 'BUYER');
+
+        if (
+            in_array($baseRole, ['SELLER', 'BUYER'], true)
+            && $this->company?->tipe === Company::TYPE_BOTH
+            && session()->has('active_role')
+        ) {
+            $sessionRole = strtoupper((string) session('active_role'));
+            if (in_array($sessionRole, ['SELLER', 'BUYER'], true)) {
+                return $sessionRole;
+            }
+        }
+
+        return $baseRole;
+    }
+
+    /**
+     * Profil kompetensi bila user ber-role INSPECTOR (PBI-01 / SYM-5).
+     *
+     * @return HasOne<InspectorProfile, $this>
+     */
+    public function inspectorProfile(): HasOne
+    {
+        return $this->hasOne(InspectorProfile::class, 'id_user', 'id_user');
     }
 }

@@ -7,7 +7,11 @@
 --}}
 @php
     $user = auth()->user();
-    $role = strtoupper($user->role ?? '');
+    // PBI-08 (SYM-12): perusahaan KEDUANYA bisa berganti peran aktif Seller/Buyer.
+    $role = $user ? $user->activeRole() : '';
+    $nextRole = $user?->company?->tipe === \App\Models\Company::TYPE_BOTH
+        ? ($role === 'SELLER' ? 'BUYER' : 'SELLER')
+        : null;
 
     $menus = [
         'ADMIN' => [
@@ -15,12 +19,12 @@
                 ['label' => 'Dashboard', 'route' => 'dashboard'],
             ],
             'MASTER DATA' => [
-                ['label' => 'Registri Inspector', 'route' => null],
+                ['label' => 'Registri Inspector', 'route' => 'admin.inspectors.index', 'active' => 'admin.inspectors.*'],
                 ['label' => 'Kategori Material', 'route' => 'admin.categories.index', 'active' => 'admin.categories.*'],
                 ['label' => 'Parameter Dampak', 'route' => null],
             ],
             'VERIFIKASI & TRANSAKSI' => [
-                ['label' => 'Verifikasi Mitra', 'route' => null],
+                ['label' => 'Verifikasi Mitra', 'route' => 'admin.companies.index', 'active' => 'admin.companies.*'],
                 ['label' => 'Moderasi Listing', 'route' => null],
                 ['label' => 'Penugasan Inspeksi', 'route' => null],
                 ['label' => 'Sengketa & Klaim', 'route' => null],
@@ -37,17 +41,17 @@
             'KATALOG' => [
                 ['label' => 'Listing Saya', 'route' => null],
                 ['label' => 'Jadwal Pasokan', 'route' => null],
-                ['label' => 'Papan Kebutuhan', 'route' => null],
+                ['label' => 'Papan Kebutuhan', 'route' => 'seller.demands.index', 'active' => 'seller.demands.*'],
             ],
             'TRANSAKSI' => [
                 ['label' => 'RFQ Masuk', 'route' => 'rfq.index', 'active' => 'rfq.*'],
                 ['label' => 'Purchase Order', 'route' => 'po.index', 'active' => 'po.*'],
-                ['label' => 'Invoice', 'route' => null],
+                ['label' => 'Invoice', 'route' => 'seller.invoices.index', 'active' => 'seller.*'],
                 ['label' => 'Pengiriman', 'route' => null],
                 ['label' => 'Sengketa', 'route' => null],
             ],
             'AKUN' => [
-                ['label' => 'Profil Perusahaan', 'route' => null],
+                ['label' => 'Profil Perusahaan', 'route' => 'companies.edit', 'active' => 'companies.*'],
                 ['label' => 'Ulasan', 'route' => null],
             ],
         ],
@@ -57,18 +61,18 @@
             ],
             'PASAR' => [
                 ['label' => 'Katalog Material', 'route' => null],
-                ['label' => 'Papan Kebutuhan', 'route' => null],
+                ['label' => 'Kebutuhan Saya', 'route' => 'buyer.demands.index', 'active' => 'buyer.demands.*'],
                 ['label' => 'Daftar Pantau', 'route' => null],
             ],
             'TRANSAKSI' => [
                 ['label' => 'RFQ & Negosiasi', 'route' => 'rfq.index', 'active' => 'rfq.*'],
                 ['label' => 'Purchase Order', 'route' => 'po.index', 'active' => 'po.*'],
-                ['label' => 'Invoice & Pembayaran', 'route' => null],
+                ['label' => 'Invoice & Pembayaran', 'route' => 'buyer.invoices.index', 'active' => 'buyer.*'],
                 ['label' => 'Penerimaan Barang', 'route' => null],
                 ['label' => 'Sengketa', 'route' => null],
             ],
             'AKUN' => [
-                ['label' => 'Profil Perusahaan', 'route' => null],
+                ['label' => 'Profil Perusahaan', 'route' => 'companies.edit', 'active' => 'companies.*'],
                 ['label' => 'Ulasan', 'route' => null],
             ],
         ],
@@ -82,7 +86,7 @@
                 ['label' => 'Laporan Mutu', 'route' => null],
             ],
             'AKUN' => [
-                ['label' => 'Profil Kompetensi', 'route' => null],
+                ['label' => 'Profil Kompetensi', 'route' => 'inspector.profile', 'active' => 'inspector.profile*'],
             ],
         ],
     ];
@@ -149,6 +153,16 @@
         <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-container text-label-sm text-on-primary-container" aria-hidden="true">{{ $initials }}</span>
         <div class="min-w-0 flex-1">
             <p class="truncate text-label-md">{{ $user->nama }}</p>
+            @if ($nextRole)
+                <form method="POST" action="{{ route('companies.switch-role') }}">
+                    @csrf
+                    <input type="hidden" name="role" value="{{ $nextRole }}">
+                    <button type="submit"
+                            class="text-label-sm text-on-secondary-muted underline-offset-2 hover:text-on-secondary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                        Beralih ke mode {{ ucfirst(strtolower($nextRole)) }}
+                    </button>
+                </form>
+            @endif
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
