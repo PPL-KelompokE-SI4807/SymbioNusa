@@ -1,59 +1,73 @@
-{{-- FND-04 Dashboard Buyer. --}}
+{{--
+    Dasbor Buyer (FND-04, DESIGN.md amandemen FND v8): 4 tile bermakna → Perlu tindakan + Order pembelian (kiri)
+    dan Kebutuhan saya + Pengiriman berjalan (kanan).
+--}}
 @use('App\Support\Format')
-@use('App\Support\StatusMap')
+@use('App\Support\MaterialPhoto')
 
 <div class="space-y-6">
-    <section aria-label="Ringkasan Buyer" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        @foreach ($kpis as $kpi)
-            <x-ui.kpi :label="$kpi['label']" :value="$kpi['value']" :exact="$kpi['exact'] ?? null" :caption="$kpi['caption'] ?? null" />
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        @foreach ($tiles as $tile)
+            <x-ui.kpi :label="$tile['label']" :value="$tile['value']" :unit="$tile['unit']" :caption="$tile['caption']"
+                      :exact="$tile['exact'] ?? null" :tone="$tile['tone']" />
         @endforeach
-    </section>
+    </div>
 
-    <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <x-ui.card title="Order pembelian terbaru" :padding="false">
-            @if ($orders->isEmpty())
-                <p class="px-6 pb-6 text-body-md text-on-surface-muted">Belum ada order. Ajukan RFQ ke Seller, lalu buat PO setelah harga disepakati.</p>
-            @else
-                <x-ui.table label="Order pembelian terbaru">
-                    <x-slot:head>
-                        <th scope="col" class="px-6">PO</th>
-                        <th scope="col" class="px-4">Seller</th>
-                        <th scope="col" class="px-4 text-right">Total</th>
-                        <th scope="col" class="hidden px-6 sm:table-cell">Status</th>
-                    </x-slot:head>
-                    @foreach ($orders as $order)
-                        <tr class="border-t border-outline">
-                            <td class="whitespace-nowrap px-6 py-3 text-label-md">PO-{{ $order->id_purchase_order }}<span class="mt-1 block sm:hidden"><x-ui.badge :variant="StatusMap::badge('purchase_orders.status', $order->status)">{{ StatusMap::label('purchase_orders.status', $order->status) }}</x-ui.badge></span></td>
-                            <td class="px-4 py-3">{{ $order->seller->nama ?? '–' }}</td>
-                            <td class="whitespace-nowrap px-4 py-3 text-right tabular-nums">{{ Format::rupiah($order->volume_kg * $order->harga_per_kg) }}</td>
-                            <td class="hidden px-6 py-3 sm:table-cell"><x-ui.badge :variant="StatusMap::badge('purchase_orders.status', $order->status)">{{ StatusMap::label('purchase_orders.status', $order->status) }}</x-ui.badge></td>
-                        </tr>
-                    @endforeach
-                </x-ui.table>
-            @endif
-        </x-ui.card>
+    <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+        <div class="min-w-0 space-y-6">
+            <x-dash.todo-list title="Perlu tindakan" :items="$todo" />
+            <x-dash.order-table title="Order pembelian" :orders="$orders" party="seller" empty="Belum ada order pembelian." />
+        </div>
 
-        <x-ui.card title="Kebutuhan saya" :padding="false">
-            @if ($demands->isEmpty())
-                <p class="px-6 pb-6 text-body-md text-on-surface-muted">Belum ada kebutuhan. Publikasikan kebutuhan agar Seller bisa menawarkan materialnya.</p>
-            @else
-                <x-ui.table label="Kebutuhan saya">
-                    <x-slot:head>
-                        <th scope="col" class="px-6">Kategori</th>
-                        <th scope="col" class="px-4 text-right">Volume</th>
-                        <th scope="col" class="hidden px-4 sm:table-cell">Berlaku sampai</th>
-                        <th scope="col" class="hidden px-6 sm:table-cell">Status</th>
-                    </x-slot:head>
-                    @foreach ($demands as $demand)
-                        <tr class="border-t border-outline">
-                            <td class="px-6 py-3 text-label-md">{{ $demand->category->nama ?? '–' }}<span class="mt-1 block sm:hidden"><x-ui.badge :variant="StatusMap::badge('demand_requests.status', $demand->status)">{{ StatusMap::label('demand_requests.status', $demand->status) }}</x-ui.badge></span></td>
-                            <td class="whitespace-nowrap px-4 py-3 text-right tabular-nums">{{ Format::kg($demand->volume_kg) }}</td>
-                            <td class="hidden whitespace-nowrap px-4 py-3 sm:table-cell">{{ Format::date($demand->berlaku_sampai) }}</td>
-                            <td class="hidden px-6 py-3 sm:table-cell"><x-ui.badge :variant="StatusMap::badge('demand_requests.status', $demand->status)">{{ StatusMap::label('demand_requests.status', $demand->status) }}</x-ui.badge></td>
-                        </tr>
-                    @endforeach
-                </x-ui.table>
-            @endif
-        </x-ui.card>
+        <div class="space-y-6">
+            <x-ui.card title="Kebutuhan saya">
+                @if ($demand)
+                    @php($photo = MaterialPhoto::forCategory($demand->category->nama ?? null))
+                    @if ($photo)
+                        <img src="{{ $photo }}" alt="" class="h-36 w-full rounded-md object-cover">
+                    @endif
+                    <div class="mt-4 flex items-start justify-between gap-3">
+                        <p class="min-w-0 text-body-lg font-semibold">{{ $demand->category->nama ?? 'Kebutuhan' }}</p>
+                        <x-ui.badge :variant="\App\Support\StatusMap::badge('demand_requests.status', $demand->status)">
+                            {{ \App\Support\StatusMap::label('demand_requests.status', $demand->status) }}
+                        </x-ui.badge>
+                    </div>
+                    <dl class="mt-4 grid grid-cols-2 gap-2.5">
+                        <div class="rounded-md bg-surface-muted px-3.5 py-3">
+                            <dt class="text-body-sm text-on-surface-subtle">Volume</dt>
+                            <dd class="text-label-md font-semibold tabular-nums">{{ Format::kg($demand->volume_kg) }}</dd>
+                        </div>
+                        <div class="rounded-md bg-surface-muted px-3.5 py-3">
+                            <dt class="text-body-sm text-on-surface-subtle">Berlaku sampai</dt>
+                            <dd class="text-label-md font-semibold">{{ Format::date($demand->berlaku_sampai) }}</dd>
+                        </div>
+                    </dl>
+                    @if (Route::has('buyer.demands.index'))
+                        <x-ui.button variant="secondary" :href="route('buyer.demands.index')" class="mt-4 w-full">Semua kebutuhan</x-ui.button>
+                    @endif
+                @else
+                    <p class="text-body-md text-on-surface-muted">Belum ada kebutuhan terbuka. Ajukan kebutuhan agar Seller bisa menawarkan materialnya.</p>
+                @endif
+            </x-ui.card>
+
+            <x-ui.card title="Pengiriman berjalan" :padding="false">
+                @if ($shipments->isEmpty())
+                    <p class="px-6 pb-6 text-body-md text-on-surface-muted">Tidak ada order yang sedang dikirim.</p>
+                @else
+                    <ul class="px-3 pb-3">
+                        @foreach ($shipments as $order)
+                            <li class="flex items-center gap-3 rounded-md p-2.5">
+                                <x-ui.monogram :name="$order->seller->nama ?? 'PO'" />
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-label-md font-semibold">PO-{{ $order->id_purchase_order }}</p>
+                                    <p class="text-body-sm text-on-surface-subtle">{{ $order->seller->nama ?? '–' }} · {{ Format::kg($order->volume_kg) }}</p>
+                                </div>
+                                <x-ui.badge variant="info">Dalam Pengiriman</x-ui.badge>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </x-ui.card>
+        </div>
     </div>
 </div>

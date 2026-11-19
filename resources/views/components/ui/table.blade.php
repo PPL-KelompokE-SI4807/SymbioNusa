@@ -1,12 +1,8 @@
 {{--
-    Tabel data (DESIGN.md › Data table): header 12 px redup, baris minimal 52 px dengan garis tipis,
-    angka rata kanan (beri kelas text-right tabular-nums pada sel angka), bisa digeser di layar sempit.
+    Tabel data (DESIGN.md › Data table, amandemen FND v8): header 13 px redup, baris minimal 56 px dengan garis tipis,
+    angka rata kanan (beri kelas text-right tabular-nums pada sel angka), kolom status memakai x-ui.badge,
+    bisa digeser di layar sempit.
     label: nama wilayah tabel untuk pembaca layar.
-    Contoh:
-    <x-ui.table label="Order terbaru">
-        <x-slot:head><th class="px-4">PO</th><th class="px-4 text-right">Total</th></x-slot:head>
-        <tr class="border-t border-outline"><td class="px-4 py-3">PO-21</td><td class="px-4 py-3 text-right tabular-nums">Rp 3.000.000</td></tr>
-    </x-ui.table>
 --}}
 @props(['label'])
 
@@ -14,7 +10,7 @@
      tabindex="0" role="region" aria-label="{{ $label }}">
     <table class="w-full text-left text-data-tabular">
         <thead>
-            <tr class="h-11 text-label-sm text-on-surface-muted [&>th]:font-medium [&>th]:whitespace-nowrap">
+            <tr class="h-10 text-body-sm text-on-surface-subtle [&>th]:font-medium [&>th]:whitespace-nowrap">
                 {{ $head }}
             </tr>
         </thead>
