@@ -6,6 +6,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanyDocumentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemandRequestController;
+use App\Http\Controllers\DocumentVerificationController;
 use App\Http\Controllers\InspectorProfileController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RfqController;
@@ -105,6 +106,13 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('seller/papan-kebutuhan')->name('seller.demands.')->group(function () {
         Route::get('/', [DemandRequestController::class, 'sellerIndex'])->name('index');
         Route::get('/{demand}', [DemandRequestController::class, 'sellerShow'])->name('show');
+    });
+
+    // PBI-17 (SYM-21): Verifikasi Dokumen Legalitas Non-B3 (Inspector)
+    Route::prefix('inspector/verifikasi-dokumen')->name('inspector.verifications.')->group(function () {
+        Route::get('/', [DocumentVerificationController::class, 'index'])->name('index');
+        Route::get('/{verification}', [DocumentVerificationController::class, 'show'])->name('show');
+        Route::post('/{verification}', [DocumentVerificationController::class, 'verify'])->name('verify');
     });
 });
 

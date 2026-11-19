@@ -82,7 +82,7 @@
             ],
             'INSPEKSI' => [
                 ['label' => 'Tugas Inspeksi', 'route' => null],
-                ['label' => 'Verifikasi Dokumen', 'route' => null],
+                ['label' => 'Verifikasi Dokumen', 'route' => 'inspector.verifications.index', 'active' => 'inspector.verifications.*'],
                 ['label' => 'Laporan Mutu', 'route' => null],
             ],
             'AKUN' => [
