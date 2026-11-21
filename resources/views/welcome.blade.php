@@ -155,7 +155,9 @@
                     @endforeach
                 </div>
 
-                <div class="mt-4 overflow-x-auto">
+                {{-- Wadah scroll bisa difokus agar tabel lebar tetap bisa digeser dengan keyboard (WCAG 2.1.1). --}}
+                <div class="mt-4 overflow-x-auto rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+                     tabindex="0" role="region" aria-label="Tabel papan material, geser ke samping untuk kolom lain">
                     <table class="w-full min-w-[640px] border-collapse text-left">
                         <thead>
                             <tr class="border-b border-outline text-body-sm text-on-surface-subtle">
@@ -269,9 +271,10 @@
                 </ol>
             </div>
 
-            <div id="peran" class="mt-16 scroll-mt-8 overflow-x-auto rounded-lg bg-surface shadow-card">
+            <div id="peran" class="mt-16 scroll-mt-8 overflow-x-auto rounded-lg bg-surface shadow-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+                 tabindex="0" role="region" aria-labelledby="peran-judul">
                 <table class="w-full min-w-[640px] border-collapse text-left">
-                    <caption class="px-6 pt-6 pb-2 text-left text-headline-md">Empat peran, satu rantai</caption>
+                    <caption id="peran-judul" class="px-6 pt-6 pb-2 text-left text-headline-md">Empat peran, satu rantai</caption>
                     <thead>
                         <tr class="border-b border-outline text-body-sm text-on-surface-subtle">
                             <th scope="col" class="px-6 py-3 font-medium">Peran</th>
