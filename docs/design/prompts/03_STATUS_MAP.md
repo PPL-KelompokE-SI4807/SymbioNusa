@@ -14,7 +14,7 @@
 ## Aturan pakai
 
 1. Nilai database selalu dari DDL. Label boleh berbeda dari nilai (mis. `TERBIT` → "Menunggu Pembayaran"), tetapi satu nilai hanya punya satu label di seluruh aplikasi.
-2. Varian badge menentukan glyph dan warna **status indicator** di DESIGN.md (amandemen 19 Nov 2026): `warning` = cincin putus-putus #b45309, `info` = cincin setengah terisi #1e40af, `success` = lingkaran penuh bercentang #15803d, `danger` = lingkaran penuh bersilang #b91c1c, `neutral` = lingkaran penuh bergaris #5f6d64. Label selalu tampil sebagai teks di samping glyph; komponennya tetap `<x-ui.badge :variant="...">`.
+2. Varian badge menentukan glyph dan warna **status text** di DESIGN.md (FND v10, Components › Status text): `warning` = cincin putus-putus #b45309, `info` = cincin setengah terisi #1e40af, `success` = lingkaran penuh bercentang #15803d, `danger` = lingkaran penuh bersilang #b91c1c, `neutral` = lingkaran penuh bergaris #5f6d64. Label selalu tampil sebagai teks berwarna di samping glyph, tanpa latar, tanpa border, tanpa bentuk pill; komponennya tetap `<x-ui.badge :variant="...">`, hanya tampilannya yang berupa teks.
 3. Arti varian: `warning` = menunggu tindakan seseorang; `info` = sedang berjalan di proses; `success` = selesai dengan baik atau aktif; `danger` = gagal, ditolak, atau butuh perhatian; `neutral` = berakhir tanpa masalah atau tidak aktif.
 4. Di kode: setiap PHP Enum punya `label(): string` dan `badge(): string`; Blade memakai `<x-ui.badge :variant="$status->badge()">{{ $status->label() }}</x-ui.badge>`. Enum milik modul anggota lain dikerjakan oleh pemiliknya (AGENTS.md §4).
 5. Di prompt Stitch: pakai label kolom "Label UI" persis.

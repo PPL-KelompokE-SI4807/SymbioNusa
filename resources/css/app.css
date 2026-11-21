@@ -3,7 +3,7 @@
 @source '../../storage/framework/views/*.php';
 
 /*
- * Token desain SymbioNusa. Nilai disalin persis dari docs/design/DESIGN.md (amandemen 19 Nov 2026, FND v8).
+ * Token desain SymbioNusa. Nilai disalin persis dari docs/design/DESIGN.md (FND v10 Heavy-Clean, 21 Nov 2026).
  * Pakai kelas token (bg-primary, text-on-surface-muted, rounded-md, text-headline-lg),
  * bukan hex mentah atau palet bawaan (emerald-*, slate-*).
  */
@@ -52,6 +52,30 @@
   --color-neutral-container: #e4e4e7;
   --color-on-neutral-container: #3f3f46;
 
+  /* FND v10: data ink. */
+  --color-band-forest-from: #0f3f22;
+  --color-band-forest-to: #14532d;
+  --color-on-band: #ffffff;
+  --color-on-band-muted: #cfeedd;
+  --color-insight-marker: #b45309;
+  --color-age-bar-track: #e2e8df;
+  --color-age-bar-fresh: #86c79b;
+  --color-age-bar-aging: #fbbf24;
+  --color-age-bar-stale: #b91c1c;
+  --color-chart-lead: #15803d;
+  --color-category-plastik: #1e40af;
+  --color-category-tekstil: #b45309;
+  --color-category-kayu: #92400e;
+  --color-category-kertas: #3f3f46;
+  --color-category-pangan: #65a30d;
+  --color-photo-label: #14532d;
+  --color-on-photo-label: #ffffff;
+
+  /*
+   * LEGACY (FND v8) — dihapus oleh FND v10. Masih dipakai kpi.blade.php dan
+   * livewire/dashboard/admin.blade.php; hapus blok ini saat keduanya dibangun ulang
+   * ke summary strip dan alur order v10. Jangan dipakai di kode baru.
+   */
   --color-tile-sun-from: #f59e0b;
   --color-tile-sun-to: #fbbf24;
   --color-on-tile-sun: #3d2600;
@@ -64,7 +88,6 @@
   --color-on-tile: #ffffff;
   --color-on-tile-muted: #cfeedd;
   --color-stage-stuck: #fbbf24;
-  --color-chart-lead: #15803d;
   --color-chart-2: #3f3f46;
   --color-chart-3: #52525b;
   --color-chart-4: #71717a;
@@ -87,6 +110,7 @@
   --radius-lg: 20px;
 
   --shadow-card: 0 8px 24px -8px rgb(16 24 40 / 0.10), 0 1px 2px rgb(16 24 40 / 0.05);
+  --shadow-raised: 0 18px 36px -18px rgb(16 24 40 / 0.16);
   --shadow-overlay: 0 16px 40px -12px rgb(16 24 40 / 0.22), 0 2px 6px rgb(16 24 40 / 0.08);
 
   --text-hero: 40px;
@@ -103,7 +127,16 @@
   --text-headline-md--font-weight: 600;
   --text-display-metric: 32px;
   --text-display-metric--line-height: 1.1;
-  --text-display-metric--font-weight: 600;
+  --text-display-metric--font-weight: 700;
+  --text-metric: 28px;
+  --text-metric--line-height: 1.1;
+  --text-metric--font-weight: 700;
+  --text-display-band: 40px;
+  --text-display-band--line-height: 1.1;
+  --text-display-band--font-weight: 700;
+  --text-list-title: 15px;
+  --text-list-title--line-height: 1.3;
+  --text-list-title--font-weight: 600;
   --text-body-lg: 16px;
   --text-body-lg--line-height: 1.5;
   --text-body-md: 14px;
@@ -125,6 +158,23 @@
   --text-label-group--font-weight: 500;
   --text-data-tabular: 14px;
   --text-data-tabular--line-height: 1.4;
+
+  /* Hover saja (warna, latar, bayangan). Gerak tata letak memakai solver spring, bukan easing CSS. */
+  --ease-hover: cubic-bezier(.22, 1, .36, 1);
+}
+
+/* FND v10: palet terang dikunci di semua perangkat. Jangan menambah override prefers-color-scheme: dark. */
+:root {
+  color-scheme: light;
+}
+
+/* Scrim untuk label di atas foto material (DESIGN.md, Photos). */
+.photo-scrim {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 64%;
+  background: linear-gradient(to top, rgb(9 26 18 / 0.68) 0%, rgb(9 26 18 / 0.40) 48%, rgb(9 26 18 / 0) 100%);
+  pointer-events: none;
 }
 
 ::selection {

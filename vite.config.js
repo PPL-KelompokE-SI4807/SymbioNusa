@@ -9,9 +9,9 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
             fonts: [
-                // Font utama DESIGN.md. Diunduh saat build dan disajikan dari server sendiri.
+                // Font utama DESIGN.md. Diunduh saat build dan disajikan dari server sendiri. 700 hanya untuk angka (FND v10).
                 bunny('Figtree', {
-                    weights: [400, 500, 600],
+                    weights: [400, 500, 600, 700],
                 }),
             ],
         }),
