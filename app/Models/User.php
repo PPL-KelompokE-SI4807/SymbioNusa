@@ -18,6 +18,11 @@ use Illuminate\Notifications\Notifiable;
  * @property string|null $password_hash
  * @property string $status
  * @property int|null $id_company
+ * @property int|null $match_score
+ * @property int|null $active_workload
+ * @property bool|null $has_category_match
+ * @property bool|null $has_region_match
+ * @property-read InspectorProfile|null $inspectorProfile
  */
 class User extends Authenticatable
 {
@@ -78,6 +83,11 @@ class User extends Authenticatable
     public function inspections(): HasMany
     {
         return $this->hasMany(Inspection::class, 'users_id_user', 'id_user');
+    }
+
+    public function documentVerifications(): HasMany
+    {
+        return $this->hasMany(DocumentVerification::class, 'users_id_user', 'id_user');
     }
 
     public function activeRole(): string

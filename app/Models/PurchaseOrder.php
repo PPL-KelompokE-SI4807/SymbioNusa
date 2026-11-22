@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Collection<int, OrderStatusHistory> $statusHistory
  * @property-read Collection<int, Invoice> $invoices
  * @property-read Collection<int, Inspection> $inspections
+ * @property-read Collection<int, DocumentVerification> $documentVerifications
  * @property-read Collection<int, Dispute> $disputes
  * @property-read Collection<int, ImpactLog> $impactLogs
  */
@@ -105,9 +106,6 @@ class PurchaseOrder extends Model
             ->orderBy('id_order_status_history', 'asc');
     }
 
-    /**
-     * @return HasMany<Invoice, $this>
-     */
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class, 'purchase_orders_id_purchase_order', 'id_purchase_order');
@@ -119,6 +117,14 @@ class PurchaseOrder extends Model
     public function inspections(): HasMany
     {
         return $this->hasMany(Inspection::class, 'purchase_orders_id_purchase_order', 'id_purchase_order');
+    }
+
+    /**
+     * @return HasMany<DocumentVerification, $this>
+     */
+    public function documentVerifications(): HasMany
+    {
+        return $this->hasMany(DocumentVerification::class, 'purchase_orders_id_purchase_order', 'id_purchase_order');
     }
 
     /**

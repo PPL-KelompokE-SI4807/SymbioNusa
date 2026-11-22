@@ -89,6 +89,12 @@ final class StatusMap
             'DESK' => ['Desk', 'neutral'],
             'LAPANGAN' => ['Lapangan', 'neutral'],
         ],
+        'document_verifications.status' => [
+            'MENUNGGU' => ['Menunggu Verifikasi', 'warning'],
+            'SETUJU' => ['Disetujui', 'success'],
+            'DITOLAK' => ['Ditolak', 'danger'],
+            'DIBATALKAN' => ['Dibatalkan', 'neutral'],
+        ],
         'categories.status' => [
             'AKTIF' => ['Aktif', 'success'],
             'ARSIP' => ['Diarsipkan', 'neutral'],

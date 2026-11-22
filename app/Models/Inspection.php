@@ -17,12 +17,24 @@ use Illuminate\Support\Carbon;
  * @property string $status DITUGASKAN | DIPROSES | SELESAI | DIBATALKAN
  * @property int $purchase_orders_id_purchase_order
  * @property int $users_id_user
- * @property-read PurchaseOrder|null $purchaseOrder
- * @property-read User|null $inspector
+ * @property-read PurchaseOrder $purchaseOrder
+ * @property-read User $inspector
  */
 class Inspection extends Model
 {
     use HasFactory;
+
+    public const MODE_DESK = 'DESK';
+
+    public const MODE_LAPANGAN = 'LAPANGAN';
+
+    public const STATUS_DITUGASKAN = 'DITUGASKAN';
+
+    public const STATUS_DIPROSES = 'DIPROSES';
+
+    public const STATUS_SELESAI = 'SELESAI';
+
+    public const STATUS_DIBATALKAN = 'DIBATALKAN';
 
     protected $table = 'inspections';
 
