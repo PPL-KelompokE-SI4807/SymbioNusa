@@ -276,13 +276,13 @@
 
             <div id="peran" class="mt-16 scroll-mt-8 overflow-x-auto rounded-lg bg-surface shadow-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
                  tabindex="0" role="region" aria-labelledby="peran-judul">
-                <table class="w-full min-w-[640px] border-collapse text-left">
-                    <caption id="peran-judul" class="px-6 pt-6 pb-2 text-left text-headline-md">Empat peran, satu rantai</caption>
+                <table class="w-full border-collapse text-left sm:min-w-[640px]">
+                    <caption id="peran-judul" class="px-[18px] pt-6 pb-2 text-left text-dash-title sm:px-6">Empat peran, satu rantai</caption>
                     <thead>
                         <tr class="border-b border-outline-hairline text-body-sm text-on-surface-subtle">
-                            <th scope="col" class="px-6 py-3 font-medium">Peran</th>
-                            <th scope="col" class="px-6 py-3 font-medium">Tanggung jawab</th>
-                            <th scope="col" class="px-6 py-3 font-medium">Pekerjaan pertama di dashboard</th>
+                            <th scope="col" class="px-[18px] py-3 font-medium sm:px-6">Peran</th>
+                            <th scope="col" class="hidden px-6 py-3 font-medium sm:table-cell">Tanggung jawab</th>
+                            <th scope="col" class="hidden px-6 py-3 font-medium sm:table-cell">Pekerjaan pertama di dashboard</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -293,9 +293,14 @@
                             ['Admin/DLH', 'Memverifikasi mitra dan mengawasi kepatuhan', 'Meninjau antrean verifikasi'],
                         ] as [$role, $duty, $first])
                             <tr class="border-b border-outline-hairline last:border-0">
-                                <td class="px-6 py-4 font-semibold">{{ $role }}</td>
-                                <td class="px-6 py-4">{{ $duty }}</td>
-                                <td class="px-6 py-4 text-on-surface-muted">{{ $first }}</td>
+                                <td class="px-[18px] py-4 sm:px-6">
+                                    <span class="block font-semibold">{{ $role }}</span>
+                                    {{-- Di bawah 640 px kolom lain dilipat ke sel ini, bukan disembunyikan di area gulir. --}}
+                                    <span class="mt-1 block sm:hidden">{{ $duty }}</span>
+                                    <span class="block text-body-sm text-on-surface-muted sm:hidden">Pertama di dashboard: {{ $first }}</span>
+                                </td>
+                                <td class="hidden px-6 py-4 sm:table-cell">{{ $duty }}</td>
+                                <td class="hidden px-6 py-4 text-on-surface-muted sm:table-cell">{{ $first }}</td>
                             </tr>
                         @endforeach
                     </tbody>
