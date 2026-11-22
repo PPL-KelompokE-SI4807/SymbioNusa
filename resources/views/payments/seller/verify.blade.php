@@ -16,16 +16,6 @@
         subtitle="Periksa kesesuaian berkas transfer dan nominal pembayaran dari Buyer."
     />
 
-    @if ($errors->any())
-        <x-ui.alert variant="danger" class="mb-6">
-            <p class="font-medium">Terdapat kesalahan:</p>
-            <ul class="mt-1 list-disc list-inside text-sm">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </x-ui.alert>
-    @endif
 
     @php
         $invoice = $payment->invoice;

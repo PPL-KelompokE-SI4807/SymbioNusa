@@ -14,11 +14,6 @@
         subtitle="Jelajahi permintaan bahan baku sekunder dari industri Buyer dan tawarkan material sisa produksi Anda."
     />
 
-    @if (session('success'))
-        <x-ui.alert variant="success" class="mb-6">
-            {{ session('success') }}
-        </x-ui.alert>
-    @endif
 
     {{-- Filter Bar --}}
     <x-ui.card class="mb-6">

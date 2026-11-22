@@ -17,16 +17,6 @@
             subtitle="Perbarui data spesifikasi, volume, atau tanggal berlaku kebutuhan perusahaan Anda."
         />
 
-        @if ($errors->any())
-            <x-ui.alert variant="danger" class="mb-6">
-                <p class="font-medium">Terdapat beberapa kesalahan pengisian formulir:</p>
-                <ul class="list-disc list-inside mt-1 text-sm space-y-0.5">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </x-ui.alert>
-        @endif
 
         <form method="POST" action="{{ route('buyer.demands.update', $demand) }}" id="demand-form">
             @csrf

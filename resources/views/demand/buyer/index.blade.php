@@ -20,11 +20,6 @@
         </x-slot:actions>
     </x-ui.page-header>
 
-    @if (session('success'))
-        <x-ui.alert variant="success" class="mb-6">
-            {{ session('success') }}
-        </x-ui.alert>
-    @endif
 
     {{-- Strip ringkasan: satu permukaan --}}
     <x-ui.summary-strip label="Ringkasan kebutuhan" class="mb-6">

@@ -14,11 +14,6 @@
         subtitle="Pantau status tagihan invoice dan verifikasi bukti transfer pembayaran dari Buyer."
     />
 
-    @if (session('success'))
-        <x-ui.alert variant="success" class="mb-6">
-            {{ session('success') }}
-        </x-ui.alert>
-    @endif
 
     {{-- Strip ringkasan: satu permukaan (data dari controller) --}}
     <x-ui.summary-strip label="Ringkasan invoice" class="mb-6">

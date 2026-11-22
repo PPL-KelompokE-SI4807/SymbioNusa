@@ -16,16 +16,6 @@
         subtitle="Kirimkan bukti transfer bank untuk diverifikasi oleh Seller sebelum material dikirim."
     />
 
-    @if ($errors->any())
-        <x-ui.alert variant="danger" class="mb-6">
-            <p class="font-medium">Terdapat kesalahan pada isian formulir:</p>
-            <ul class="mt-1 list-disc list-inside text-sm">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </x-ui.alert>
-    @endif
 
     @if ($invoice->latestPayment && ($invoice->latestPayment->status_verifikasi?->value === 'DITOLAK' || $invoice->latestPayment->status_verifikasi === 'DITOLAK'))
         <x-ui.alert variant="danger" class="mb-6">

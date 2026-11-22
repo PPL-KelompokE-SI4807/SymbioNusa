@@ -11,11 +11,6 @@
 @section('content')
     <x-ui.page-header title="Invoice & Pembayaran" subtitle="Kelola tagihan invoice dan pantau status verifikasi pembayaran transfer Anda." />
 
-    @if (session('success'))
-        <x-ui.alert variant="success" class="mb-6">
-            {{ session('success') }}
-        </x-ui.alert>
-    @endif
 
     <x-ui.card :padding="false">
         {{-- Di bawah 1024 px tabel menjadi baris ledger (DESIGN.md › Responsive); tabel tetap untuk layar lebar. --}}
