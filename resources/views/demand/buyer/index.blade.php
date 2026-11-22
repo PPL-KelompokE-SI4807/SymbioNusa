@@ -72,7 +72,52 @@
     </x-ui.card>
 
     <x-ui.card :padding="false">
-        <x-ui.table label="Daftar Kebutuhan Bahan Baku Buyer">
+        {{-- Di bawah 1024 px tabel menjadi baris ledger (DESIGN.md › Responsive); tabel tetap untuk layar lebar. --}}
+        @if ($demands->count() > 0)
+            <ul class="divide-y divide-outline-hairline lg:hidden" aria-label="Daftar kebutuhan bahan baku">
+                @foreach ($demands as $demand)
+                    @php
+                        $statusVal = $demand->status instanceof \App\Enums\DemandRequestStatus ? $demand->status->value : $demand->status;
+                        $statusBadge = $demand->status instanceof \App\Enums\DemandRequestStatus ? $demand->status->badge() : \App\Support\StatusMap::badge('demand_requests.status', $demand->status);
+                        $statusLabel = $demand->status instanceof \App\Enums\DemandRequestStatus ? $demand->status->label() : \App\Support\StatusMap::label('demand_requests.status', $demand->status);
+                        $frekuensiLabel = $demand->frekuensi instanceof \App\Enums\DemandRequestFrequency ? $demand->frekuensi->label() : \App\Support\StatusMap::label('demand_requests.frekuensi', $demand->frekuensi);
+                    @endphp
+                    <li class="px-[18px] py-4 sm:px-6">
+                        <p class="text-dash-row text-on-surface">{{ $demand->category?->nama ?? '–' }}</p>
+                        <p class="mt-0.5 text-body-sm tabular-nums text-on-surface">
+                            {{ number_format((float) $demand->volume_kg, 2, ',', '.') }} kg · {{ $frekuensiLabel }} ·
+                            {{ $demand->harga_maks ? 'maks. '.\App\Support\Format::rupiah($demand->harga_maks).'/kg' : 'harga terbuka' }}
+                        </p>
+                        <p class="text-body-sm text-on-surface-muted">
+                            Berlaku {{ $demand->berlaku_sampai ? 's.d. '.\App\Support\Format::date($demand->berlaku_sampai) : 'tanpa batas' }}
+                        </p>
+                        <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+                            <x-ui.badge :variant="$statusBadge">{{ $statusLabel }}</x-ui.badge>
+                            @if (in_array($statusVal, ['DRAF', 'TERBUKA'], true))
+                                <div class="flex items-center gap-3">
+                                    <x-ui.button href="{{ route('buyer.demands.edit', $demand) }}" variant="secondary" size="lg">Ubah</x-ui.button>
+                                    @if ($statusVal === 'DRAF')
+                                        <form method="POST" action="{{ route('buyer.demands.destroy', $demand) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus draf kebutuhan ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <x-ui.button type="submit" variant="text-danger" class="min-h-11 px-1">Hapus</x-ui.button>
+                                        </form>
+                                    @else
+                                        <form method="POST" action="{{ route('buyer.demands.close', $demand) }}" onsubmit="return confirm('Tutup permintaan kebutuhan ini dari pasar?');">
+                                            @csrf
+                                            @method('PATCH')
+                                            <x-ui.button type="submit" variant="text" class="min-h-11 px-1">Tutup</x-ui.button>
+                                        </form>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+
+        <x-ui.table label="Daftar Kebutuhan Bahan Baku Buyer" class="{{ $demands->count() > 0 ? 'hidden lg:block' : '' }}">
             <x-slot:head>
                 <th scope="col" class="px-4 py-3 text-left">Komoditas / Kategori</th>
                 <th scope="col" class="px-4 py-3 text-left">Volume</th>

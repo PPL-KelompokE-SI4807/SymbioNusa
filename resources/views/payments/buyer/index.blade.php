@@ -18,7 +18,54 @@
     @endif
 
     <x-ui.card :padding="false">
-        <x-ui.table label="Daftar Invoice & Pembayaran Buyer">
+        {{-- Di bawah 1024 px tabel menjadi baris ledger (DESIGN.md › Responsive); tabel tetap untuk layar lebar. --}}
+        @if ($invoices->count() > 0)
+            <ul class="divide-y divide-outline-hairline lg:hidden" aria-label="Daftar invoice dan pembayaran">
+                @foreach ($invoices as $invoice)
+                    @php
+                        $payment = $invoice->latestPayment;
+                        $po = $invoice->purchaseOrder;
+                        $ditolak = $payment && ($payment->status_verifikasi?->value === 'DITOLAK' || $payment->status_verifikasi === 'DITOLAK');
+                        $menunggu = $payment && ($payment->status_verifikasi?->value === 'MENUNGGU' || $payment->status_verifikasi === 'MENUNGGU');
+                    @endphp
+                    <li class="flex items-start gap-3 px-[18px] py-4 sm:px-6">
+                        <div class="min-w-0 flex-1">
+                            <p class="flex flex-wrap items-baseline gap-x-2">
+                                <span class="text-dash-row tabular-nums text-on-surface">{{ $invoice->nomor }}</span>
+                                <span class="font-semibold tabular-nums text-on-surface">{{ \App\Support\Format::rupiah($invoice->total) }}</span>
+                            </p>
+                            <p class="text-body-sm text-on-surface-muted">
+                                {{ $po?->seller?->nama ?? '–' }} · jatuh tempo {{ \App\Support\Format::date($invoice->jatuh_tempo) }}
+                            </p>
+                            <div class="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
+                                <x-ui.badge :variant="\App\Support\StatusMap::badge('invoices.status', $invoice->status)">
+                                    {{ \App\Support\StatusMap::label('invoices.status', $invoice->status) }}
+                                </x-ui.badge>
+                                @if ($payment)
+                                    <x-ui.badge :variant="$payment->status_verifikasi instanceof \App\Enums\PaymentVerificationStatus ? $payment->status_verifikasi->badge() : \App\Support\StatusMap::badge('payments.status_verifikasi', $payment->status_verifikasi)">
+                                        {{ $payment->status_verifikasi instanceof \App\Enums\PaymentVerificationStatus ? $payment->status_verifikasi->label() : \App\Support\StatusMap::label('payments.status_verifikasi', $payment->status_verifikasi) }}
+                                    </x-ui.badge>
+                                @else
+                                    <span class="text-body-sm text-on-surface-muted">Belum bayar</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="flex shrink-0 flex-col items-end gap-1">
+                            @if ($invoice->status === 'TERBIT' && (! $payment || $ditolak))
+                                <x-ui.button href="{{ route('buyer.invoices.pay', $invoice) }}" variant="secondary" size="lg">{{ $payment ? 'Unggah Ulang' : 'Bayar Sekarang' }}</x-ui.button>
+                            @elseif ($invoice->status === 'TERBIT' && $menunggu)
+                                <x-ui.button href="{{ route('buyer.invoices.pay', $invoice) }}" variant="secondary" size="lg">Ganti Bukti</x-ui.button>
+                                <x-ui.button href="{{ route('payments.proof', $payment) }}" variant="text" target="_blank" class="min-h-11">Lihat Bukti</x-ui.button>
+                            @elseif ($invoice->status !== 'TERBIT' && $payment)
+                                <x-ui.button href="{{ route('payments.proof', $payment) }}" variant="text" target="_blank" class="min-h-11">Lihat Bukti</x-ui.button>
+                            @endif
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+
+        <x-ui.table label="Daftar Invoice & Pembayaran Buyer" class="{{ $invoices->count() > 0 ? 'hidden lg:block' : '' }}">
             <x-slot:head>
                 <th scope="col" class="px-4 py-3 text-left">No. Invoice</th>
                 <th scope="col" class="px-4 py-3 text-left">Seller</th>
