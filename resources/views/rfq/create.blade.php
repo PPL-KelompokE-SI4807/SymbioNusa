@@ -13,11 +13,6 @@
 @section('content')
     <x-ui.page-header title="Ajukan RFQ Baru" subtitle="Kirim penawaran volume dan harga material sisa produksi kepada Seller." />
 
-    @if ($errors->any())
-        <x-ui.alert variant="danger" class="mb-6">
-            Terdapat kesalahan pada isian formulir. Mohon periksa kembali input Anda di bawah ini.
-        </x-ui.alert>
-    @endif
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {{-- Formulir Utama --}}

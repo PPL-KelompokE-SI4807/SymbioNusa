@@ -46,17 +46,7 @@
         </div>
     </div>
 
-    @if (session('success'))
-        <x-ui.alert variant="success" class="mb-6">
-            {{ session('success') }}
-        </x-ui.alert>
-    @endif
 
-    @if ($errors->any())
-        <x-ui.alert variant="danger" class="mb-6">
-            {{ $errors->first() }}
-        </x-ui.alert>
-    @endif
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {{-- Kolom Kiri: Utas Negosiasi & Riwayat Tawaran --}}
@@ -111,7 +101,7 @@
                                     </strong>
                                 </div>
                                 <span class="text-body-sm text-on-surface-muted">
-                                    {{ $offer->company?->tipe ?? '' }}
+                                    {{ ucfirst(strtolower((string) ($offer->company?->tipe ?? ''))) }}
                                 </span>
                             </div>
 

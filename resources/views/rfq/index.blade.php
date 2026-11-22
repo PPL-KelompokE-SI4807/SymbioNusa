@@ -20,11 +20,6 @@
         @endif
     </x-ui.page-header>
 
-    @if (session('success'))
-        <x-ui.alert variant="success" class="mb-6">
-            {{ session('success') }}
-        </x-ui.alert>
-    @endif
 
     {{-- Strip ringkasan sesuai Screen 07: satu permukaan --}}
     <x-ui.summary-strip label="Ringkasan RFQ" class="mb-6">
