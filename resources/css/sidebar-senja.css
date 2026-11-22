@@ -1,7 +1,7 @@
 /*
  * Sidebar & top bar mobile "Senja di Sawah" di SEMUA halaman (keputusan PM 22 Nov 2026).
- * Token sidebar bersama (--color-secondary*, --color-primary-container) ditimpa di dalam [data-sidebar] saja,
- * sehingga konten layar non-dashboard tidak berubah. Gradien overlay sidebar adalah satu dari dua gradien
+ * Token sidebar (--color-secondary*, --color-primary-container) ditimpa di dalam [data-sidebar] saja, karena di sidebar
+ * keadaan aktifnya terbalik (bidang terang di atas forest) dan hover-nya tembus pandang. Gradien overlay sidebar adalah satu dari dua gradien
  * yang diizinkan (panduan §4). Kait: data-sidebar, data-brand-mark, data-brand-tagline, data-nav-label,
  * data-nav-count, data-user-card, data-avatar di components/app/sidebar.blade.php dan layouts/app.blade.php.
  */

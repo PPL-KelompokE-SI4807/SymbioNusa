@@ -5,116 +5,97 @@
 @source '../../storage/framework/views/*.php';
 
 /*
- * Token desain SymbioNusa. Nilai disalin persis dari docs/design/DESIGN.md (FND v10 Heavy-Clean, 21 Nov 2026).
+ * Token desain SymbioNusa: struktur FND v10 Heavy-Clean (docs/design/DESIGN.md), nilai varian "Senja di Sawah"
+ * untuk SELURUH aplikasi (keputusan PM 22 Nov 2026; panduan dashboard Senja §3). Satu sumber nilai, nama token lama.
  * Pakai kelas token (bg-primary, text-on-surface-muted, rounded-md, text-headline-lg),
  * bukan hex mentah atau palet bawaan (emerald-*, slate-*).
  */
 @theme {
   --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
 
-  --color-primary: #15803d;
-  --color-primary-hover: #166534;
+  --color-primary: #3f6212;
+  --color-primary-hover: #2f3d12;
   --color-on-primary: #ffffff;
-  --color-primary-container: #dcfce7;
-  --color-on-primary-container: #14532d;
-  --color-secondary: #14532d;
-  --color-secondary-hover: #1b5e37;
-  --color-on-secondary: #ffffff;
-  --color-on-secondary-muted: #cfeedd;
-  --color-secondary-label: #a7e0b8;
+  --color-primary-container: #fef3c7;
+  --color-on-primary-container: #1c2a0a;
+  --color-secondary: #1e2a08;
+  --color-secondary-hover: #2f3d12;
+  --color-on-secondary: #fef9c3;
+  --color-on-secondary-muted: #fef9c3;
+  --color-secondary-label: #e3d99a;
   --color-tertiary: #1e40af;
   --color-on-tertiary: #ffffff;
-  --color-neutral: #5f6d64;
-  --color-background: #eef3ec;
+  --color-neutral: #4a4a1a;
+  --color-background: #fdf8d8;
   --color-surface: #ffffff;
-  --color-surface-muted: #eef3ec;
-  --color-on-surface: #16241b;
-  --color-on-surface-muted: #4b5a50;
-  --color-on-surface-subtle: #5f6d64;
-  --color-outline: #e2e8df;
-  --color-outline-control: #c9d3c6;
-  --color-outline-input: #7a8a7f;
-  --color-focus-ring: #15803d;
+  --color-surface-muted: #fef3c7;
+  --color-on-surface: #1c2a0a;
+  --color-on-surface-muted: #4a4a1a;
+  --color-on-surface-subtle: #4a4a1a;
+  --color-outline: #e3d99a;
+  --color-outline-control: #e3d99a;
+  --color-outline-input: #8a8350;
+  --color-focus-ring: #3f6212;
   --color-error: #b91c1c;
-  --color-error-container: #fef2f2;
-  --color-error-line: #fecaca;
-  --color-on-error-container: #7f1d1d;
-  --color-warning: #b45309;
-  --color-warning-container: #fff7e6;
-  --color-warning-line: #fde3a7;
-  --color-on-warning-container: #78350f;
-  --color-success: #15803d;
-  --color-success-container: #f0fdf4;
-  --color-success-line: #bbf7d0;
-  --color-on-success-container: #14532d;
+  --color-error-container: #fdf2f2;
+  --color-error-line: #e3d99a;
+  --color-on-error-container: #1c2a0a;
+  --color-warning: #92400e;
+  --color-warning-container: #fef3c7;
+  --color-warning-line: #e3d99a;
+  --color-on-warning-container: #1c2a0a;
+  --color-success: #3f6212;
+  --color-success-container: #fef3c7;
+  --color-success-line: #e3d99a;
+  --color-on-success-container: #1c2a0a;
   --color-info: #1e40af;
-  --color-info-container: #dbeafe;
-  --color-info-line: #bfdbfe;
-  --color-on-info-container: #1e40af;
+  --color-info-container: #fef3c7;
+  --color-info-line: #e3d99a;
+  --color-on-info-container: #1c2a0a;
   --color-neutral-container: #e4e4e7;
   --color-on-neutral-container: #3f3f46;
 
   /* FND v10: data ink. */
-  --color-band-forest-from: #0f3f22;
-  --color-band-forest-to: #14532d;
+  --color-band-forest-from: #1e2a08;
+  --color-band-forest-to: #2f3d12;
   --color-on-band: #ffffff;
-  --color-on-band-muted: #cfeedd;
-  --color-insight-marker: #b45309;
-  --color-age-bar-track: #e2e8df;
-  --color-age-bar-fresh: #86c79b;
+  --color-on-band-muted: #fef9c3;
+  --color-insight-marker: #92400e;
+  --color-age-bar-track: #f6efc6;
+  --color-age-bar-fresh: #ddd08a;
   --color-age-bar-aging: #fbbf24;
   --color-age-bar-stale: #b91c1c;
-  --color-chart-lead: #15803d;
-  --color-category-plastik: #1e40af;
-  --color-category-tekstil: #b45309;
-  --color-category-kayu: #92400e;
-  --color-category-kertas: #3f3f46;
+  --color-chart-lead: #3f6212;
+  --color-category-plastik: #d97706;
+  --color-category-tekstil: #ea580c;
+  --color-category-kayu: #a16207;
+  --color-category-kertas: #57534e;
   --color-category-pangan: #65a30d;
-  --color-photo-label: #14532d;
+  --color-photo-label: #1e2a08;
   --color-on-photo-label: #ffffff;
 
 
-  /*
-   * LEGACY (FND v8) — dihapus oleh FND v10. Masih dipakai kpi.blade.php dan
-   * livewire/dashboard/admin.blade.php; hapus blok ini saat keduanya dibangun ulang
-   * ke summary strip dan alur order v10. Jangan dipakai di kode baru.
-   */
-  --color-tile-sun-from: #f59e0b;
-  --color-tile-sun-to: #fbbf24;
-  --color-on-tile-sun: #3d2600;
-  --color-tile-green-from: #166534;
-  --color-tile-green-to: #15803d;
-  --color-tile-sky-from: #075985;
-  --color-tile-sky-to: #0369a1;
-  --color-tile-forest-from: #0f3f22;
-  --color-tile-forest-to: #14532d;
-  --color-on-tile: #ffffff;
-  --color-on-tile-muted: #cfeedd;
-  --color-stage-stuck: #fbbf24;
-  --color-chart-2: #3f3f46;
-  --color-chart-3: #52525b;
-  --color-chart-4: #71717a;
-  --color-chart-5: #8a8a93;
+  /* Monogram perusahaan (Senja): satu pasangan tenang surface2 + ink, bukan rona acak per perusahaan. */
+  --color-mono-green: #fef3c7;
+  --color-on-mono-green: #1c2a0a;
+  --color-mono-clay: #fef3c7;
+  --color-on-mono-clay: #1c2a0a;
+  --color-mono-sky: #fef3c7;
+  --color-on-mono-sky: #1c2a0a;
+  --color-mono-sun: #fef3c7;
+  --color-on-mono-sun: #1c2a0a;
+  --color-mono-zinc: #fef3c7;
+  --color-on-mono-zinc: #1c2a0a;
 
-  /* Monogram perusahaan: latar rona tipis + tinta gelap (kontras ≥ 4.5:1). */
-  --color-mono-green: #dbeee1;
-  --color-on-mono-green: #166534;
-  --color-mono-clay: #f6e2d9;
-  --color-on-mono-clay: #9a3412;
-  --color-mono-sky: #dbe9f2;
-  --color-on-mono-sky: #075985;
-  --color-mono-sun: #fdf0d0;
-  --color-on-mono-sun: #92400e;
-  --color-mono-zinc: #e4e7e4;
-  --color-on-mono-zinc: #3f3f46;
+  /* Senja (panduan §8.9): tombol & kontrol 9, baris interaktif & segmen 8, kartu 14. */
+  --radius-sm: 9px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
 
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-
-  --shadow-card: 0 8px 24px -8px rgb(16 24 40 / 0.10), 0 1px 2px rgb(16 24 40 / 0.05);
-  --shadow-raised: 0 18px 36px -18px rgb(16 24 40 / 0.16);
-  --shadow-overlay: 0 16px 40px -12px rgb(16 24 40 / 0.22), 0 2px 6px rgb(16 24 40 / 0.08);
+  /* Kartu: garis 1 px line (sebagai ring, tanpa menggeser tata letak) + bayangan sangat lembut bertint keemasan. */
+  --shadow-card: 0 0 0 1px var(--color-outline), 0 1px 3px rgb(62 52 10 / 0.04);
+  --shadow-raised: 0 0 0 1px var(--color-outline), 0 18px 36px -18px rgb(62 52 10 / 0.16);
+  --shadow-overlay: 0 16px 40px -12px rgb(30 42 8 / 0.24), 0 2px 6px rgb(62 52 10 / 0.08);
 
   --text-hero: 40px;
   --text-hero--line-height: 1.15;
@@ -181,9 +162,8 @@
 }
 
 /*
- * Dashboard Senja di Sawah (panduan dashboard §3.3, keputusan PM 22 Nov 2026): token turunan yang hanya dipakai
- * dashboard. "static" agar variabelnya selalu tersedia untuk var() di SVG/inline style. Token bersama lain ditimpa
- * di dalam .dash-senja (resources/css/dashboard-senja.css).
+ * Senja di Sawah (panduan dashboard §3.3, keputusan PM 22 Nov 2026): token turunan varian (hairline baris, segmen alur,
+ * aksen jingga senja untuk aksen kecil saja). "static" agar variabelnya selalu tersedia untuk var() di SVG/inline style.
  */
 @theme static {
   --color-outline-hairline: #f6efc6;
@@ -198,6 +178,9 @@
 :root {
   color-scheme: light;
 }
+body {
+  font-feature-settings: "tnum";
+}
 
 /* Scrim untuk label di atas foto material (DESIGN.md, Photos). */
 .photo-scrim {
@@ -209,8 +192,16 @@
 }
 
 ::selection {
-  background: #bbf7d0;
-  color: #14532d;
+  background: #fef3c7;
+  color: #1c2a0a;
+}
+
+/* Judul halaman (panduan §8.2): clamp(25px, 3.2vw, 34px) / 900, di bawah batas 40 px aplikasi. */
+.page-title {
+  font-size: clamp(25px, 3.2vw, 34px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 
 [x-cloak] {
