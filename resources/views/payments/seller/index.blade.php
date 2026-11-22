@@ -20,15 +20,15 @@
         </x-ui.alert>
     @endif
 
-    {{-- KPI Strip Ringkasan (data dari controller) --}}
-    <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+    {{-- Strip ringkasan: satu permukaan (data dari controller) --}}
+    <x-ui.summary-strip label="Ringkasan invoice" class="mb-6">
         <x-ui.kpi label="Total Invoice" :value="$kpi['total']" caption="Invoice yang diterbitkan" />
-        <x-ui.kpi label="Perlu Verifikasi" :value="$kpi['menunggu']" caption="Bukti bayar masuk" />
+        <x-ui.kpi label="Perlu Verifikasi" :value="$kpi['menunggu']" caption="Bukti bayar masuk" :tone="$kpi['menunggu'] > 0 ? 'warning' : 'plain'" />
         <x-ui.kpi label="Sudah Lunas" :value="$kpi['lunas']" caption="Pembayaran terverifikasi" />
         <x-ui.kpi label="Bukti Ditolak" :value="$kpi['ditolak']" caption="Menunggu kirim ulang" />
-    </div>
+    </x-ui.summary-strip>
 
-    <x-ui.card>
+    <x-ui.card :padding="false">
         <x-ui.table label="Daftar Invoice dan Pembayaran Seller">
             <x-slot:head>
                 <th scope="col" class="px-4 py-3 text-left">No. Invoice</th>
@@ -46,14 +46,14 @@
                     $po = $invoice->purchaseOrder;
                     $isMenunggu = $payment && ($payment->status_verifikasi?->value === 'MENUNGGU' || $payment->status_verifikasi === 'MENUNGGU');
                 @endphp
-                <tr class="hover:bg-surface-alt/50 transition {{ $isMenunggu ? 'bg-warning/5' : '' }}">
-                    <td class="px-4 py-3 font-semibold text-on-surface">
+                <tr class="h-14 border-t border-outline-hairline hover:bg-surface-muted/60">
+                    <td class="px-4 py-3 text-dash-row tabular-nums text-on-surface">
                         {{ $invoice->nomor }}
                     </td>
                     <td class="px-4 py-3 text-on-surface">
                         {{ $po?->buyer?->nama ?? '–' }}
                     </td>
-                    <td class="px-4 py-3 font-medium text-on-surface">
+                    <td class="px-4 py-3 font-semibold tabular-nums text-on-surface">
                         {{ \App\Support\Format::rupiah($invoice->total) }}
                     </td>
                     <td class="px-4 py-3 text-on-surface-muted">
@@ -75,11 +75,11 @@
                     </td>
                     <td class="px-4 py-3 text-right">
                         @if ($isMenunggu)
-                            <x-ui.button href="{{ route('seller.payments.verify', $payment) }}" variant="primary" size="sm">
-                                Verifikasi Pembayaran
+                            <x-ui.button href="{{ route('seller.payments.verify', $payment) }}" variant="secondary">
+                                Verifikasi
                             </x-ui.button>
                         @elseif ($payment)
-                            <x-ui.button href="{{ route('payments.proof', $payment) }}" variant="secondary" size="sm" target="_blank">
+                            <x-ui.button href="{{ route('payments.proof', $payment) }}" variant="text" target="_blank" class="min-h-10">
                                 Lihat Bukti
                             </x-ui.button>
                         @else
@@ -89,15 +89,16 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="px-4 py-8 text-center text-on-surface-muted">
-                        Belum ada invoice yang diterbitkan.
+                    <td colspan="7" class="px-4 py-10 text-center">
+                        <p class="text-dash-sub text-on-surface">Belum ada invoice</p>
+                        <p class="mt-1 text-body-sm text-on-surface-muted">Invoice terbit otomatis setelah order lolos inspeksi.</p>
                     </td>
                 </tr>
             @endforelse
         </x-ui.table>
 
         @if ($invoices->hasPages())
-            <div class="mt-4 border-t border-outline pt-4">
+            <div class="border-t border-outline-hairline px-6 py-4">
                 {{ $invoices->links() }}
             </div>
         @endif

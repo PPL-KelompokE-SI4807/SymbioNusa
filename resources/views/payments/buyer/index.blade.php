@@ -17,7 +17,7 @@
         </x-ui.alert>
     @endif
 
-    <x-ui.card padding="false">
+    <x-ui.card :padding="false">
         <x-ui.table label="Daftar Invoice & Pembayaran Buyer">
             <x-slot:head>
                 <th scope="col" class="px-4 py-3 text-left">No. Invoice</th>
@@ -34,14 +34,14 @@
                     $payment = $invoice->latestPayment;
                     $po = $invoice->purchaseOrder;
                 @endphp
-                <tr class="border-t border-outline hover:bg-surface-alt/50 transition">
-                    <td class="px-4 py-3 font-semibold text-on-surface">
+                <tr class="h-14 border-t border-outline-hairline hover:bg-surface-muted/60">
+                    <td class="px-4 py-3 text-dash-row tabular-nums text-on-surface">
                         {{ $invoice->nomor }}
                     </td>
                     <td class="px-4 py-3 text-on-surface">
                         {{ $po?->seller?->nama ?? '–' }}
                     </td>
-                    <td class="px-4 py-3 font-medium text-on-surface tabular-nums">
+                    <td class="px-4 py-3 font-semibold tabular-nums text-on-surface">
                         {{ \App\Support\Format::rupiah($invoice->total) }}
                     </td>
                     <td class="px-4 py-3 text-on-surface-muted">
@@ -64,21 +64,21 @@
                     <td class="px-4 py-3 text-right">
                         @if ($invoice->status === 'TERBIT')
                             @if (! $payment || $payment->status_verifikasi?->value === 'DITOLAK' || $payment->status_verifikasi === 'DITOLAK')
-                                <x-ui.button href="{{ route('buyer.invoices.pay', $invoice) }}" variant="primary" size="sm">
+                                <x-ui.button href="{{ route('buyer.invoices.pay', $invoice) }}" variant="secondary">
                                     {{ $payment ? 'Unggah Ulang' : 'Bayar Sekarang' }}
                                 </x-ui.button>
                             @elseif ($payment->status_verifikasi?->value === 'MENUNGGU' || $payment->status_verifikasi === 'MENUNGGU')
                                 <div class="flex items-center justify-end gap-2">
-                                    <x-ui.button href="{{ route('buyer.invoices.pay', $invoice) }}" variant="secondary" size="sm">
+                                    <x-ui.button href="{{ route('buyer.invoices.pay', $invoice) }}" variant="secondary">
                                         Ganti Bukti
                                     </x-ui.button>
-                                    <x-ui.button href="{{ route('payments.proof', $payment) }}" variant="ghost" size="sm" target="_blank">
+                                    <x-ui.button href="{{ route('payments.proof', $payment) }}" variant="text" target="_blank" class="min-h-10">
                                         Lihat Bukti
                                     </x-ui.button>
                                 </div>
                             @endif
                         @elseif ($payment)
-                            <x-ui.button href="{{ route('payments.proof', $payment) }}" variant="secondary" size="sm" target="_blank">
+                            <x-ui.button href="{{ route('payments.proof', $payment) }}" variant="text" target="_blank" class="min-h-10">
                                 Lihat Bukti
                             </x-ui.button>
                         @else
@@ -88,15 +88,16 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="px-4 py-8 text-center text-on-surface-muted">
-                        Belum ada invoice yang diterbitkan untuk perusahaan Anda.
+                    <td colspan="7" class="px-4 py-10 text-center">
+                        <p class="text-dash-sub text-on-surface">Belum ada invoice</p>
+                        <p class="mt-1 text-body-sm text-on-surface-muted">Invoice dari Seller muncul di sini setelah order Anda lolos inspeksi.</p>
                     </td>
                 </tr>
             @endforelse
         </x-ui.table>
 
         @if ($invoices->hasPages())
-            <div class="p-4 border-t border-outline">
+            <div class="border-t border-outline-hairline px-6 py-4">
                 {{ $invoices->links() }}
             </div>
         @endif

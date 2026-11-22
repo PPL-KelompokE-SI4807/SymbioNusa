@@ -39,7 +39,7 @@
         {{-- Kolom Kiri: Formulir Unggah Bukti --}}
         <div class="lg:col-span-2">
             <x-ui.card>
-                <h2 class="text-base font-semibold text-on-surface mb-4">Formulir Bukti Pembayaran</h2>
+                <h2 class="mb-4 text-dash-title text-on-surface">Formulir Bukti Pembayaran</h2>
 
                 <form method="POST" action="{{ route('buyer.invoices.store', $invoice) }}" enctype="multipart/form-data" class="space-y-5">
                     @csrf
@@ -74,8 +74,8 @@
                         </x-ui.field>
                     </div>
 
-                    <div class="border-t border-outline pt-4">
-                        <h3 class="text-sm font-semibold text-on-surface mb-3">Informasi Rekening Asal (Pengirim)</h3>
+                    <div class="border-t border-outline-hairline pt-4">
+                        <h3 class="mb-3 text-dash-sub text-on-surface">Rekening asal (pengirim)</h3>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div>
                                 <x-ui.field label="Nama Bank" for="bank_asal" required>
@@ -113,7 +113,7 @@
                         </div>
                     </div>
 
-                    <div class="border-t border-outline pt-4">
+                    <div class="border-t border-outline-hairline pt-4">
                         <x-ui.field
                             label="Berkas Bukti Transfer"
                             for="bukti"
@@ -125,13 +125,13 @@
                                 id="bukti"
                                 name="bukti"
                                 accept=".jpg,.jpeg,.png,.pdf"
-                                class="block w-full text-sm text-on-surface file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-on-primary hover:file:opacity-90 cursor-pointer"
+                                class="block w-full rounded-sm border border-dashed border-outline-input bg-surface px-3 py-3 text-body-md text-on-surface file:mr-4 file:h-10 file:cursor-pointer file:rounded-sm file:border-0 file:bg-primary-container file:px-3 file:text-label-md file:font-semibold file:text-on-primary-container hover:file:bg-primary hover:file:text-on-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
                                 required
                             />
                         </x-ui.field>
                     </div>
 
-                    <div class="rounded-md bg-surface-alt p-3 text-xs text-on-surface-muted">
+                    <div class="text-body-sm text-on-surface-muted">
                         <strong>Catatan:</strong> Bukti transfer hanya dapat diganti sebelum diverifikasi valid oleh Seller. Pastikan bukti terlihat jelas dan memuat stempel/referensi transaksi bank.
                     </div>
 
@@ -150,30 +150,30 @@
         {{-- Kolom Kanan: Ringkasan Invoice --}}
         <div>
             <x-ui.card>
-                <h2 class="text-base font-semibold text-on-surface mb-4">Ringkasan Invoice</h2>
+                <h2 class="mb-4 text-dash-title text-on-surface">Ringkasan Invoice</h2>
 
-                <dl class="space-y-3 text-sm">
-                    <div class="flex justify-between border-b border-outline pb-2">
+                <dl class="divide-y divide-outline-hairline text-body-md">
+                    <div class="flex justify-between gap-4 py-2.5">
                         <dt class="text-on-surface-muted">Nomor Invoice</dt>
-                        <dd class="font-semibold text-on-surface">{{ $invoice->nomor }}</dd>
+                        <dd class="font-semibold tabular-nums text-on-surface">{{ $invoice->nomor }}</dd>
                     </div>
-                    <div class="flex justify-between border-b border-outline pb-2">
+                    <div class="flex justify-between gap-4 py-2.5">
                         <dt class="text-on-surface-muted">Pihak Seller</dt>
                         <dd class="font-medium text-on-surface text-right">{{ $invoice->purchaseOrder?->seller?->nama ?? '–' }}</dd>
                     </div>
-                    <div class="flex justify-between border-b border-outline pb-2">
+                    <div class="flex justify-between gap-4 py-2.5">
                         <dt class="text-on-surface-muted">Jatuh Tempo</dt>
                         <dd class="text-on-surface">{{ \App\Support\Format::date($invoice->jatuh_tempo) }}</dd>
                     </div>
-                    <div class="flex justify-between border-b border-outline pb-2">
+                    <div class="flex justify-between gap-4 py-2.5">
                         <dt class="text-on-surface-muted">Total Tagihan</dt>
-                        <dd class="text-base font-bold text-primary">{{ \App\Support\Format::rupiah($invoice->total) }}</dd>
+                        <dd class="text-dash-sub tabular-nums text-on-surface">{{ \App\Support\Format::rupiah($invoice->total) }}</dd>
                     </div>
                 </dl>
 
-                <div class="mt-5 rounded-md border border-outline bg-surface-alt p-4">
-                    <h3 class="text-xs font-semibold uppercase tracking-wider text-on-surface-muted mb-2">Instruksi Pembayaran</h3>
-                    <p class="text-xs text-on-surface leading-relaxed">
+                <div class="mt-5 border-t border-outline-hairline pt-4">
+                    <h3 class="mb-2 text-label-md font-bold text-on-surface">Instruksi pembayaran</h3>
+                    <p class="text-body-sm text-on-surface-muted">
                         Silakan lakukan pembayaran manual via transfer antar-bank ke rekening resmi Seller yang tertera pada dokumen kontrak PO. Simpan struk/tangkapan layar mutasi untuk diunggah di formulir ini.
                     </p>
                 </div>

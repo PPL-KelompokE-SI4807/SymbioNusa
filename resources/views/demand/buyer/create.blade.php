@@ -32,9 +32,9 @@
             @csrf
 
             <x-ui.card class="space-y-6 mb-6">
-                <h3 class="text-title-md font-semibold text-on-surface border-b border-outline pb-3">
+                <h2 class="text-dash-title text-on-surface">
                     Informasi Material & Kebutuhan
-                </h3>
+                </h2>
 
                 {{-- Pilih Kategori --}}
                 <x-ui.field label="Kategori Material" for="categories_id_categories" name="categories_id_categories" helper="Pilih kategori bahan baku non-B3 yang dibutuhkan." required>
@@ -49,14 +49,14 @@
                 </x-ui.field>
 
                 {{-- Container Spesifikasi Minimal Dinamis --}}
-                <div id="specs-wrapper" class="space-y-4 rounded-sm border border-outline bg-surface-alt/40 p-4">
-                    <div class="flex items-center justify-between border-b border-outline pb-2">
-                        <span class="text-label-md font-semibold text-on-surface">Spesifikasi Minimal yang Diharapkan</span>
-                        <span class="text-xs text-on-surface-muted">Sesuai templat spesifikasi kategori</span>
+                <div id="specs-wrapper" class="space-y-4 border-t border-outline-hairline pt-5">
+                    <div class="flex flex-wrap items-baseline justify-between gap-2">
+                        <h3 class="text-dash-sub text-on-surface">Spesifikasi minimal yang diharapkan</h3>
+                        <span class="text-body-sm text-on-surface-muted">Sesuai templat spesifikasi kategori</span>
                     </div>
 
                     <div id="specs-fields" class="space-y-3">
-                        <p id="specs-placeholder" class="text-body-sm text-on-surface-muted italic py-2">
+                        <p id="specs-placeholder" class="py-2 text-body-sm text-on-surface-muted">
                             Pilih kategori material di atas untuk menampilkan kolom spesifikasi minimal.
                         </p>
                     </div>
@@ -116,7 +116,7 @@
 
             {{-- Tombol Aksi --}}
             <div class="flex items-center justify-end gap-3">
-                <x-ui.button href="{{ route('buyer.demands.index') }}" variant="ghost" size="md">
+                <x-ui.button href="{{ route('buyer.demands.index') }}" variant="text" size="md">
                     Batal
                 </x-ui.button>
                 <x-ui.button type="submit" name="action" value="draft" variant="secondary" size="md">
