@@ -145,7 +145,32 @@
                 </form>
 
                 @if ($company->documents->count() > 0)
-                    <x-ui.table label="Dokumen legalitas perusahaan">
+                    {{-- Di bawah 1024 px tabel menjadi baris ledger (DESIGN.md › Responsive). --}}
+                    <ul class="divide-y divide-outline-hairline border-t border-outline-hairline lg:hidden" aria-label="Dokumen legalitas perusahaan">
+                        @foreach ($company->documents as $doc)
+                            <li class="flex flex-wrap items-center justify-between gap-3 px-[18px] py-4 sm:px-6">
+                                <div class="min-w-0">
+                                    <p class="text-dash-row text-on-surface">{{ $doc->jenis }}</p>
+                                    <p class="text-body-sm text-on-surface-muted">
+                                        Berlaku sampai {{ $doc->berlaku_sampai ? Format::date($doc->berlaku_sampai) : 'seumur hidup' }}
+                                    </p>
+                                    <x-ui.badge class="mt-1.5" :variant="$docVariant($doc->status)">{{ ucfirst(strtolower((string) $doc->status)) }}</x-ui.badge>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <x-ui.button variant="text" href="{{ asset('storage/'.$doc->file_url) }}" target="_blank" class="min-h-11"
+                                        aria-label="Lihat {{ $doc->jenis }}">Lihat</x-ui.button>
+                                    <form method="POST" action="{{ route('companies.documents.destroy', $doc) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <x-ui.button type="submit" variant="text-danger" class="min-h-11"
+                                            aria-label="Hapus {{ $doc->jenis }}">Hapus</x-ui.button>
+                                    </form>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+
+                    <x-ui.table label="Dokumen legalitas perusahaan" class="hidden lg:block">
                         <x-slot:head>
                             <th scope="col" class="px-6">Jenis dokumen</th>
                             <th scope="col" class="px-4">Berlaku sampai</th>
