@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {{--
-    Layout halaman tamu (masuk, lupa kata sandi, atur ulang) — DESIGN.md › Layout › Auth pages (amandemen FND v8).
+    Layout halaman tamu (masuk, lupa kata sandi, atur ulang) — DESIGN.md › Layout › Auth pages, gaya FND v11 Senja di Sawah.
     Desktop: panel foto material 640 px di kiri (lapisan hijau hutan, pernyataan, chip material), kartu form di kanan.
     Mobile: pita foto di atas, kartu form menumpuk di bawahnya.
     Halaman memakai @extends('layouts.guest'), @section('title', ...), @section('content').
@@ -33,18 +33,19 @@
         <aside class="relative isolate overflow-hidden bg-secondary text-on-secondary lg:w-[44%] lg:max-w-[640px] lg:shrink-0">
             <img src="{{ asset('images/material/kardus-besar.jpg') }}" alt=""
                  class="absolute inset-0 -z-20 size-full object-cover">
-            <div class="absolute inset-0 -z-10 bg-linear-to-b from-secondary/60 to-secondary/90" aria-hidden="true"></div>
+            {{-- Lapisan forest Senja (overlay foto publik, salah satu dari dua gradien yang diizinkan). --}}
+            <div class="absolute inset-0 -z-10 bg-[linear-gradient(168deg,rgb(71_88_28/0.62),rgb(30_42_8/0.92)_72%)]" aria-hidden="true"></div>
 
             <div class="flex h-56 flex-col justify-between px-5 pt-6 pb-14 sm:px-8 lg:h-full lg:min-h-screen lg:p-14">
                 <a href="{{ url('/') }}" class="flex w-fit items-center gap-3 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-secondary">
-                    <span class="flex size-10 items-center justify-center rounded-sm bg-primary-container text-on-primary-container" aria-hidden="true">
+                    <span data-brand-mark class="flex size-10 items-center justify-center" aria-hidden="true">
                         <x-ui.icon name="loop" class="size-6" />
                     </span>
-                    <span class="text-headline-md">SymbioNusa</span>
+                    <span class="text-dash-title">SymbioNusa</span>
                 </a>
 
                 <div class="space-y-5">
-                    <p class="max-w-md text-hero-sm lg:text-hero">
+                    <p class="max-w-md text-hero-sm font-extrabold lg:text-display-band lg:font-black">
                         Sisa produksi satu industri, bahan baku industri lain.
                     </p>
                     <p class="hidden max-w-lg text-body-lg text-on-secondary-muted lg:block">
@@ -52,7 +53,7 @@
                     </p>
                     <ul class="hidden flex-wrap gap-2 lg:flex" aria-label="Contoh material">
                         @foreach ($chips as [$file, $label])
-                            <li class="flex h-10 items-center gap-2 rounded-full bg-on-secondary/15 py-1 pr-3.5 pl-1 text-label-md font-semibold">
+                            <li class="flex h-10 items-center gap-2 rounded-full bg-[rgb(30_42_8/0.78)] py-1 pr-3.5 pl-1 text-label-md font-semibold">
                                 <img src="{{ asset('images/material/'.$file) }}" alt="" class="size-8 rounded-full object-cover">
                                 {{ $label }}
                             </li>

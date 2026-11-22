@@ -11,16 +11,16 @@
 
     @if (session('success'))
         {{-- Setelah dikirim: form diganti instruksi (pesan generik dari controller, tidak membocorkan akun). --}}
-        <div class="mt-7 flex size-14 items-center justify-center rounded-md bg-primary-container text-on-primary-container" aria-hidden="true">
-            <x-ui.icon name="mail" class="size-7" />
+        <div class="mt-7 text-primary" aria-hidden="true">
+            <x-ui.icon name="mail" class="size-10" />
         </div>
-        <h1 class="mt-5 text-headline-lg">Periksa email Anda</h1>
+        <h1 class="mt-5 page-title">Periksa email Anda</h1>
         <p class="mt-2 text-body-lg text-on-surface-muted" role="status">{{ session('success') }} Tautan berlaku 60 menit.</p>
 
         <x-ui.button variant="secondary" size="xl" :href="route('password.request')" class="mt-7 w-full">Kirim ulang tautan</x-ui.button>
         <p class="mt-3 text-body-sm text-on-surface-subtle">Tidak ada di kotak masuk? Periksa folder spam.</p>
     @else
-        <h1 class="mt-7 text-headline-lg">Lupa kata sandi</h1>
+        <h1 class="mt-7 page-title">Lupa kata sandi</h1>
         <p class="mt-2 text-body-lg text-on-surface-muted">
             Masukkan email akun Anda. Kami kirim tautan untuk membuat kata sandi baru.
         </p>

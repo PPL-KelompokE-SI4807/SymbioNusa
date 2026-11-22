@@ -9,7 +9,7 @@
         $mismatch = $passwordError === 'Konfirmasi kata sandi tidak sama.';
     @endphp
 
-    <h1 class="text-headline-lg">Buat kata sandi baru</h1>
+    <h1 class="page-title">Buat kata sandi baru</h1>
     @if ($email)
         <p class="mt-2 text-body-lg text-on-surface-muted">Untuk akun <span class="font-semibold text-on-surface">{{ $email }}</span></p>
     @else

@@ -10,7 +10,7 @@
         $credentialError = $emailError !== '' && (str_starts_with($emailError, 'Email atau kata sandi salah') || str_starts_with($emailError, 'Terlalu banyak percobaan'));
     @endphp
 
-    <h1 class="text-headline-lg">Masuk</h1>
+    <h1 class="page-title">Masuk</h1>
     <p class="mt-2 text-body-lg text-on-surface-muted">Gunakan email dan kata sandi akun perusahaan Anda.</p>
 
     @if ($credentialError)
@@ -50,16 +50,16 @@
     @if (config('app.demo_login'))
         <section class="mt-8" aria-labelledby="demo-login-title">
             <div class="flex items-center gap-3">
-                <span class="h-px flex-1 bg-outline" aria-hidden="true"></span>
+                <span class="h-px flex-1 bg-outline-hairline" aria-hidden="true"></span>
                 <h2 id="demo-login-title" class="text-body-sm text-on-surface-subtle">Akun demo · masuk tanpa sandi</h2>
-                <span class="h-px flex-1 bg-outline" aria-hidden="true"></span>
+                <span class="h-px flex-1 bg-outline-hairline" aria-hidden="true"></span>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-2.5">
                 @foreach (['admin' => ['Admin / DLH', 'AD'], 'seller' => ['Seller', 'SL'], 'buyer' => ['Buyer', 'BY'], 'inspector' => ['Inspector', 'IN']] as $demoRole => [$demoLabel, $demoInitials])
                     <form method="POST" action="{{ route('login.demo', $demoRole) }}">
                         @csrf
                         <button type="submit"
-                                class="flex h-12 w-full items-center gap-2.5 rounded-sm bg-surface-muted px-2 text-label-md font-semibold text-on-surface hover:bg-outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
+                                class="flex h-12 w-full items-center gap-2.5 rounded-sm border border-outline-control bg-surface px-2 text-label-md font-semibold text-on-surface transition-colors hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
                             <x-ui.monogram :name="$demoLabel" :initials="$demoInitials" size="sm" />
                             {{ $demoLabel }}
                         </button>
