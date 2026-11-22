@@ -22,14 +22,33 @@ final class Format
      */
     public static function rupiahShort(float|int|string|null $value): string
     {
-        $value = (float) $value;
+        [$amount, $unit] = self::rupiahParts($value);
 
-        return match (true) {
-            abs($value) >= 1_000_000_000 => 'Rp '.self::number($value / 1_000_000_000, 1).' M',
-            abs($value) >= 1_000_000 => 'Rp '.self::number($value / 1_000_000, 1).' jt',
-            abs($value) >= 1_000 => 'Rp '.self::number($value / 1_000, 1).' rb',
-            default => self::rupiah($value),
+        return trim($amount.' '.$unit);
+    }
+
+    /**
+     * Bentuk ringkas yang dipecah untuk tile KPI: ["Rp 214,6", "jt"]. Desimal ",0" dibuang ("Rp 24 jt").
+     *
+     * @return array{0: string, 1: string}
+     */
+    public static function rupiahParts(float|int|string|null $value): array
+    {
+        $value = (float) $value;
+        [$scaled, $unit] = match (true) {
+            abs($value) >= 1_000_000_000 => [$value / 1_000_000_000, 'M'],
+            abs($value) >= 1_000_000 => [$value / 1_000_000, 'jt'],
+            abs($value) >= 1_000 => [$value / 1_000, 'rb'],
+            default => [$value, ''],
         };
+
+        if ($unit === '') {
+            return [self::rupiah($value), ''];
+        }
+
+        $text = self::number($scaled, 1);
+
+        return ['Rp '.(str_ends_with($text, ',0') ? substr($text, 0, -2) : $text), $unit];
     }
 
     public static function kg(float|int|string|null $value): string
@@ -40,6 +59,16 @@ final class Format
     public static function ton(float|int|string|null $value, int $decimals = 2): string
     {
         return self::number($value, $decimals).' ton';
+    }
+
+    /**
+     * Tanggal tanpa tahun untuk daftar, mis. "20 Nov".
+     */
+    public static function dayMonth(\DateTimeInterface|string|null $value): string
+    {
+        $full = self::date($value);
+
+        return $full === '–' ? $full : implode(' ', array_slice(explode(' ', $full), 0, 2));
     }
 
     /**
