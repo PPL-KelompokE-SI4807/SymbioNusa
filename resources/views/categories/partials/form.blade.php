@@ -100,12 +100,12 @@
                 </div>
             </div>
 
-            <div class="flex items-start gap-3 rounded-md bg-error-container p-4 text-on-error-container">
+            <div class="flex items-start gap-3 border-t border-outline-hairline pt-4">
                 <input type="checkbox" id="is_b3_prohibited" name="is_b3_prohibited" value="1"
                     @checked($value('is_b3_prohibited')) class="{{ $checkbox }}" aria-describedby="is_b3_prohibited-desc">
                 <div>
-                    <label for="is_b3_prohibited" class="text-label-md">Tandai sebagai B3 (dilarang)</label>
-                    <p id="is_b3_prohibited-desc" class="text-body-sm">Listing baru dengan kategori ini otomatis <strong>ditolak</strong> sistem.</p>
+                    <label for="is_b3_prohibited" class="text-label-md font-semibold text-error">Tandai sebagai B3 (dilarang)</label>
+                    <p id="is_b3_prohibited-desc" class="text-body-sm text-on-surface-muted">Listing baru dengan kategori ini otomatis <strong>ditolak</strong> sistem.</p>
                 </div>
             </div>
         </div>
@@ -131,7 +131,7 @@
 
     {{-- Satu baris parameter; disalin oleh skrip di bawah. "__N__" diganti nomor baris. --}}
     <template id="param-row-template">
-        <div class="param-row grid grid-cols-1 items-end gap-3 rounded-md border border-outline bg-background p-3 sm:grid-cols-12">
+        <div class="param-row grid grid-cols-1 items-end gap-3 border-b border-outline-hairline pb-4 sm:grid-cols-12">
             <x-ui.field label="Nama parameter" for="param-nama-__N__" class="sm:col-span-4">
                 <x-ui.input id="param-nama-__N__" class="param-nama" placeholder="Mis. Kebersihan" />
             </x-ui.field>
@@ -158,7 +158,7 @@
         </div>
     </template>
 
-    <details class="mt-6 border-t border-outline pt-4">
+    <details class="mt-6 border-t border-outline-hairline pt-4">
         <summary class="cursor-pointer text-label-md text-on-surface hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
             Mode lanjutan: edit JSON templat
         </summary>

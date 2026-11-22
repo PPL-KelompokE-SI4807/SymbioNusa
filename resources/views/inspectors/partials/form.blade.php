@@ -12,7 +12,7 @@
     $selectedExpertise = array_map('intval', (array) old('bidang_keahlian', $inspector?->expertiseIds() ?? []));
     $selectedWilayah = old('wilayah_tugas', $inspector?->wilayah_tugas);
     $maxMb = (int) (InspectorRules::maxUploadKb() / 1024);
-    $chip = 'flex min-h-10 cursor-pointer items-center gap-2 rounded-sm border border-outline-input bg-surface px-3 py-2 text-body-md text-on-surface transition-colors hover:bg-background has-[:checked]:border-primary has-[:checked]:bg-primary-container has-[:checked]:text-on-primary-container has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus-ring';
+    $chip = 'flex min-h-10 cursor-pointer items-center gap-2 rounded-sm border border-outline-input bg-surface px-3 py-2 text-body-md text-on-surface transition-colors hover:bg-surface-muted has-[:checked]:border-primary has-[:checked]:bg-primary-container has-[:checked]:text-on-primary-container has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus-ring';
     $expertiseError = $errors->first('bidang_keahlian') ?: $errors->first('bidang_keahlian.*');
 @endphp
 
@@ -51,7 +51,7 @@
 <x-ui.card title="Kompetensi">
     <div class="space-y-6">
         <fieldset aria-describedby="bidang_keahlian-helper{{ $expertiseError ? ' bidang_keahlian-error' : '' }}">
-            <legend class="text-label-md text-on-surface">
+            <legend class="text-label-md font-semibold text-on-surface">
                 Bidang keahlian (kategori material)
                 <span class="text-error" aria-hidden="true">*</span>
                 <span class="sr-only">(wajib)</span>
@@ -113,7 +113,7 @@
 
             @if ($inspector)
                 <div class="space-y-1.5">
-                    <p class="text-label-md text-on-surface">Berlaku sampai</p>
+                    <p class="text-label-md font-semibold text-on-surface">Berlaku sampai</p>
                     <p class="flex h-10 items-center text-body-md tabular-nums text-on-surface">{{ Format::date($inspector->berlaku_sampai) }}</p>
                     <p class="text-body-sm text-on-surface-muted">
                         Ubah masa berlaku lewat

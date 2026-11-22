@@ -29,7 +29,7 @@
                         <x-ui.badge variant="danger">Dilarang (B3)</x-ui.badge>
                     @endif
                 </div>
-                <h1 class="text-headline-lg text-on-surface">{{ $category->nama }}</h1>
+                <h1 class="page-title text-on-surface">{{ $category->nama }}</h1>
                 <p class="mt-1 text-body-md text-on-surface-muted">
                     @if ($category->parent)
                         Subkategori dari
@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <x-ui.summary-strip label="Aturan mutu kategori" cols="3" class="mb-6">
             <x-ui.kpi label="Toleransi susut pengiriman"
                 :value="Format::number($category->toleransi_susut_persen, 2).'%'"
                 caption="Disalin ke PO saat dibuat untuk evaluasi selisih tonase." />
@@ -59,9 +59,9 @@
                     ? 'Toleransi ±'.Format::number($category->toleransi_kadar_air_poin, 2).' poin'
                     : 'Tanpa toleransi poin kadar air.'" />
 
-            <div class="rounded-md border border-outline bg-surface p-5">
-                <p class="text-body-sm text-on-surface-muted">Risiko & verifikasi</p>
-                <dl class="mt-3 space-y-3 text-body-md">
+            <div class="col-span-2 min-w-0 bg-surface p-[18px] sm:px-6 sm:py-5 xl:col-span-1">
+                <dt class="text-label-md font-semibold text-on-surface-muted">Risiko & verifikasi</dt>
+                <dd><dl class="mt-3 space-y-3 text-body-md">
                     <div class="flex items-center justify-between gap-3">
                         <dt class="text-on-surface-muted">Tingkat risiko</dt>
                         <dd>
@@ -74,9 +74,9 @@
                         <dt class="text-on-surface-muted">Sertifikat lab</dt>
                         <dd class="text-on-surface">{{ $category->wajib_sertifikat_lab ? 'Wajib' : 'Opsional' }}</dd>
                     </div>
-                </dl>
+                </dl></dd>
             </div>
-        </div>
+        </x-ui.summary-strip>
 
         <x-ui.card title="Templat spesifikasi" :padding="false" class="mb-6">
             <p class="-mt-2 px-6 pb-4 text-body-sm text-on-surface-muted">
@@ -93,7 +93,7 @@
                         <th scope="col" class="px-6">Pengisian</th>
                     </x-slot:head>
                     @foreach ($schema as $idx => $param)
-                        <tr class="h-13 border-t border-outline">
+                        <tr class="h-14 border-t border-outline-hairline">
                             <td class="px-6 py-3 text-right tabular-nums text-on-surface-muted">{{ $idx + 1 }}</td>
                             <td class="px-4 py-3 font-medium text-on-surface">{{ $param['nama'] ?? '–' }}</td>
                             <td class="px-4 py-3 text-on-surface">{{ $tipeLabel[$param['tipe'] ?? 'text'] ?? ($param['tipe'] ?? 'Teks') }}</td>
@@ -109,16 +109,16 @@
                     @endforeach
                 </x-ui.table>
             @else
-                <p class="border-t border-outline px-6 py-8 text-center text-body-sm text-on-surface-muted">
+                <p class="border-t border-outline-hairline px-6 py-8 text-center text-body-sm text-on-surface-muted">
                     Belum ada parameter templat untuk kategori ini.
                 </p>
             @endif
         </x-ui.card>
 
         <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-            <x-ui.card :title="'Subkategori ('.$category->children->count().')'">
+            <x-ui.card :title="'Subkategori · '.$category->children->count()">
                 @if ($category->children->count() > 0)
-                    <ul class="divide-y divide-outline">
+                    <ul class="divide-y divide-outline-hairline">
                         @foreach ($category->children as $child)
                             <li class="flex items-center justify-between gap-3 py-3">
                                 <a href="{{ route('admin.categories.show', $child) }}"
@@ -136,9 +136,9 @@
                 @endif
             </x-ui.card>
 
-            <x-ui.card :title="'Listing dengan kategori ini ('.$category->listings->count().')'">
+            <x-ui.card :title="'Listing dengan kategori ini · '.$category->listings->count()">
                 @if ($category->listings->count() > 0)
-                    <ul class="divide-y divide-outline">
+                    <ul class="divide-y divide-outline-hairline">
                         @foreach ($category->listings->take(5) as $listing)
                             <li class="flex items-center justify-between gap-3 py-3">
                                 <div class="min-w-0">
@@ -167,9 +167,9 @@
 
             @if ($category->status === 'AKTIF')
                 @if ($canArchive)
-                    <div class="flex flex-wrap items-center justify-between gap-4 rounded-md bg-background p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-4 border-t border-outline-hairline pt-4">
                         <div>
-                            <p class="text-label-md text-on-surface">Kategori siap diarsipkan</p>
+                            <p class="text-dash-row text-on-surface">Kategori siap diarsipkan</p>
                             <p class="text-body-sm text-on-surface-muted">Tidak ada subkategori atau listing aktif yang bergantung pada kategori ini.</p>
                         </div>
                         <form method="POST" action="{{ route('admin.categories.archive', $category) }}"
@@ -189,9 +189,9 @@
                     </x-ui.alert>
                 @endif
             @else
-                <div class="flex flex-wrap items-center justify-between gap-4 rounded-md bg-background p-4">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-t border-outline-hairline pt-4">
                     <div>
-                        <p class="text-label-md text-on-surface">Kategori sedang diarsipkan</p>
+                        <p class="text-dash-row text-on-surface">Kategori sedang diarsipkan</p>
                         <p class="text-body-sm text-on-surface-muted">Kategori ini tidak bisa dipilih saat membuat listing baru.</p>
                     </div>
                     <form method="POST" action="{{ route('admin.categories.unarchive', $category) }}">

@@ -27,12 +27,13 @@
         </x-slot:actions>
     </x-ui.page-header>
 
-    <div class="mb-6 grid grid-cols-2 gap-4 xl:grid-cols-4">
+    <x-ui.summary-strip label="Ringkasan registri Inspector" class="mb-6">
         <x-ui.kpi label="Total Inspector" :value="Format::number($stats['total'])" />
         <x-ui.kpi label="Aktif" :value="Format::number($stats['aktif'])" caption="Bisa ditugaskan" />
-        <x-ui.kpi label="Sertifikat ≤ 30 hari" :value="Format::number($stats['segera_berakhir'])" caption="Perlu diperpanjang" />
+        <x-ui.kpi label="Sertifikat ≤ 30 hari" :value="Format::number($stats['segera_berakhir'])" caption="Perlu diperpanjang"
+            :tone="$stats['segera_berakhir'] > 0 ? 'warning' : 'plain'" />
         <x-ui.kpi label="Nonaktif" :value="Format::number($stats['nonaktif'])" caption="Kedaluwarsa atau dikeluarkan" />
-    </div>
+    </x-ui.summary-strip>
 
     <x-ui.card class="mb-6">
         <form method="GET" action="{{ route('admin.inspectors.index') }}" role="search" aria-label="Saring Inspector"
@@ -84,18 +85,18 @@
 
         @if ($inspectors->count() > 0)
             {{-- Di bawah 1536 px tabel 7 kolom (plus sidebar 240 px) tidak muat tanpa memotong kolom Aksi, jadi tampil sebagai kartu. --}}
-            <ul class="grid grid-cols-1 gap-4 border-t border-outline p-4 sm:grid-cols-2 sm:p-6 xl:grid-cols-3 2xl:hidden" aria-label="Daftar Inspector">
+            <ul class="divide-y divide-outline-hairline border-t border-outline-hairline 2xl:hidden" aria-label="Daftar Inspector">
                 @foreach ($inspectors as $ins)
                     @php
                         $status = $ins->status($today);
                         $expertise = $ins->expertiseCategories($categories);
                         $days = $ins->daysUntilExpiry($today);
                     @endphp
-                    <li class="flex flex-col gap-3 rounded-md border border-outline p-4">
+                    <li class="flex flex-col gap-3 px-[18px] py-4 sm:px-6">
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
                                 <a href="{{ route('admin.inspectors.show', $ins) }}"
-                                    class="text-label-md text-on-surface hover:text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
+                                    class="text-dash-row text-on-surface hover:text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
                                     {{ $ins->user->nama }}
                                 </a>
                                 <p class="truncate text-body-sm text-on-surface-muted">{{ $ins->wilayah_tugas ?? '–' }}</p>
@@ -110,7 +111,7 @@
                             <dd class="text-right tabular-nums text-on-surface">{{ Format::date($ins->berlaku_sampai) }}</dd>
                         </dl>
                         @include('inspectors.partials.expiry-note', ['days' => $days, 'status' => $status, 'class' => 'text-body-sm'])
-                        <div class="mt-auto flex flex-wrap items-center gap-x-4 border-t border-outline pt-3">
+                        <div class="flex flex-wrap items-center gap-x-4">
                             @include('inspectors.partials.row-actions', ['ins' => $ins, 'status' => $status, 'touch' => true])
                         </div>
                     </li>
@@ -133,10 +134,10 @@
                         $status = $ins->status($today);
                         $days = $ins->daysUntilExpiry($today);
                     @endphp
-                    <tr class="h-13 border-t border-outline align-middle hover:bg-background">
+                    <tr class="h-14 border-t border-outline-hairline align-middle hover:bg-surface-muted/60">
                         <td class="px-4 py-3">
                             <a href="{{ route('admin.inspectors.show', $ins) }}"
-                                class="font-medium text-on-surface hover:text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
+                                class="text-dash-row text-on-surface hover:text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
                                 {{ $ins->user->nama }}
                             </a>
                         </td>
@@ -162,20 +163,20 @@
             </x-ui.table>
 
             @if ($inspectors->hasPages())
-                <div class="border-t border-outline px-6 py-4">
+                <div class="border-t border-outline-hairline px-6 py-4">
                     {{ $inspectors->links() }}
                 </div>
             @endif
         @else
-            <div class="border-t border-outline px-6 pb-10 pt-8 text-center">
+            <div class="border-t border-outline-hairline px-6 pb-10 pt-8 text-center">
                 @if ($filtered)
-                    <p class="text-label-md text-on-surface">Tidak ada Inspector yang cocok dengan saringan.</p>
+                    <p class="text-dash-sub text-on-surface">Tidak ada Inspector yang cocok dengan saringan.</p>
                     <p class="mt-1 text-body-sm text-on-surface-muted">Ubah kata kunci atau saringan, atau tampilkan semua Inspector.</p>
                     <div class="mt-4">
                         <x-ui.button variant="secondary" href="{{ route('admin.inspectors.index') }}">Tampilkan semua</x-ui.button>
                     </div>
                 @else
-                    <p class="text-label-md text-on-surface">Belum ada Inspector terdaftar.</p>
+                    <p class="text-dash-sub text-on-surface">Belum ada Inspector terdaftar.</p>
                     <p class="mt-1 text-body-sm text-on-surface-muted">Daftarkan Inspector beserta sertifikasinya agar bisa ditugaskan memverifikasi mutu.</p>
                     <div class="mt-4">
                         <x-ui.button href="{{ route('admin.inspectors.create') }}">Daftarkan Inspector</x-ui.button>
