@@ -98,14 +98,6 @@ class PurchaseOrder extends Model
     }
 
     /**
-     * @return BelongsTo<RfqContract, $this>
-     */
-    public function rfqContract(): BelongsTo
-    {
-        return $this->belongsTo(RfqContract::class, 'rfq_contracts_id_rfq_contract', 'id_rfq_contract');
-    }
-
-    /**
      * @return HasMany<OrderStatusHistory, $this>
      */
     public function statusHistory(): HasMany
