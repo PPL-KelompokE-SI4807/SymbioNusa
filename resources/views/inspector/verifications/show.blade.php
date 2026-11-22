@@ -126,7 +126,7 @@
                                                 <x-ui.button
                                                     variant="secondary"
                                                     type="button"
-                                                    @click="previewUrl = '{{ asset($doc->file_url) }}'; previewTitle = '{{ $doc->jenis }}'"
+                                                    @click="previewUrl = '{{ asset('storage/'.$doc->file_url) }}'; previewTitle = '{{ $doc->jenis }}'"
                                                 >
                                                     Lihat Dokumen
                                                 </x-ui.button>
@@ -165,7 +165,7 @@
                                                 <x-ui.button
                                                     variant="secondary"
                                                     type="button"
-                                                    @click="previewUrl = '{{ asset($doc->file_url) }}'; previewTitle = '{{ $doc->jenis }}'"
+                                                    @click="previewUrl = '{{ asset('storage/'.$doc->file_url) }}'; previewTitle = '{{ $doc->jenis }}'"
                                                 >
                                                     Lihat Dokumen
                                                 </x-ui.button>

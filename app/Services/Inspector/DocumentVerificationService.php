@@ -52,7 +52,8 @@ class DocumentVerificationService
         if ($sellerId) {
             $legalitas = CompanyDocument::query()
                 ->where('id_company', $sellerId)
-                ->whereIn('jenis', ['NIB', 'AKTA_PENDIRIAN', 'NPWP', 'LAINNYA'])
+                // SURAT_NON_B3 diunggah lewat profil perusahaan (PBI-08) dan inti pemeriksaan PBI-17.
+                ->whereIn('jenis', ['NIB', 'AKTA_PENDIRIAN', 'NPWP', 'SURAT_NON_B3', 'LAINNYA'])
                 ->get();
 
             $izinUsaha = CompanyDocument::query()
@@ -98,7 +99,8 @@ class DocumentVerificationService
                 ->where('status', 'DITUGASKAN')
                 ->update(['status' => 'DIPROSES']);
 
-            // TODO(SYM-21): koordinasi OrderStateMachine (Dhafi/PBI-05) untuk transisi status order jika disetujui
+            // Status order tidak berubah di sini: hasil SETUJU menjadi syarat pengiriman (PBI-11),
+            // sedangkan transisi Lolos/Gagal Inspeksi dilakukan laporan mutu (PBI-19).
 
             return $verification->fresh();
         });

@@ -127,6 +127,25 @@ class DocumentVerificationTest extends TestCase
         $response->assertSee($this->sellerCompany->nama);
     }
 
+    public function test_surat_pernyataan_non_b3_tampil_di_dokumen_legalitas_dengan_tautan_storage(): void
+    {
+        CompanyDocument::create([
+            'id_company' => $this->sellerCompany->id_company,
+            'jenis' => 'SURAT_NON_B3',
+            'file_url' => 'company-documents/surat-non-b3.pdf',
+            'status' => CompanyDocument::STATUS_VALID,
+            'berlaku_sampai' => now()->addYear()->toDateString(),
+        ]);
+
+        $response = $this->actingAs($this->inspector)
+            ->get(route('inspector.verifications.show', $this->verification));
+
+        $response->assertOk();
+        $response->assertSee('Dokumen Legalitas (1)');
+        $response->assertSee('SURAT_NON_B3');
+        $response->assertSee(asset('storage/company-documents/surat-non-b3.pdf'), false);
+    }
+
     public function test_inspector_ditugaskan_dapat_menyetujui_verifikasi_dokumen_dengan_checklist(): void
     {
         $payload = [
