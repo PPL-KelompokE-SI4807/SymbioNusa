@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CompanyVerificationController;
+use App\Http\Controllers\Admin\InspectionAssignmentController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanyDocumentController;
@@ -126,6 +127,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{verification}', [DocumentVerificationController::class, 'show'])->name('show');
         Route::post('/{verification}', [DocumentVerificationController::class, 'verify'])->name('verify');
     });
+
+    // PBI-18 (SYM-22): Penugasan Inspeksi (Admin)
+    Route::prefix('admin/penugasan-inspeksi')->name('admin.inspections.')->group(function () {
+        Route::get('/', [InspectionAssignmentController::class, 'index'])->name('index');
+        Route::get('/{order}/tugaskan', [InspectionAssignmentController::class, 'create'])->name('create');
+        Route::post('/{order}/tugaskan', [InspectionAssignmentController::class, 'store'])->name('store');
+        Route::get('/{inspection}', [InspectionAssignmentController::class, 'show'])->name('show');
+        Route::post('/{inspection}/batalkan', [InspectionAssignmentController::class, 'cancel'])->name('cancel');
+    });
+
+    // PBI-18 (SYM-22): Tugas Inspeksi (Inspector)
+    Route::get('/inspector/tugas-inspeksi', [InspectionAssignmentController::class, 'inspectorTasks'])->name('inspector.tasks.index');
 });
 
 require __DIR__.'/auth.php';

@@ -27,7 +27,7 @@
             'VERIFIKASI & TRANSAKSI' => [
                 ['label' => 'Verifikasi Mitra', 'icon' => 'building', 'route' => 'admin.companies.index', 'active' => 'admin.companies.*'],
                 ['label' => 'Moderasi Listing', 'icon' => 'clipboard', 'route' => null],
-                ['label' => 'Penugasan Inspeksi', 'icon' => 'calendar', 'route' => null],
+                ['label' => 'Penugasan Inspeksi', 'icon' => 'calendar', 'route' => 'admin.inspections.index', 'active' => 'admin.inspections.*'],
                 ['label' => 'Sengketa & Klaim', 'icon' => 'scale', 'route' => null],
             ],
             'PENGAWASAN' => [
@@ -82,7 +82,7 @@
                 ['label' => 'Dashboard', 'icon' => 'grid', 'route' => 'dashboard'],
             ],
             'INSPEKSI' => [
-                ['label' => 'Tugas Inspeksi', 'icon' => 'calendar', 'route' => null],
+                ['label' => 'Tugas Inspeksi', 'icon' => 'calendar', 'route' => 'inspector.tasks.index', 'active' => 'inspector.tasks.*'],
                 ['label' => 'Verifikasi Dokumen', 'icon' => 'file', 'route' => 'inspector.verifications.index', 'active' => 'inspector.verifications.*'],
                 ['label' => 'Laporan Mutu', 'icon' => 'flask', 'route' => null],
             ],
