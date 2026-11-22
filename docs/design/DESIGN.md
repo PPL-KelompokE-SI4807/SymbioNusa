@@ -1,78 +1,127 @@
 ---
 version: beta
 name: SymbioNusa
-description: Regulator-supervised B2B platform for non-hazardous (non-B3) industrial production residue in Indonesia. Calm, credible operational UI in Bahasa Indonesia. FND v10 "Heavy-Clean" (21 Nov 2026) — the FND v9 rules and tokens, plus the interaction and motion layer of the Heavy-Clean direction (action feedback loop, interactive drill-down, one spring system). Rich behaviour, quiet surface. Identity from FND v8 is retained.
+description: Regulator-supervised B2B platform for non-hazardous (non-B3) industrial production residue in Indonesia. Calm, credible operational UI in Bahasa Indonesia. FND v11 "Senja di Sawah" (22 Nov 2026) — the PM-approved Senja di Sawah dashboard is the visual reference for every screen; FND v10 Heavy-Clean rules (Ledger, Text budget, Data honesty, Interaction integrity, Motion) are unchanged. The previous Sage values are history.
 colors:
-  primary: "#15803d"
-  primary-hover: "#166534"
+  primary: "#3f6212"
+  primary-hover: "#2f3d12"
   on-primary: "#ffffff"
-  primary-container: "#dcfce7"
-  on-primary-container: "#14532d"
-  secondary: "#14532d"
-  secondary-hover: "#1b5e37"
-  on-secondary: "#ffffff"
-  on-secondary-muted: "#cfeedd"
-  secondary-label: "#a7e0b8"
+  primary-container: "#fef3c7"
+  on-primary-container: "#1c2a0a"
+  secondary: "#1e2a08"
+  secondary-hover: "#2f3d12"
+  on-secondary: "#fef9c3"
+  on-secondary-muted: "#fef9c3"
+  secondary-label: "#e3d99a"
   tertiary: "#1e40af"
   on-tertiary: "#ffffff"
-  neutral: "#5f6d64"
-  background: "#eef3ec"
+  neutral: "#4a4a1a"
+  background: "#fdf8d8"
   surface: "#ffffff"
-  surface-muted: "#eef3ec"
-  on-surface: "#16241b"
-  on-surface-muted: "#4b5a50"
-  on-surface-subtle: "#5f6d64"
-  outline: "#e2e8df"
-  outline-control: "#c9d3c6"
-  outline-input: "#7a8a7f"
-  focus-ring: "#15803d"
+  surface-muted: "#fef3c7"
+  on-surface: "#1c2a0a"
+  on-surface-muted: "#4a4a1a"
+  on-surface-subtle: "#4a4a1a"
+  outline: "#e3d99a"
+  outline-control: "#e3d99a"
+  outline-input: "#8a8350"
+  focus-ring: "#3f6212"
   error: "#b91c1c"
-  error-container: "#fef2f2"
-  error-line: "#fecaca"
-  on-error-container: "#7f1d1d"
-  warning: "#b45309"
-  warning-container: "#fff7e6"
-  warning-line: "#fde3a7"
-  on-warning-container: "#78350f"
-  success: "#15803d"
-  success-container: "#f0fdf4"
-  success-line: "#bbf7d0"
-  on-success-container: "#14532d"
+  error-container: "#fdf2f2"
+  error-line: "#e3d99a"
+  on-error-container: "#1c2a0a"
+  warning: "#92400e"
+  warning-container: "#fef3c7"
+  warning-line: "#e3d99a"
+  on-warning-container: "#1c2a0a"
+  success: "#3f6212"
+  success-container: "#fef3c7"
+  success-line: "#e3d99a"
+  on-success-container: "#1c2a0a"
   info: "#1e40af"
-  info-container: "#dbeafe"
-  info-line: "#bfdbfe"
-  on-info-container: "#1e40af"
+  info-container: "#fef3c7"
+  info-line: "#e3d99a"
+  on-info-container: "#1c2a0a"
   neutral-container: "#e4e4e7"
   on-neutral-container: "#3f3f46"
-  band-forest-from: "#0f3f22"
-  band-forest-to: "#14532d"
+  band-forest-from: "#1e2a08"
+  band-forest-to: "#2f3d12"
   on-band: "#ffffff"
-  on-band-muted: "#cfeedd"
-  insight-marker: "#b45309"
-  age-bar-track: "#e2e8df"
-  age-bar-fresh: "#86c79b"
+  on-band-muted: "#fef9c3"
+  insight-marker: "#92400e"
+  age-bar-track: "#f6efc6"
+  age-bar-fresh: "#ddd08a"
   age-bar-aging: "#fbbf24"
   age-bar-stale: "#b91c1c"
-  chart-lead: "#15803d"
-  category-plastik: "#1e40af"
-  category-tekstil: "#b45309"
-  category-kayu: "#92400e"
-  category-kertas: "#3f3f46"
+  chart-lead: "#3f6212"
+  category-plastik: "#d97706"
+  category-tekstil: "#ea580c"
+  category-kayu: "#a16207"
+  category-kertas: "#57534e"
   category-pangan: "#65a30d"
   photo-scrim: "rgba(9,26,18,0.68)"
-  photo-label: "#14532d"
+  photo-label: "#1e2a08"
   on-photo-label: "#ffffff"
-  mono-green: "#dbeee1"
-  on-mono-green: "#166534"
-  mono-clay: "#f6e2d9"
-  on-mono-clay: "#9a3412"
-  mono-sky: "#dbe9f2"
-  on-mono-sky: "#075985"
-  mono-sun: "#fdf0d0"
-  on-mono-sun: "#92400e"
-  mono-zinc: "#e4e7e4"
-  on-mono-zinc: "#3f3f46"
+  mono-green: "#fef3c7"
+  on-mono-green: "#1c2a0a"
+  mono-clay: "#fef3c7"
+  on-mono-clay: "#1c2a0a"
+  mono-sky: "#fef3c7"
+  on-mono-sky: "#1c2a0a"
+  mono-sun: "#fef3c7"
+  on-mono-sun: "#1c2a0a"
+  mono-zinc: "#fef3c7"
+  on-mono-zinc: "#1c2a0a"
+  outline-hairline: "#f6efc6"
+  flow-segment: "#f7f0c2"
+  flow-segment-line: "#ddd08a"
+  accent: "#c2410c"
+  on-accent: "#ffffff"
+  category-lainnya: "#ddd08a"
+  sidebar-base: "#1e2a08"
+  sidebar-overlay: "linear-gradient(168deg, rgba(71,88,28,.94), rgba(30,42,8,.98) 72%)"
+  sidebar-text: "#fef9c3"
+  sidebar-count-badge: "#d97706"
 typography:
+  page-title:
+    fontFamily: Figtree
+    fontSize: "clamp(25px, 3.2vw, 34px)"
+    fontWeight: 900
+    letterSpacing: "-0.02em"
+    lineHeight: 1.15
+    usage: "H1 of every application page (x-ui.page-header, class .page-title). Names the context, never a greeting."
+  card-title:
+    fontFamily: Figtree
+    fontSize: 19px
+    fontWeight: 800
+    lineHeight: 1.25
+    usage: "Card and zone titles (text-dash-title)."
+  subtitle:
+    fontFamily: Figtree
+    fontSize: 16px
+    fontWeight: 800
+    lineHeight: 1.3
+    usage: "Detail-panel titles, empty-state titles (text-dash-sub)."
+  row-title:
+    fontFamily: Figtree
+    fontSize: 15px
+    fontWeight: 700
+    lineHeight: 1.3
+    usage: "Queue, ledger and table row titles (text-dash-row)."
+  dash-metric:
+    fontFamily: Figtree
+    fontSize: 32px
+    fontWeight: 900
+    lineHeight: 1.05
+    fontFeature: '"tnum" 1'
+    usage: "Summary-strip values, order-flow counts, date-block day numbers (text-dash-metric)."
+  eyebrow:
+    fontFamily: Figtree
+    fontSize: 12px
+    fontWeight: 800
+    letterSpacing: "0.13em"
+    textTransform: uppercase
+    usage: "Dashboard zone eyebrows and sidebar group labels only."
   display-public:
     fontFamily: Figtree
     fontSize: "clamp(46px, 6vw, 92px)"
@@ -151,14 +200,18 @@ typography:
     lineHeight: 1.4
     fontFeature: '"tnum" 1'
 rounded:
-  sm: 10px
-  md: 14px
-  lg: 20px
+  sm: 9px
+  md: 8px
+  lg: 14px
+  photo-label: 6px
+  count-badge: 5px
+  sidebar: 24px
   full: 9999px
 shadow:
-  card: "0 8px 24px -8px rgba(16,24,40,0.10), 0 1px 2px rgba(16,24,40,0.05)"
-  raised: "0 18px 36px -18px rgba(16,24,40,0.16)"
-  overlay: "0 16px 40px -12px rgba(16,24,40,0.22), 0 2px 6px rgba(16,24,40,0.08)"
+  card: "0 0 0 1px {colors.outline}, 0 1px 3px rgba(62,52,10,0.04)"
+  raised: "0 0 0 1px {colors.outline}, 0 18px 36px -18px rgba(62,52,10,0.16)"
+  overlay: "0 16px 40px -12px rgba(30,42,8,0.24), 0 2px 6px rgba(62,52,10,0.08)"
+  sidebar: "0 16px 32px -20px rgba(30,42,8,0.28)"
 spacing:
   base: 4px
   xs: 4px
@@ -170,6 +223,7 @@ spacing:
   gutter: 24px
   page-margin: 16px
   sidebar-width: 276px
+  card-padding-mobile: 18px
   topbar-height-mobile: 64px
   control-height: 40px
   control-height-lg: 44px
@@ -316,7 +370,17 @@ components:
 
 # SymbioNusa
 
-> **Amendment 22 Nov 2026 — dashboard variant "Senja di Sawah" (PM decision).** The role dashboards adopt the PM-approved variant *SymbioNusa Dashboard — Varian Senja di Sawah* (palette `senjasawah` from the colour lab). **Scope: dashboard content only.** The content area of `/dashboard` is wrapped in `.dash-senja`, which re-declares the existing `--color-*` tokens with the Senja values (bg `#fdf8d8`, surface `#ffffff`, surface2 `#fef3c7`, ink `#1c2a0a`, meta `#4a4a1a`, line `#e3d99a`, forest `#2f3d12` / `#47581c` / `#1e2a08`, on-forest `#fef9c3`, primary/success `#3f6212`, accent `#c2410c` for small accents only, warning `#92400e`, danger `#b91c1c`; categories Plastik `#d97706`, Pangan `#65a30d`, Tekstil `#ea580c`, Kayu `#a16207`, Kertas `#57534e`; derived line-2 `#f6efc6`, seg-bg `#f7f0c2`, seg-line `#ddd08a`). Values live in `resources/css/dashboard-senja.css` (overrides) and the `@theme static` block in `resources/css/app.css` (dashboard-only tokens) — one place each, no second naming scheme. **Sidebar (all pages, PM decision 22 Nov 2026):** the shared sidebar and the mobile top bar take the variant style on every screen (forest-deep base with the 168° overlay `rgba(71,88,28,.94) → rgba(30,42,8,.98) 72%`, radius 24 px, accent logo mark, tagline "Sirkular industri Nusantara", tracked group eyebrows, square gold count badge, outlined user card), defined in `resources/css/sidebar-senja.css` through `data-sidebar*` hooks (the sidebar tokens are re-declared inside the sidebar only). **Unchanged:** the content area of every non-dashboard screen and all rules in this file (Ledger, Text budget, Data honesty, Interaction integrity, Motion with one spring solver and three presets, light-only palette, 40 px maximum in the app). Inside the dashboard, card radius is 14 px, buttons 9 px, flow segments 8 px; Figtree 800/900 are loaded for dashboard numbers and titles. **Data limits recorded with the decision:** `purchase_orders` and `impact_logs` have no date columns, so Zone 3 is titled "Gambaran total tercatat", comparators appear only where the data supports them, age bars appear only for orders with a dated `order_status_history` row, and the "Terlama · n hari" marker waits for PM-stated stage thresholds (schema request: `prompts/91_USULAN_PERUBAHAN_SKEMA.md`, Usulan 3). Rolled out per role with PM review after each, all four role dashboards (Admin, Seller, Buyer, Inspector) on 22 Nov 2026. Shared dashboard partials live in `resources/views/livewire/dashboard/partials/` (queue, running, metrics, stage-chart); role-specific visuals are the Admin order river and outcome bar, the Seller listing photo cards, the Buyer route tracker (position from manifest status, not GPS) and the Inspector hour timeline with one SEKARANG marker and a credential card. The full §7.1 action feedback loop waits for the backend actions (confirm PO, confirm receipt, assign Inspector, decide dispute, start inspection) to exist.
+> **Amendment 22 Nov 2026 (FND v11 — "Senja di Sawah" becomes the design system, PM decision).** The PM stated that the Senja di Sawah dashboard is the UI/UX SymbioNusa keeps ("pokoknya saya udah suka sama ui/ux yang dashboard ini"). From this amendment on, the Senja di Sawah dashboard is the **visual reference for every screen** — dashboards, queues, tables, forms, detail pages, auth and the landing page — not only for `/dashboard`.
+>
+> - **Values.** The front matter now holds the Senja values (palette `senjasawah`): background #fdf8d8, surface #ffffff, surface2 #fef3c7, ink #1c2a0a, meta #4a4a1a (the one secondary tone), line #e3d99a, line-2 (outline-hairline) #f6efc6, forest #2f3d12 / forest2 #47581c / forestDeep #1e2a08, onForest #fef9c3, primary = success #3f6212, accent #c2410c (small accents only: the selected segment, the SEKARANG marker, the logo mark — never a second button or a large field), warning #92400e, danger #b91c1c; categories Plastik #d97706, Pangan #65a30d, Tekstil #ea580c, Kayu #a16207, Kertas #57534e. Input borders use #8a8350 (3.86:1 on white), because line #e3d99a (1.43:1) may not be the only boundary of an input. In code they live once, in the `@theme` blocks of `resources/css/app.css`, under the existing token names; `.dash-senja` no longer re-declares any token.
+> - **Shapes.** Card and summary strip 14 px; button, input, select and segmented control 9 px; order-flow segment, small interactive row and alert 8 px; photo label 6 px; sidebar 24 px; sidebar count badge 5 px. Cards carry a 1 px line border (drawn as a ring) plus a very soft golden shadow; neutral rgba(16,24,40,…) shadows are retired.
+> - **Type.** Figtree weights 400–900 are loaded. 900: page title (clamp 25–34 px) and metric values (32 px); 800: card and zone titles (19 px), subtitles (16 px), eyebrows; 700: row titles (15 px). The only uppercase tracked style is the 12 px / 800 eyebrow (dashboard zones, sidebar groups). Minimum text stays 12 px; the application maximum stays 40 px; display-public stays on public surfaces only.
+> - **Sidebar.** The Senja sidebar (forestDeep with the 168° overlay, onForest text, inverted active item, square gold count badge, outlined user card) is the shell of every page; `resources/css/sidebar-senja.css`.
+> - **Unchanged.** Every Heavy-Clean rule in this file: Ledger (no pills in the content area, status as coloured text + glyph, ledger rows on one white surface, colour as data ink), Text budget, Data honesty, Interaction integrity and the Action feedback loop, Motion (one spring solver, three presets), locked light palette, the summary strip instead of KPI tiles, two gradients only (sidebar overlay and photo scrim; the impact band uses the forest range #1e2a08 → #2f3d12).
+> - **History.** The FND v10 Sage values are superseded and kept as history only (git history of this file; old → new: background #eef3ec → #fdf8d8, on-surface #16241b → #1c2a0a, meta #5f6d64 → #4a4a1a, outline #e2e8df → #e3d99a, primary #15803d → #3f6212, warning #b45309 → #92400e, sidebar #14532d → #1e2a08, categories Plastik #1e40af / Tekstil #b45309 / Kayu #92400e / Kertas #3f3f46 → #d97706 / #ea580c / #a16207 / #57534e, radii 10/14/20 → 9/8/14). Hex values quoted in the body text of the older amendments and sections below describe that history; where they disagree with the front matter or this block, this block and the front matter win.
+> - **Contrast.** Recomputed from the Senja hex values with a WCAG 2.x script on 22 Nov 2026; the table is in `prompts/02_ATURAN_UI_SYMBIONUSA.md`.
+
+> **Amendment 22 Nov 2026 — dashboard variant "Senja di Sawah" (PM decision).** The role dashboards adopt the PM-approved variant *SymbioNusa Dashboard — Varian Senja di Sawah* (palette `senjasawah` from the colour lab). **Scope: dashboard content only.** The content area of `/dashboard` is wrapped in `.dash-senja`, which re-declares the existing `--color-*` tokens with the Senja values (bg `#fdf8d8`, surface `#ffffff`, surface2 `#fef3c7`, ink `#1c2a0a`, meta `#4a4a1a`, line `#e3d99a`, forest `#2f3d12` / `#47581c` / `#1e2a08`, on-forest `#fef9c3`, primary/success `#3f6212`, accent `#c2410c` for small accents only, warning `#92400e`, danger `#b91c1c`; categories Plastik `#d97706`, Pangan `#65a30d`, Tekstil `#ea580c`, Kayu `#a16207`, Kertas `#57534e`; derived line-2 `#f6efc6`, seg-bg `#f7f0c2`, seg-line `#ddd08a`). Values live in `resources/css/dashboard-senja.css` (overrides) and the `@theme static` block in `resources/css/app.css` (dashboard-only tokens) — one place each, no second naming scheme. **Sidebar (all pages, PM decision 22 Nov 2026):** the shared sidebar and the mobile top bar take the variant style on every screen (forest-deep base with the 168° overlay `rgba(71,88,28,.94) → rgba(30,42,8,.98) 72%`, radius 24 px, accent logo mark, tagline "Sirkular industri Nusantara", tracked group eyebrows, square gold count badge, outlined user card), defined in `resources/css/sidebar-senja.css` through `data-sidebar*` hooks (the sidebar tokens are re-declared inside the sidebar only). **Unchanged (superseded by FND v11 above for the content area of non-dashboard screens):** all rules in this file (Ledger, Text budget, Data honesty, Interaction integrity, Motion with one spring solver and three presets, light-only palette, 40 px maximum in the app). Inside the dashboard, card radius is 14 px, buttons 9 px, flow segments 8 px; Figtree 800/900 are loaded for dashboard numbers and titles. **Data limits recorded with the decision:** `purchase_orders` and `impact_logs` have no date columns, so Zone 3 is titled "Gambaran total tercatat", comparators appear only where the data supports them, age bars appear only for orders with a dated `order_status_history` row, and the "Terlama · n hari" marker waits for PM-stated stage thresholds (schema request: `prompts/91_USULAN_PERUBAHAN_SKEMA.md`, Usulan 3). Rolled out per role with PM review after each, all four role dashboards (Admin, Seller, Buyer, Inspector) on 22 Nov 2026. Shared dashboard partials live in `resources/views/livewire/dashboard/partials/` (queue, running, metrics, stage-chart); role-specific visuals are the Admin order river and outcome bar, the Seller listing photo cards, the Buyer route tracker (position from manifest status, not GPS) and the Inspector hour timeline with one SEKARANG marker and a credential card. The full §7.1 action feedback loop waits for the backend actions (confirm PO, confirm receipt, assign Inspector, decide dispute, start inspection) to exist.
 
 > **Amendment 21 Nov 2026 (FND v9).** PM (Mayhesa) approved this refinement of FND v8, following the dashboard audit of 21 Nov 2026 and the UI/UX audit of 19 Nov 2026. The identity is unchanged: Figtree, the same closed palette, radii 10/14/20, the floating forest sidebar, status as glyph + text, one filled action per region. What changes is discipline, not appearance: KPI tiles are flat instead of gradient; a display type tier is ratified for public surfaces only; a Data honesty section makes period labels, true denominators, true counts and honest inference labels mandatory; dashboards follow role-specific patterns instead of one generic pattern; a credential card, a freshness rule, a fixed material-category colour mapping, a motion budget and tightened accessibility rules are added. The FND v8 amendment of 19 Nov 2026 (FigCraft direction, colour fields, soft shapes, real material photos) remains the visual basis; older values are in git history.
 
@@ -646,7 +710,7 @@ Accessibility wiring is part of the system, not a per-form afterthought.
 - Don't use display-public inside the application, or display sizes as a substitute for hierarchy in a dashboard.
 - Don't present an unlabelled all-time total as if it were this month's, a subset share as if it were the whole, or a headcount inference as a diagnosis.
 - Don't render pseudo-action text ("Konfirmasi segera") in place of a missing page.
-- Don't use uppercase tracked labels, weight 700 outside numbers, weights above 700, or text below 12 px.
+- Don't use uppercase tracked labels outside the 12 px eyebrow (dashboard zones, sidebar groups), or text below 12 px. Weights follow FND v11 (900 page titles and metrics, 800 titles, 700 row titles).
 - Don't count numbers up on load, add decorative or looping motion, use CSS easing for layout motion, or ignore `prefers-reduced-motion`.
 - Don't add a dark palette or `prefers-color-scheme: dark` overrides.
 - Don't show the role switcher outside demo mode.
