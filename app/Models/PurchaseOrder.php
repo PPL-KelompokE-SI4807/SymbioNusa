@@ -105,6 +105,7 @@ class PurchaseOrder extends Model
         return $this->hasMany(OrderStatusHistory::class, 'purchase_orders_id_purchase_order', 'id_purchase_order')
             ->orderBy('id_order_status_history', 'asc');
     }
+
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class, 'purchase_orders_id_purchase_order', 'id_purchase_order');

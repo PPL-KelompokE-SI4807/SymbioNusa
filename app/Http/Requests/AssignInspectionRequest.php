@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Inspection;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +20,7 @@ class AssignInspectionRequest extends FormRequest
     /**
      * Aturan validasi penugasan inspeksi.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

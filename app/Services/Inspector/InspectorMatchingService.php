@@ -4,6 +4,7 @@ namespace App\Services\Inspector;
 
 use App\Models\Category;
 use App\Models\Inspection;
+use App\Models\InspectorProfile;
 use App\Models\PurchaseOrder;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -29,7 +30,7 @@ class InspectorMatchingService
         /** @var Category|null $category */
         $category = $po->rfqContract?->listing?->category;
         $categoryId = $category?->id_categories;
-        $sellerWilayah = trim((string) ($po->seller?->alamat ?? ''));
+        $sellerWilayah = $po->seller ? trim((string) $po->seller->alamat) : '';
 
         // Ambil seluruh user ber-role INSPECTOR yang aktif dan sertifikatnya belum kedaluwarsa
         $inspectors = User::query()
@@ -47,8 +48,8 @@ class InspectorMatchingService
 
         foreach ($inspectors as $inspector) {
             $profile = $inspector->inspectorProfile;
-            $skills = (array) ($profile?->bidang_keahlian ?? []);
-            $wilayah = trim((string) ($profile?->wilayah_tugas ?? ''));
+            $skills = $profile instanceof InspectorProfile ? (array) $profile->bidang_keahlian : [];
+            $wilayah = $profile instanceof InspectorProfile ? trim((string) $profile->wilayah_tugas) : '';
 
             // 1. Kecocokan Keahlian Kategori (Bobot 50 poin)
             $categoryMatch = false;

@@ -37,8 +37,9 @@ class InspectionModeAdvisor
 
         /** @var Category|null $category */
         $category = $po->rfqContract?->listing?->category;
-        $categoryRisk = $category?->tingkat_risiko ?? 'RENDAH';
-        $wajibLab = (bool) ($category?->wajib_uji_lab ?? false);
+        $categoryRisk = $category instanceof Category ? $category->tingkat_risiko : 'RENDAH';
+        $wajibLab = $category instanceof Category ? (bool) $category->wajib_sertifikat_lab : false;
+        $categoryName = $category instanceof Category ? $category->nama : 'Umum';
         $volume = (float) ($po->volume_kg ?? 0);
         $isHighVolume = $volume > self::VOLUME_THRESHOLD_KG;
 
@@ -46,7 +47,7 @@ class InspectionModeAdvisor
         if (strtoupper($categoryRisk) === 'TINGGI') {
             return [
                 'mode' => Inspection::MODE_LAPANGAN,
-                'alasan' => "Kategori material berisiko tinggi ({$category?->nama}) memerlukan pemeriksaan fisik di lokasi.",
+                'alasan' => "Kategori material berisiko tinggi ({$categoryName}) memerlukan pemeriksaan fisik di lokasi.",
                 'tingkat_risiko_kategori' => $categoryRisk,
                 'volume_kg' => $volume,
                 'is_high_volume' => $isHighVolume,
@@ -58,7 +59,7 @@ class InspectionModeAdvisor
         if ($wajibLab) {
             return [
                 'mode' => Inspection::MODE_LAPANGAN,
-                'alasan' => "Kategori ({$category?->nama}) mewajibkan pengujian laboratorium dan pengambilan sampel langsung di lapangan.",
+                'alasan' => "Kategori ({$categoryName}) mewajibkan pengujian laboratorium dan pengambilan sampel langsung di lapangan.",
                 'tingkat_risiko_kategori' => $categoryRisk,
                 'volume_kg' => $volume,
                 'is_high_volume' => $isHighVolume,

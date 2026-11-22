@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AssignInspectionRequest;
 use App\Models\Inspection;
