@@ -46,7 +46,7 @@
             ],
             'TRANSAKSI' => [
                 ['label' => 'RFQ Masuk', 'icon' => 'chat', 'route' => 'rfq.index', 'active' => 'rfq.*'],
-                ['label' => 'Purchase Order', 'icon' => 'file', 'route' => null],
+                ['label' => 'Purchase Order', 'icon' => 'file', 'route' => 'po.index', 'active' => 'po.*'],
                 ['label' => 'Invoice', 'icon' => 'receipt', 'route' => 'seller.invoices.index', 'active' => 'seller.*'],
                 ['label' => 'Pengiriman', 'icon' => 'truck', 'route' => null],
                 ['label' => 'Sengketa', 'icon' => 'scale', 'route' => null],
@@ -67,7 +67,7 @@
             ],
             'TRANSAKSI' => [
                 ['label' => 'RFQ & Negosiasi', 'icon' => 'chat', 'route' => 'rfq.index', 'active' => 'rfq.*'],
-                ['label' => 'Purchase Order', 'icon' => 'file', 'route' => null],
+                ['label' => 'Purchase Order', 'icon' => 'file', 'route' => 'po.index', 'active' => 'po.*'],
                 ['label' => 'Invoice & Pembayaran', 'icon' => 'receipt', 'route' => 'buyer.invoices.index', 'active' => 'buyer.*'],
                 ['label' => 'Penerimaan Barang', 'icon' => 'truck', 'route' => null],
                 ['label' => 'Sengketa', 'icon' => 'scale', 'route' => null],
