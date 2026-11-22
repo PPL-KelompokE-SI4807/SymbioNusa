@@ -96,10 +96,15 @@
                     @csrf
                     <h3 class="text-dash-sub text-on-surface">Setujui verifikasi</h3>
                     <p class="text-body-sm text-on-surface-muted">Perusahaan mendapat akses penuh untuk membuat listing dan bertransaksi.</p>
-                    <x-ui.button type="submit">
+                    {{-- Server menolak persetujuan tanpa dokumen; tombol tidak menjanjikan aksi yang pasti gagal (DESIGN.md › Action resolution). --}}
+                    @php($noDocuments = $company->documents->isEmpty())
+                    <x-ui.button type="submit" :disabled="$noDocuments" :aria-describedby="$noDocuments ? 'approve-blocked' : null">
                         <x-ui.icon name="check" class="size-[18px]" />
                         Setujui
                     </x-ui.button>
+                    @if ($noDocuments)
+                        <p id="approve-blocked" class="text-body-sm font-medium text-warning">Belum bisa disetujui: belum ada berkas legalitas.</p>
+                    @endif
                 </form>
 
                 <form method="POST" action="{{ route('admin.companies.reject', $company) }}"
