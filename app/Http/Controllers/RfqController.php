@@ -31,7 +31,7 @@ class RfqController extends Controller
         $user = $request->user();
         $this->authorize('viewAny', RfqContract::class);
 
-        $query = RfqContract::with(['listing.category', 'listing.company', 'company', 'latestOffer']);
+        $query = RfqContract::with(['listing.category', 'listing.company', 'company', 'latestOffer', 'purchaseOrder']);
 
         if ($user->role === 'SELLER') {
             $query->whereHas('listing', function ($q) use ($user) {
@@ -81,7 +81,8 @@ class RfqController extends Controller
             $query->whereHas('listing', fn ($lq) => $lq->where('categories_id_categories', $kategoriId));
         }
 
-        $rfqs = $query->orderByDesc('id_rfq_contract')->paginate(10)->withQueryString();
+        $sortOrder = $request->input('sort') === 'asc' ? 'asc' : 'desc';
+        $rfqs = $query->orderBy('id_rfq_contract', $sortOrder)->paginate(10)->withQueryString();
         $categories = Category::where('status', 'AKTIF')->orderBy('nama')->get();
 
         return view('rfq.index', compact(
@@ -139,6 +140,7 @@ class RfqController extends Controller
             'listing.company',
             'company',
             'offers.company',
+            'purchaseOrder',
         ]);
 
         return view('rfq.show', compact('rfq'));

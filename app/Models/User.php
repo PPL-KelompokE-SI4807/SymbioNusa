@@ -48,6 +48,7 @@ class User extends Authenticatable
     {
         return [
             'password_hash' => 'hashed',
+            'id_company' => 'integer',
         ];
     }
 

@@ -27,13 +27,13 @@ class LoginTest extends TestCase
         ]);
     }
 
-    public function test_login_page_is_displayed_without_demo_shortcuts_outside_local(): void
+    public function test_login_page_is_displayed_without_demo_shortcuts_when_flag_is_off(): void
     {
         $response = $this->get('/login');
 
         $response->assertOk();
-        $response->assertSee('Masuk ke Platform');
-        $response->assertDontSee('Akses cepat akun demo');
+        $response->assertSee('Gunakan email dan kata sandi akun perusahaan Anda.');
+        $response->assertDontSee('Akun demo');
         $response->assertDontSee('/login/demo/', false);
     }
 
@@ -132,10 +132,45 @@ class LoginTest extends TestCase
         $this->actingAs($user)->get('/login')->assertRedirect('/dashboard');
     }
 
-    public function test_demo_login_route_is_not_available_outside_local_environment(): void
+    public function test_demo_login_route_is_not_available_when_flag_is_off(): void
     {
+        $this->assertFalse(config('app.demo_login'));
+
         $this->post('/login/demo/admin')->assertNotFound();
         $this->get('/login/as/admin')->assertNotFound();
+        $this->assertGuest();
+    }
+
+    public function test_demo_login_shortcuts_appear_when_flag_is_on(): void
+    {
+        config(['app.demo_login' => true]);
+
+        $response = $this->get('/login');
+
+        $response->assertOk();
+        $response->assertSee('Akun demo');
+        $response->assertSee('/login/demo/admin', false);
+        $response->assertSee('/login/demo/inspector', false);
+    }
+
+    public function test_demo_login_signs_in_seeded_account_when_flag_is_on(): void
+    {
+        config(['app.demo_login' => true]);
+
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@symbionusa.test'],
+            ['nama' => 'Admin Demo', 'role' => 'ADMIN', 'password_hash' => 'password', 'status' => 'AKTIF'],
+        );
+
+        $this->post('/login/demo/admin')->assertRedirect('/dashboard');
+        $this->assertAuthenticatedAs($admin);
+    }
+
+    public function test_demo_login_rejects_unknown_role_when_flag_is_on(): void
+    {
+        config(['app.demo_login' => true]);
+
+        $this->post('/login/demo/superadmin')->assertNotFound();
         $this->assertGuest();
     }
 }

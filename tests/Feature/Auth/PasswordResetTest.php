@@ -38,7 +38,7 @@ class PasswordResetTest extends TestCase
 
     public function test_forgot_password_page_is_displayed(): void
     {
-        $this->get('/forgot-password')->assertOk()->assertSee('Lupa Kata Sandi');
+        $this->get('/forgot-password')->assertOk()->assertSee('Lupa kata sandi');
     }
 
     public function test_reset_link_is_sent_to_active_user(): void
@@ -88,7 +88,7 @@ class PasswordResetTest extends TestCase
 
             $this->get('/reset-password/'.$notification->token.'?email='.urlencode($user->email))
                 ->assertOk()
-                ->assertSee('Atur Ulang Kata Sandi')
+                ->assertSee('Buat kata sandi baru')
                 ->assertSee($user->email);
 
             return str_contains($mail->actionUrl, '/reset-password/'.$notification->token)

@@ -63,16 +63,31 @@
             {{-- Banner Kesepakatan bila status DISEPAKATI --}}
             @if ($statusValue === 'DISEPAKATI')
                 <div class="rounded-md border border-success bg-success-container p-5 text-on-success-container">
-                    <h3 class="text-headline-sm font-semibold">Kontrak RFQ Telah Disepakati</h3>
-                    <p class="mt-1 text-body-sm">
-                        Kedua belah pihak telah menyepakati volume 
-                        <strong>{{ \App\Support\Format::number($rfq->volume_kg_disepakati) }} kg</strong> dengan harga 
-                        <strong>{{ \App\Support\Format::rupiah($rfq->harga_disepakati) }}/kg</strong> 
-                        (Total: <strong>{{ \App\Support\Format::rupiah((float)$rfq->volume_kg_disepakati * (float)$rfq->harga_disepakati) }}</strong>).
-                    </p>
-                    <p class="mt-2 text-body-xs text-on-success-container">
-                        Volume dan harga terkunci untuk pembuatan Purchase Order resmi.
-                    </p>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h3 class="text-headline-sm font-semibold">Kontrak RFQ Telah Disepakati</h3>
+                            <p class="mt-1 text-body-sm">
+                                Kedua belah pihak telah menyepakati volume 
+                                <strong>{{ \App\Support\Format::number($rfq->volume_kg_disepakati) }} kg</strong> dengan harga 
+                                <strong>{{ \App\Support\Format::rupiah($rfq->harga_disepakati) }}/kg</strong> 
+                                (Total: <strong>{{ \App\Support\Format::rupiah((float)$rfq->volume_kg_disepakati * (float)$rfq->harga_disepakati) }}</strong>).
+                            </p>
+                            <p class="mt-2 text-body-xs text-on-success-container">
+                                Volume dan harga terkunci untuk pembuatan Purchase Order resmi.
+                            </p>
+                        </div>
+                        @if ($user && $user->role === 'BUYER' && $rfq->companies_id_company === $user->id_company)
+                            @if ($rfq->purchaseOrder)
+                                <x-ui.button href="{{ route('po.show', $rfq->purchaseOrder) }}" variant="primary">
+                                    Lihat PO
+                                </x-ui.button>
+                            @else
+                                <x-ui.button href="{{ route('po.create', ['rfq_id' => $rfq->id_rfq_contract]) }}" variant="primary">
+                                    Buat Purchase Order
+                                </x-ui.button>
+                            @endif
+                        @endif
+                    </div>
                 </div>
             @endif
 

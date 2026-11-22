@@ -9,6 +9,7 @@ use App\Http\Controllers\DemandRequestController;
 use App\Http\Controllers\DocumentVerificationController;
 use App\Http\Controllers\InspectorProfileController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\RfqController;
 use Illuminate\Support\Facades\Route;
 
@@ -72,6 +73,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{rfq}/accept', [RfqController::class, 'accept'])->name('accept');
         Route::post('/{rfq}/reject', [RfqController::class, 'reject'])->name('reject');
         Route::post('/{rfq}/withdraw', [RfqController::class, 'withdraw'])->name('withdraw');
+    });
+
+    Route::prefix('po')->name('po.')->group(function () {
+        Route::get('/', [PurchaseOrderController::class, 'index'])->name('index');
+        Route::get('/create', [PurchaseOrderController::class, 'create'])->name('create');
+        Route::post('/', [PurchaseOrderController::class, 'store'])->name('store');
+        Route::get('/{po}', [PurchaseOrderController::class, 'show'])->name('show');
+        Route::post('/{po}/send', [PurchaseOrderController::class, 'send'])->name('send');
+        Route::post('/{po}/confirm', [PurchaseOrderController::class, 'confirm'])->name('confirm');
+        Route::post('/{po}/reject', [PurchaseOrderController::class, 'reject'])->name('reject');
+        Route::post('/{po}/cancel', [PurchaseOrderController::class, 'cancel'])->name('cancel');
     });
 
     // PBI-07: Verifikasi Pembayaran (Buyer & Seller)
