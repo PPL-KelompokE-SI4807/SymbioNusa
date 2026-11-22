@@ -12,8 +12,9 @@
     <x-ui.page-header title="RFQ & Negosiasi" subtitle="Pantau pengajuan RFQ dan utas negosiasi harga material sisa produksi.">
         @if (auth()->user()?->role === 'BUYER')
             <x-slot:actions>
-                <x-ui.button href="{{ route('rfq.create') }}" variant="primary">
-                    + Ajukan RFQ
+                <x-ui.button href="{{ route('rfq.create') }}">
+                    <x-ui.icon name="plus" />
+                    Ajukan RFQ
                 </x-ui.button>
             </x-slot:actions>
         @endif
@@ -25,13 +26,13 @@
         </x-ui.alert>
     @endif
 
-    {{-- KPI strip sesuai Screen 07 --}}
-    <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+    {{-- Strip ringkasan sesuai Screen 07: satu permukaan --}}
+    <x-ui.summary-strip label="Ringkasan RFQ" class="mb-6">
         <x-ui.kpi label="Total RFQ" :value="$totalRfq" caption="Seluruh pengajuan RFQ" />
         <x-ui.kpi label="Terbuka / Negosiasi" :value="$terbukaNegosiasi" caption="Perlu respons/tindak lanjut" />
         <x-ui.kpi label="Disepakati" :value="$disepakati" caption="Siap diproses ke PO" />
         <x-ui.kpi label="Ditolak / Kedaluwarsa" :value="$ditolakKedaluwarsa" caption="Selesai tanpa kesepakatan" />
-    </div>
+    </x-ui.summary-strip>
 
     {{-- Filter bar --}}
     <x-ui.card class="mb-6">
@@ -66,17 +67,53 @@
                 </x-ui.field>
             </div>
             <div class="flex items-center gap-2">
-                <x-ui.button type="submit" variant="primary">Saring</x-ui.button>
+                <x-ui.button type="submit" variant="secondary">Saring</x-ui.button>
                 @if (request()->hasAny(['q', 'status', 'kategori']))
-                    <x-ui.button href="{{ route('rfq.index') }}" variant="secondary">Reset</x-ui.button>
+                    <x-ui.button href="{{ route('rfq.index') }}" variant="text" class="h-10 px-2">Reset</x-ui.button>
                 @endif
             </div>
         </form>
     </x-ui.card>
 
     {{-- Data Table --}}
-    <x-ui.card padding="false">
-        <x-ui.table label="Tabel Daftar RFQ">
+    <x-ui.card :padding="false">
+        {{-- Di bawah 1024 px tabel menjadi baris ledger (DESIGN.md › Responsive). --}}
+        @if ($rfqs->count() > 0)
+            <ul class="divide-y divide-outline-hairline lg:hidden" aria-label="Daftar RFQ">
+                @foreach ($rfqs as $rfq)
+                    @php
+                        $latestOffer = $rfq->latestOffer;
+                        $volumeTampil = $rfq->volume_kg_disepakati ?? $latestOffer?->volume_kg ?? 0;
+                        $hargaTampil = $rfq->harga_disepakati ?? $latestOffer?->harga_per_kg ?? 0;
+                        $putaranTampil = $latestOffer?->urutan ?? 1;
+                        $statusValue = $rfq->status instanceof \App\Enums\RfqStatus ? $rfq->status->value : $rfq->status;
+                    @endphp
+                    <li class="flex items-start gap-3 px-[18px] py-4 sm:px-6">
+                        <div class="min-w-0 flex-1">
+                            <p class="flex flex-wrap items-baseline gap-x-2">
+                                <span class="text-dash-row tabular-nums text-on-surface">RFQ-{{ str_pad((string) $rfq->id_rfq_contract, 4, '0', STR_PAD_LEFT) }}</span>
+                                <span class="text-body-md font-semibold text-on-surface">{{ $rfq->listing?->judul ?? '–' }}</span>
+                            </p>
+                            <p class="text-body-sm text-on-surface-muted">
+                                {{ auth()->user()?->role === 'SELLER' ? ($rfq->company?->nama ?? '–') : ($rfq->listing?->company?->nama ?? '–') }}
+                            </p>
+                            <p class="mt-1 text-body-sm tabular-nums text-on-surface">
+                                {{ \App\Support\Format::number($volumeTampil) }} kg · {{ \App\Support\Format::rupiah($hargaTampil) }}/kg
+                                <span class="text-on-surface-muted">· putaran {{ $putaranTampil }}/5 · tenggat {{ $rfq->tenggat ? \App\Support\Format::date($rfq->tenggat) : '–' }}</span>
+                            </p>
+                            <div class="mt-1.5">
+                                <x-ui.badge :variant="\App\Support\StatusMap::badge('rfq_contracts.status', $statusValue)">
+                                    {{ \App\Support\StatusMap::label('rfq_contracts.status', $statusValue) }}
+                                </x-ui.badge>
+                            </div>
+                        </div>
+                        <x-ui.button href="{{ route('rfq.show', $rfq) }}" variant="secondary" size="lg">Lihat</x-ui.button>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+
+        <x-ui.table label="Tabel Daftar RFQ" class="{{ $rfqs->count() > 0 ? 'hidden lg:block' : '' }}">
             <x-slot:head>
                 <th class="px-4 py-3">No. RFQ</th>
                 <th class="px-4 py-3">Material</th>
@@ -97,14 +134,14 @@
                     $putaranTampil = $latestOffer?->urutan ?? 1;
                     $statusValue = $rfq->status instanceof \App\Enums\RfqStatus ? $rfq->status->value : $rfq->status;
                 @endphp
-                <tr class="border-t border-outline hover:bg-surface-container-lowest">
-                    <td class="px-4 py-3 font-medium text-on-surface">
+                <tr class="h-14 border-t border-outline-hairline hover:bg-surface-muted/60">
+                    <td class="px-4 py-3 text-dash-row tabular-nums whitespace-nowrap text-on-surface">
                         RFQ-{{ str_pad((string) $rfq->id_rfq_contract, 4, '0', STR_PAD_LEFT) }}
                     </td>
                     <td class="px-4 py-3">
-                        <span class="font-medium text-on-surface">{{ $rfq->listing?->judul ?? '–' }}</span>
+                        <span class="font-semibold text-on-surface">{{ $rfq->listing?->judul ?? '–' }}</span>
                         @if ($rfq->listing?->category)
-                            <span class="block text-body-xs text-on-surface-muted">{{ $rfq->listing->category->nama }}</span>
+                            <span class="block text-body-sm text-on-surface-muted">{{ $rfq->listing->category->nama }}</span>
                         @endif
                     </td>
                     <td class="px-4 py-3 text-on-surface">
@@ -132,22 +169,23 @@
                         </x-ui.badge>
                     </td>
                     <td class="px-4 py-3 text-right whitespace-nowrap">
-                        <x-ui.button href="{{ route('rfq.show', $rfq) }}" variant="secondary" size="sm">
+                        <x-ui.button href="{{ route('rfq.show', $rfq) }}" variant="secondary">
                             Lihat
                         </x-ui.button>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" class="px-4 py-12 text-center text-on-surface-muted">
-                        Tidak ada data RFQ yang cocok dengan kriteria filter.
+                    <td colspan="9" class="px-4 py-12 text-center">
+                        <p class="text-dash-sub text-on-surface">Tidak ada RFQ yang cocok</p>
+                        <p class="mt-1 text-body-sm text-on-surface-muted">Ubah pencarian atau saringan untuk melihat RFQ lain.</p>
                     </td>
                 </tr>
             @endforelse
         </x-ui.table>
 
         @if ($rfqs->hasPages())
-            <div class="border-t border-outline p-4">
+            <div class="border-t border-outline-hairline px-6 py-4">
                 {{ $rfqs->links() }}
             </div>
         @endif
