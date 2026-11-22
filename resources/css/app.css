@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./dashboard-senja.css";
+@import "./sidebar-senja.css";
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
@@ -70,6 +72,7 @@
   --color-category-pangan: #65a30d;
   --color-photo-label: #14532d;
   --color-on-photo-label: #ffffff;
+
 
   /*
    * LEGACY (FND v8) — dihapus oleh FND v10. Masih dipakai kpi.blade.php dan
@@ -159,8 +162,36 @@
   --text-data-tabular: 14px;
   --text-data-tabular--line-height: 1.4;
 
+  /* Dashboard Senja di Sawah (panduan §8.2). Maksimum di dashboard 40 px. */
+  --text-dash-title: 19px;
+  --text-dash-title--line-height: 1.25;
+  --text-dash-title--font-weight: 800;
+  --text-dash-sub: 16px;
+  --text-dash-sub--line-height: 1.3;
+  --text-dash-sub--font-weight: 800;
+  --text-dash-metric: 32px;
+  --text-dash-metric--line-height: 1.05;
+  --text-dash-metric--font-weight: 900;
+  --text-dash-row: 15px;
+  --text-dash-row--line-height: 1.3;
+  --text-dash-row--font-weight: 700;
+
   /* Hover saja (warna, latar, bayangan). Gerak tata letak memakai solver spring, bukan easing CSS. */
   --ease-hover: cubic-bezier(.22, 1, .36, 1);
+}
+
+/*
+ * Dashboard Senja di Sawah (panduan dashboard §3.3, keputusan PM 22 Nov 2026): token turunan yang hanya dipakai
+ * dashboard. "static" agar variabelnya selalu tersedia untuk var() di SVG/inline style. Token bersama lain ditimpa
+ * di dalam .dash-senja (resources/css/dashboard-senja.css).
+ */
+@theme static {
+  --color-outline-hairline: #f6efc6;
+  --color-flow-segment: #f7f0c2;
+  --color-flow-segment-line: #ddd08a;
+  --color-accent: #c2410c;
+  --color-on-accent: #ffffff;
+  --color-category-lainnya: #ddd08a;
 }
 
 /* FND v10: palet terang dikunci di semua perangkat. Jangan menambah override prefers-color-scheme: dark. */

@@ -1,0 +1,61 @@
+/*
+ * Sidebar & top bar mobile "Senja di Sawah" di SEMUA halaman (keputusan PM 22 Nov 2026).
+ * Token sidebar bersama (--color-secondary*, --color-primary-container) ditimpa di dalam [data-sidebar] saja,
+ * sehingga konten layar non-dashboard tidak berubah. Gradien overlay sidebar adalah satu dari dua gradien
+ * yang diizinkan (panduan §4). Kait: data-sidebar, data-brand-mark, data-brand-tagline, data-nav-label,
+ * data-nav-count, data-user-card, data-avatar di components/app/sidebar.blade.php dan layouts/app.blade.php.
+ */
+[data-sidebar] {
+  --color-secondary: #1e2a08;                       /* forestDeep — basis */
+  --color-on-secondary: #fef9c3;                    /* onForest */
+  --color-on-secondary-muted: rgb(254 249 195 / 0.8);
+  --color-secondary-label: rgb(254 249 195 / 0.72);
+  --color-secondary-hover: rgb(255 255 255 / 0.09);
+  --color-primary-container: #fef9c3;               /* item aktif: bidang terang di atas forest */
+  --color-on-primary-container: #2f3d12;            /* forest */
+  background-image: linear-gradient(168deg, rgb(71 88 28 / 0.94), rgb(30 42 8 / 0.98) 72%);
+  border-radius: 24px;
+}
+aside:has(> [data-sidebar]) {
+  border-radius: 24px;
+  box-shadow: 0 16px 32px -20px rgb(30 42 8 / 0.28);
+}
+[data-brand-mark] {
+  background: #c2410c;  /* accent — aksen kecil: tanda logo */
+  color: #ffffff;
+  border-radius: 11px;
+}
+[data-sidebar] [data-brand-mark] { width: 42px; height: 42px; }
+[data-brand-tagline] { display: block; font-size: 12px; font-weight: 600; }
+[data-nav-label] {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+[data-sidebar] nav a,
+[data-sidebar] nav button { font-weight: 600; }
+[data-sidebar] nav a:not([aria-current]):hover { color: #ffffff; }
+[data-nav-count] {
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 5px;           /* lencana hitungan: kotak kecil, bukan kapsul */
+  background: #d97706;          /* gold = cat1 */
+  color: #1e2a08;               /* forestDeep: kontras AA di atas emas */
+  font-size: 12px;
+  font-weight: 800;
+}
+[data-user-card] {
+  background: transparent;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 12px;
+}
+[data-avatar] {
+  border-radius: 10px;
+  background: #fef3c7;          /* surface2 */
+  color: #47581c;               /* forest2 */
+  font-weight: 900;
+}

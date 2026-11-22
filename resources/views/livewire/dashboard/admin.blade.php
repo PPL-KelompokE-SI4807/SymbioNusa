@@ -1,180 +1,301 @@
 {{--
-    Dasbor Admin / DLH (FND-04, DESIGN.md amandemen FND v8): tindakan lebih dulu, dampak di bawah.
-    Urutan: Alur order (10 tahap, 3 kelompok) → Antrean tindakan + Material → pita Dampak.
+    Dasbor Admin / DLH — varian "Senja di Sawah" (panduan dashboard Senja §6.1, keputusan PM 22 Nov 2026).
+    Urutan: Sungai Order (alur sistem) → Zona 1 "Perlu tindakan Anda" → Zona 2 "Sedang berjalan"
+    → Zona 3 "Gambaran total tercatat". Semua angka dari DashboardService::admin(); satu fakta = satu sumber nilai.
+    Token Senja berlaku lewat pembungkus .dash-senja di dashboard-overview.blade.php.
 --}}
 @use('App\Support\Format')
 @php
-    $stuck = $flow['stuck'];
-    $chartColors = ['bg-chart-lead', 'bg-chart-2', 'bg-chart-3', 'bg-chart-4', 'bg-chart-5'];
-    [$hematValue, $hematUnit] = Format::rupiahParts($impact['hemat_seller'] + $impact['hemat_buyer']);
+    $stages = collect($flow['stages']);
+    $exitsByOrigin = collect($flow['exits'])->keyBy('origin');
+    $flowSum = $stages->sum('count') + collect($flow['exits'])->sum('count');
+    // Bobot minimum agar tahap kosong tetap terlihat dan dapat diketuk; lebar tetap mengkodekan jumlah order.
+    $base = max(1, round($flowSum * 0.06, 2));
+
+    $chartStages = $stages->map(fn ($s) => collect($s)->only(['key', 'label', 'short', 'count', 'kg', 'nilai', 'orders']))->values();
+
+    [$hematValue, $hematUnit] = Format::rupiahParts($metrics['hemat_seller'] + $metrics['hemat_buyer']);
+
+    // Donut: busur dari bagian terhadap total seluruh set; pemisah putih 3 px.
+    $radius = 79;
+    $circ = 2 * M_PI * $radius;
+    $offset = 0.0;
+    $arcs = [];
+    foreach ($materials['rows'] as $row) {
+        $len = $row['share'] * $circ;
+        $gap = count($materials['rows']) > 1 ? 3 : 0;
+        $arcs[] = ['key' => $row['key'], 'color' => $row['color'] ?? 'lainnya', 'dash' => max(0.5, $len - $gap), 'offset' => -$offset];
+        $offset += $len;
+    }
+    $donutJs = ['rows' => $materials['rows'], 'totalTon' => $materials['total_ton']];
+    $groupIcons = ['sengketa' => 'scale', 'sertifikat' => 'shield', 'penugasan' => 'calendar', 'verifikasi' => 'building'];
+    $focusRing = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring';
+
+    // Zona 3: strip metrik dan hasil akhir. Dihitung di sini (bukan di blok @php di tengah file) karena Blade
+    // menggabungkan @php() sebaris dengan blok @php berikutnya.
+    $m = $metrics;
+    $metricRows = [
+        [
+            'label' => 'Tonase terdaur ulang', 'value' => Format::number($m['tonase'], 1), 'unit' => 'ton',
+            'segs' => [[$m['tonase'], 'primary'], [$m['aktif_ton'], 'flow-segment-line']],
+            'legend' => [['primary', 'selesai, '.Format::number($m['orders_selesai']).' order'], ['flow-segment-line', Format::number($m['aktif_ton'], 1).' ton masih di alur']],
+        ],
+        [
+            'label' => 'Penghematan biaya', 'value' => $hematValue, 'unit' => $hematUnit,
+            'segs' => [[$m['hemat_seller'], 'primary'], [$m['hemat_buyer'], 'flow-segment-line']],
+            'legend' => [['primary', 'Seller '.Format::rupiahShort($m['hemat_seller'])], ['flow-segment-line', 'Buyer '.Format::rupiahShort($m['hemat_buyer'])]],
+        ],
+        [
+            'label' => 'Emisi ditekan', 'value' => Format::number($m['co2e_kg'] / 1000, 1), 'unit' => 'ton CO₂e',
+            'segs' => [[$m['co2e_kg'], 'primary'], [$m['co2e_angkutan_kg'], 'warning']],
+            'legend' => [['primary', 'bersih'], ['warning', 'angkutan '.Format::number($m['co2e_angkutan_kg'] / 1000, 1).' dari '.Format::number($m['co2e_dihindari_kg'] / 1000, 1).' ton dihindari']],
+        ],
+        [
+            'label' => 'Inspector aktif', 'value' => Format::number($m['inspector_aktif']), 'unit' => null,
+            'segs' => [[$m['inspector_aktif'], 'primary'], [max(0, $m['inspector_total'] - $m['inspector_aktif']), 'outline']],
+            'legend' => [['primary', 'aktif'], ['outline', 'dari '.Format::number($m['inspector_total']).' terdaftar']],
+        ],
+    ];
+    $byKey = collect([...$flow['stages'], ...$flow['exits']])->keyBy('key');
+    $outcomes = collect([['SELESAI', 'primary'], ['DITOLAK', 'error'], ['GAGAL_INSPEKSI', 'warning'], ['DIBATALKAN', 'flow-segment-line']])
+        ->map(fn ($o) => ['key' => $o[0], 'color' => $o[1]] + collect($byKey[$o[0]])->only(['label', 'count', 'nilai', 'orders'])->all())
+        ->values();
+    $endedTotal = $outcomes->sum('count');
 @endphp
 
 <div class="space-y-6">
-    {{-- Alur order --}}
-    <x-ui.card :padding="false">
-        <div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-5 pb-1">
-            <h2 class="text-headline-md">Alur order</h2>
-            <p class="text-body-sm text-on-surface-subtle">Order aktif per tahap · RFQ terbuka {{ Format::number($flow['rfq_open']) }} belum jadi order</p>
-        </div>
-
-        <div class="overflow-x-auto px-6 pt-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" tabindex="0" role="region" aria-label="Tahapan alur order">
-            <div class="flex min-w-[860px] gap-4">
-                @foreach ($flow['groups'] as $group => $stages)
-                    <section class="min-w-0" style="flex: {{ count($stages) }} 1 0%" aria-label="{{ $group }}">
-                        <h3 class="mb-2 text-body-sm text-on-surface-subtle">{{ $group }}</h3>
-                        <ol class="flex gap-2">
-                            @foreach ($stages as $stage)
-                                <li @class([
-                                    'flex min-w-0 flex-1 flex-col gap-1.5 rounded-md px-2.5 py-3',
-                                    'bg-stage-stuck text-on-tile-sun' => $stage['stuck'],
-                                    'bg-primary-container text-on-primary-container' => $stage['done'] && ! $stage['stuck'],
-                                    'bg-surface-muted text-on-surface' => ! $stage['stuck'] && ! $stage['done'],
-                                ])>
-                                    <span @class(['min-h-[2.4em] text-label-sm leading-snug', 'text-on-surface-muted' => ! $stage['stuck'] && ! $stage['done']])>{{ $stage['label'] }}</span>
-                                    <span @class(['text-headline-lg tabular-nums', 'text-primary' => $stage['done'] && ! $stage['stuck']])>{{ Format::number($stage['count']) }}</span>
-                                    @if ($stage['stuck'])
-                                        <span class="sr-only">(tahap tertahan)</span>
-                                    @endif
-                                </li>
-                            @endforeach
-                        </ol>
-                    </section>
-                @endforeach
+    {{-- ================= ALUR SISTEM · Sungai Order ================= --}}
+    <x-ui.card :padding="false" class="p-[18px] sm:p-6" aria-labelledby="flow-title" x-data="sungaiOrder({{ Js::from(['stages' => $flow['stages'], 'exits' => $flow['exits']]) }})">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+                <p class="dash-eyebrow">Alur sistem</p>
+                <h2 id="flow-title" class="mt-2 text-dash-title">Sungai Order</h2>
             </div>
+            <button type="button" x-show="!reduced" x-cloak @click="togglePause()" :aria-pressed="paused.toString()"
+                    class="inline-flex h-10 items-center gap-2 rounded-sm border border-outline-control bg-surface px-3 text-label-md font-semibold text-on-surface hover:bg-surface-muted {{ $focusRing }}">
+                <span x-text="paused ? 'Putar aliran' : 'Jeda aliran'">Jeda aliran</span>
+            </button>
         </div>
 
-        <div class="flex flex-col gap-3 px-6 pt-4 pb-5 2xl:flex-row 2xl:items-center 2xl:gap-5">
-            <p class="text-body-sm text-on-surface-subtle">
-                Keluar alur:
-                {{ collect($flow['exits'])->map(fn ($e) => $e['label'].' '.Format::number($e['count']))->implode(' · ') }}
-            </p>
-            @if ($stuck)
-                <div class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-warning-line bg-warning-container px-4 py-2.5 text-on-warning-container 2xl:flex-1">
-                    <x-ui.icon name="alert" class="size-5 shrink-0 text-warning" />
-                    <p class="min-w-0 flex-1 basis-[calc(100%-2rem)] text-body-md sm:basis-0">
-                        <span class="font-semibold">{{ $stuck['label'] }} tertahan.</span>
-                        {{ Format::number($stuck['count']) }} order menunggu{{ $stuck['unassigned'] > 0 ? ', '.Format::number($stuck['unassigned']).' belum punya Inspector' : '' }}.
-                    </p>
-                    <a href="#antrean-tindakan" class="ml-8 inline-flex sm:ml-0 items-center gap-1 rounded-sm text-label-md font-semibold text-primary hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
-                        Lihat di antrean <x-ui.icon name="arrow-right" class="size-4" />
-                    </a>
-                </div>
-            @endif
-        </div>
-    </x-ui.card>
-
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
-        {{-- Antrean tindakan --}}
-        <x-ui.card :padding="false" id="antrean-tindakan">
-            <div x-data="{ tab: 'semua' }">
-                <div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-5 pb-2">
-                    <h2 class="text-headline-md">Antrean tindakan</h2>
-                    @php($urgentCount = collect($queue)->where('urgent', true)->count())
-                    <div class="flex gap-1 rounded-sm bg-surface-muted p-1" role="tablist" aria-label="Saring antrean">
-                        @foreach (['semua' => ['Semua', count($queue)], 'mendesak' => ['Mendesak', $urgentCount]] as $key => [$label, $n])
-                            <button type="button" role="tab" @click="tab = '{{ $key }}'" :aria-selected="(tab === '{{ $key }}').toString()"
-                                    class="flex h-8 items-center gap-1.5 rounded-[8px] px-3 text-label-md text-on-surface-muted aria-selected:bg-surface aria-selected:font-semibold aria-selected:text-on-surface aria-selected:shadow-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
-                                {{ $label }} <span class="text-body-sm text-on-surface-subtle">{{ $n }}</span>
-                            </button>
+        <div class="flow-groups mt-5" role="group" aria-label="Tahap alur order">
+            @foreach ($stages->groupBy('group') as $group => $groupStages)
+                <div class="flow-group" style="flex-grow: {{ $groupStages->sum(fn ($s) => $s['count'] + $base) }}">
+                    <p class="flow-group-label">{{ $group }}</p>
+                    <div class="flow-row">
+                        @foreach ($groupStages as $s)
+                            @php($exit = $exitsByOrigin[$s['key']] ?? null)
+                            <div class="flow-stage" style="flex-grow: {{ $s['count'] + $base }}">
+                                <button type="button" class="flow-seg {{ $focusRing }}"
+                                        @click="select('{{ $s['key'] }}')" :aria-pressed="isOn('{{ $s['key'] }}').toString()"
+                                        aria-label="{{ $s['label'] }}, {{ Format::number($s['count']) }} order" title="{{ $s['label'] }}">
+                                    <canvas data-flow-canvas data-count="{{ $s['count'] }}" aria-hidden="true"></canvas>
+                                    <span class="flow-seg-num">{{ Format::number($s['count']) }}</span>
+                                </button>
+                                <span class="flow-seg-label" aria-hidden="true">{{ $s['short'] }}</span>
+                                @if ($exit)
+                                    <button type="button" @click="select('{{ $exit['key'] }}')" :aria-pressed="isOn('{{ $exit['key'] }}').toString()"
+                                            aria-label="{{ $exit['label'] }} · {{ Format::number($exit['count']) }} order, jalur keluar dari {{ $s['label'] }}"
+                                            @class(['flow-exit', $focusRing, 'text-on-surface-muted!' => $exit['key'] === 'DIBATALKAN'])>
+                                        <span aria-hidden="true">↳</span> {{ $exit['label'] }} · {{ Format::number($exit['count']) }}
+                                    </button>
+                                @endif
+                            </div>
                         @endforeach
                     </div>
                 </div>
+            @endforeach
+        </div>
 
-                @if ($queue === [])
-                    <p class="px-6 pb-6 text-body-md text-on-surface-muted">Tidak ada tindakan yang menunggu. Antrean akan terisi saat ada sengketa, verifikasi mitra, atau sertifikat yang hampir berakhir.</p>
-                @else
-                    @php($primaryUsed = false)
-                    <ul class="px-3 pb-3">
-                        @foreach ($queue as $item)
-                            <li x-show="tab === 'semua' || {{ $item['urgent'] ? 'true' : 'false' }}"
-                                class="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md p-3 hover:bg-surface-muted sm:flex-nowrap">
-                                <x-ui.monogram :name="$item['party']" :person="$item['person'] ?? false" />
-                                <div class="min-w-0 flex-1 basis-[calc(100%-3.5rem)] sm:basis-0">
-                                    <p class="text-label-md font-semibold text-on-surface">{{ $item['title'] }}</p>
-                                    <p class="mt-0.5 text-body-sm text-on-surface-subtle">{{ $item['meta'] }}</p>
-                                </div>
-                                <div class="shrink-0 pl-14 sm:w-28 sm:pl-0">
-                                    @if ($item['urgent'])
-                                        <p class="flex items-center gap-1.5 text-label-md font-semibold text-error"><x-ui.flag /> Mendesak</p>
-                                    @endif
-                                </div>
-                                <div class="ml-auto flex shrink-0 justify-end sm:w-28">
-                                    @if ($item['url'])
-                                        <x-ui.button :href="$item['url']" :variant="$primaryUsed ? 'secondary' : 'primary'" class="h-9!">{{ $item['action'] }}</x-ui.button>
-                                        @php($primaryUsed = true)
-                                    @else
-                                        <span class="text-body-sm text-on-surface-subtle" title="Halaman untuk tindakan ini segera hadir">{{ $item['action'] }} segera</span>
-                                    @endif
-                                </div>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
+        {{-- Panel detail menempel: hanya berubah oleh klik tahap/jalur di atas. --}}
+        <div x-ref="panel" class="mt-6 -mx-2 rounded-md border-t border-outline-hairline px-2 pt-5" role="region" aria-live="polite"
+             :aria-label="current.label + ', ' + current.count + ' order'">
+            <div x-ref="panelBody">
+                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <h3 class="text-dash-sub" x-text="title"></h3>
+                    <p class="text-[22px] leading-none font-black tabular-nums" x-text="total"></p>
+                </div>
+                <p x-show="partial" x-cloak class="mt-1 text-body-sm text-on-surface-muted" x-text="partial"></p>
+                <p x-show="current.orders.length === 0" x-cloak class="mt-3 text-body-md text-on-surface-muted">Tidak ada order di tahap ini.</p>
+                <ul class="mt-3" x-show="current.orders.length > 0">
+                    <template x-for="o in current.orders" :key="o.id">
+                        <li class="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-outline-hairline py-3 sm:flex-nowrap">
+                            <span class="w-16 shrink-0 text-dash-row tabular-nums" x-text="o.code"></span>
+                            <span class="min-w-0 flex-1 basis-[calc(100%-5rem)] text-body-sm text-on-surface-muted sm:basis-0" x-text="o.seller + ' → ' + o.buyer"></span>
+                            <span class="shrink-0 text-label-md font-bold tabular-nums" x-text="money(o.nilai)"></span>
+                            <span class="flex w-[132px] shrink-0 items-center justify-end gap-2">
+                                <template x-if="o.age !== null">
+                                    <span class="flex items-center gap-2">
+                                        <span class="age-bar" aria-hidden="true"><span :style="'width:' + ageWidth(o)"></span></span>
+                                        <span class="text-label-sm font-semibold tabular-nums" x-text="num(o.age) + ' hari'"></span>
+                                    </span>
+                                </template>
+                            </span>
+                        </li>
+                    </template>
+                </ul>
+                <div x-show="linkedRows.length > 0" x-cloak class="mt-3">
+                    <button type="button" @click="toQueue()" data-press
+                            class="inline-flex h-10 items-center rounded-sm text-label-md font-bold text-primary hover:underline underline-offset-4 {{ $focusRing }}">
+                        Lihat di antrean ↓
+                    </button>
+                </div>
             </div>
-        </x-ui.card>
+        </div>
+    </x-ui.card>
 
-        {{-- Material --}}
-        <x-ui.card :padding="false">
-            <div class="flex items-center justify-between gap-3 px-5 pt-5 pb-3">
-                <h2 class="text-headline-md">Material terdaur ulang</h2>
-                <p class="text-label-md text-on-surface-muted tabular-nums">{{ Format::ton($materials['total'], 1) }}</p>
-            </div>
-            @if ($materials['rows'] === [])
-                <p class="px-5 pb-6 text-body-md text-on-surface-muted">Belum ada order selesai yang tercatat dampaknya.</p>
+    @include('livewire.dashboard.partials.queue', ['queue' => $queue, 'groupIcons' => $groupIcons, 'queueEmpty' => 'Tidak ada sengketa, sertifikat, penugasan, atau verifikasi yang menunggu keputusan Anda.'])
+
+    @include('livewire.dashboard.partials.running', ['running' => $running, 'runningEmpty' => 'Tidak ada inspeksi atau pengiriman yang sedang berjalan.'])
+
+    {{-- ================= ZONA 3 · Gambaran total tercatat ================= --}}
+    <section aria-labelledby="overview-title" class="space-y-6">
+        <div>
+            <p class="dash-eyebrow">Zona 3 · Gambaran</p>
+            <h2 id="overview-title" class="mt-2 text-dash-title">Gambaran total tercatat</h2>
+        </div>
+
+        @include('livewire.dashboard.partials.metrics', ['metricRows' => $metricRows])
+
+        {{-- Hasil akhir order: bagian dari order yang sudah berakhir (Selesai vs jalur keluar), dari angka tahap Sungai Order yang sama. --}}
+        <x-ui.card :padding="false" class="p-[18px] sm:p-6" aria-labelledby="outcome-title" x-data="hasilAkhir({{ Js::from($outcomes) }})">
+            <h3 id="outcome-title" class="text-dash-title">Hasil akhir order</h3>
+            <p class="mt-1 text-body-sm text-on-surface-muted">Order yang sudah berakhir · Total tercatat</p>
+            @if ($endedTotal === 0)
+                <p class="mt-4 text-body-md text-on-surface-muted">Belum ada order yang berakhir.</p>
             @else
-                <div class="mx-5 flex h-2.5 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
-                    @foreach ($materials['rows'] as $i => $row)
-                        <span class="{{ $chartColors[$i] }}" style="width: {{ max(2, $row['share']) }}%"></span>
+                {{-- Segmen bilah dapat diklik dengan mouse; kontrol aksesibel (keyboard, pembaca layar, sentuh) ada di baris legenda. --}}
+                <div class="outcome-bar mt-4" aria-hidden="true">
+                    @foreach ($outcomes as $o)
+                        @if ($o['count'] > 0)
+                            <span @click="pick('{{ $o['key'] }}')" :class="sel && sel !== '{{ $o['key'] }}' ? 'opacity-35' : ''"
+                                  style="flex-grow: {{ $o['count'] }}; background: var(--color-{{ $o['color'] }})"></span>
+                        @endif
                     @endforeach
                 </div>
-                <ul class="px-3 pt-2 pb-3">
-                    @foreach ($materials['rows'] as $i => $row)
-                        <li class="flex items-center gap-3 rounded-md p-2">
-                            @if ($row['photo'])
-                                <img src="{{ $row['photo'] }}" alt="" class="size-[52px] shrink-0 rounded-sm object-cover">
-                            @else
-                                <x-ui.monogram :name="$row['nama']" />
-                            @endif
-                            <div class="min-w-0 flex-1">
-                                <p class="flex items-center gap-2 text-label-md font-semibold">
-                                    <span class="size-2.5 shrink-0 rounded-[3px] {{ $chartColors[$i] }}" aria-hidden="true"></span>
-                                    <span class="truncate">{{ $row['nama'] }}</span>
-                                </p>
-                                <p class="text-body-sm text-on-surface-subtle">{{ Format::number($row['orders']) }} order · {{ Format::number($row['sellers']) }} Seller</p>
-                            </div>
-                            <div class="text-right tabular-nums">
-                                <p class="text-label-md font-semibold">{{ Format::ton($row['tonase'], 1) }}</p>
-                                <p class="text-body-sm text-on-surface-subtle">{{ $row['share'] }}%</p>
-                            </div>
+                <ul class="mt-3 grid gap-x-6 sm:grid-cols-2 xl:grid-cols-4">
+                    @foreach ($outcomes as $o)
+                        <li>
+                            <button type="button" @click="pick('{{ $o['key'] }}')" :aria-expanded="(sel === '{{ $o['key'] }}').toString()" aria-controls="outcome-detail"
+                                    @disabled($o['count'] === 0)
+                                    :class="sel === '{{ $o['key'] }}' ? 'bg-surface-muted' : ''"
+                                    class="flex min-h-11 w-full items-start gap-2.5 rounded-md px-1 py-2 text-left hover:bg-surface-muted disabled:cursor-default disabled:hover:bg-transparent {{ $focusRing }}">
+                                <span class="mt-1.5 size-2.5 shrink-0" style="background: var(--color-{{ $o['color'] }})" aria-hidden="true"></span>
+                                <span>
+                                    <span class="block text-dash-row">{{ $o['label'] }} · {{ Format::number($o['count']) }}</span>
+                                    <span class="block text-body-sm text-on-surface-muted tabular-nums">{{ (int) round(100 * $o['count'] / $endedTotal) }}% dari {{ Format::number($endedTotal) }} order berakhir</span>
+                                </span>
+                            </button>
                         </li>
                     @endforeach
                 </ul>
+                <div x-ref="detail" id="outcome-detail" style="height: 0; overflow: hidden" aria-live="polite">
+                    <template x-if="current">
+                        <div class="mt-3 border-t border-outline-hairline pt-4">
+                            <div class="flex flex-wrap items-baseline justify-between gap-2">
+                                <p class="text-dash-sub" x-text="current.label + ' · ' + num(current.count) + ' order · Total ' + money(current.nilai)"></p>
+                                <button type="button" @click="pick(sel)" class="inline-flex h-10 items-center rounded-sm text-label-md font-bold text-primary hover:underline underline-offset-4 {{ $focusRing }}">Tutup</button>
+                            </div>
+                            <ul class="mt-1">
+                                <template x-for="o in current.orders" :key="o.id">
+                                    <li class="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-outline-hairline py-2.5 first:border-t-0">
+                                        <span class="w-16 shrink-0 text-label-md font-bold tabular-nums" x-text="o.code"></span>
+                                        <span class="min-w-0 flex-1 text-body-sm text-on-surface-muted" x-text="o.seller + ' → ' + o.buyer"></span>
+                                        <span class="shrink-0 text-label-md font-bold tabular-nums" x-text="money(o.nilai)"></span>
+                                    </li>
+                                </template>
+                            </ul>
+                            <p x-show="current.count > current.orders.length" class="mt-1 text-body-sm text-on-surface-muted"
+                               x-text="'Menampilkan ' + num(current.orders.length) + ' dari ' + num(current.count)"></p>
+                        </div>
+                    </template>
+                </div>
             @endif
         </x-ui.card>
-    </div>
 
-    {{-- Dampak --}}
-    <section class="rounded-lg bg-linear-to-br from-tile-forest-from to-tile-forest-to px-6 pt-5 pb-6 text-on-tile" aria-labelledby="dampak-title">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-            <h2 id="dampak-title" class="text-headline-md">Dampak tercatat</h2>
-            <p class="text-body-sm text-on-tile-muted">{{ Format::number($impact['orders']) }} order selesai{{ app()->environment('production') ? '' : ' · data demo' }}</p>
+        <div class="grid gap-6 2xl:grid-cols-2">
+            @include('livewire.dashboard.partials.stage-chart', ['chartStages' => $chartStages, 'chartTitle' => 'Volume per tahap', 'chartSub' => 'Order yang sedang di tiap tahap · posisi saat ini'])
+
+            {{-- Komposisi material: donut + ledger (persen terhadap total seluruh set). --}}
+            <x-ui.card :padding="false" class="min-w-0 p-[18px] sm:p-6" aria-labelledby="material-title" x-data="donutMaterial({{ Js::from($donutJs) }})">
+                <h3 id="material-title" class="text-dash-title">Komposisi material</h3>
+                <p class="mt-1 text-body-sm text-on-surface-muted">Order selesai · Total tercatat</p>
+
+                @if ($materials['rows'] === [])
+                    <p class="mt-5 text-body-md text-on-surface-muted">Belum ada order selesai yang tercatat dampaknya.</p>
+                @else
+                    <div class="mt-5 flex flex-col items-center gap-6 lg:flex-row lg:items-start">
+                        <div class="donut-box">
+                            <svg width="184" height="184" viewBox="0 0 184 184" aria-hidden="true">
+                                @foreach ($arcs as $arc)
+                                    <circle cx="92" cy="92" r="{{ $radius }}" stroke="var(--color-category-{{ $arc['color'] }})"
+                                            stroke-dasharray="{{ round($arc['dash'], 2) }} {{ round($circ, 2) }}" stroke-dashoffset="{{ round($arc['offset'], 2) }}"
+                                            :style="dim('{{ $arc['key'] }}') ? 'opacity:.3' : ''"
+                                            @mouseenter="hover = '{{ $arc['key'] }}'" @mouseleave="hover = null" @click="pick('{{ $arc['key'] }}')"></circle>
+                                @endforeach
+                            </svg>
+                            <div class="donut-center">
+                                <p class="text-[26px] leading-none font-black tabular-nums" x-text="centerNum">{{ Format::number($materials['total_ton'], 1) }}</p>
+                                <p class="mt-1 text-label-sm font-semibold text-on-surface-muted" x-text="centerLbl">ton · Total tercatat</p>
+                                <p class="text-label-sm font-bold tabular-nums" x-show="centerSub" x-cloak x-text="centerSub"></p>
+                            </div>
+                        </div>
+
+                        <ul class="w-full min-w-0 flex-1">
+                            @foreach ($materials['rows'] as $row)
+                                @php($pct = (int) round($row['share'] * 100))
+                                <li>
+                                    <button type="button" @click="pick('{{ $row['key'] }}')" @mouseenter="hover = '{{ $row['key'] }}'" @mouseleave="hover = null"
+                                            :aria-expanded="(selected === '{{ $row['key'] }}').toString()" aria-controls="material-detail"
+                                            :class="selected === '{{ $row['key'] }}' ? 'bg-surface-muted' : ''"
+                                            class="flex w-full items-center gap-3 rounded-md border-t border-outline-hairline px-1 py-2.5 text-left hover:bg-surface-muted {{ $focusRing }}">
+                                        @if ($row['photo'])
+                                            <img src="{{ $row['photo'] }}" alt="" class="size-12 shrink-0 rounded-[6px] object-cover">
+                                        @else
+                                            <span class="size-12 shrink-0 rounded-[6px] bg-outline-hairline" aria-hidden="true"></span>
+                                        @endif
+                                        <span class="min-w-0 flex-1">
+                                            <span class="flex items-center gap-2 text-dash-row">
+                                                <span class="size-2.5 shrink-0" style="background: var(--color-category-{{ $row['color'] ?? 'lainnya' }})" aria-hidden="true"></span>
+                                                {{ $row['nama'] }}
+                                            </span>
+                                            <span class="mt-1.5 block h-1.5 w-full rounded-full bg-outline-hairline" aria-hidden="true">
+                                                <span class="block h-full rounded-full" style="width: {{ max(1, round($row['share'] * 100, 1)) }}%; background: var(--color-category-{{ $row['color'] ?? 'lainnya' }})"></span>
+                                            </span>
+                                            <span class="mt-1 block text-body-sm text-on-surface-muted tabular-nums">
+                                                {{ $pct === 0 && $row['share'] > 0 ? '<1' : $pct }}% dari total {{ Format::number($materials['total_ton'], 1) }} ton · {{ Format::number($row['ton'], 1) }} ton · {{ Format::rupiahShort($row['nilai']) }}
+                                            </span>
+                                        </span>
+                                    </button>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+
+                    {{-- Panel detail kategori: mengembang di tempat (spring Gentle), ditutup dengan klik ulang atau "Tutup". --}}
+                    <div x-ref="detail" id="material-detail" class="rounded-md" style="height: 0; overflow: hidden" aria-live="polite">
+                        <template x-if="sel">
+                            <div class="mt-4 border-t border-outline-hairline pt-4">
+                                <div class="flex flex-wrap items-baseline justify-between gap-2">
+                                    <p class="text-dash-sub" x-text="sel.nama + ' · ' + num(sel.count) + ' order'"></p>
+                                    <button type="button" @click="close()" class="inline-flex h-10 items-center rounded-sm text-label-md font-bold text-primary hover:underline underline-offset-4 {{ $focusRing }}">Tutup</button>
+                                </div>
+                                <p class="text-body-sm text-on-surface-muted" x-text="ton(sel.ton) + ' · ' + money(sel.nilai) + ' · ' + sel.kategori.join(', ')"></p>
+                                <ul class="mt-2">
+                                    <template x-for="o in sel.orders" :key="o.id">
+                                        <li class="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-outline-hairline py-2.5">
+                                            <span class="w-16 shrink-0 text-label-md font-bold tabular-nums" x-text="o.code"></span>
+                                            <span class="min-w-0 flex-1 text-body-sm text-on-surface-muted" x-text="o.seller + ' → ' + o.buyer"></span>
+                                            <span class="shrink-0 text-label-md font-bold tabular-nums" x-text="ton(o.ton) + ' · ' + money(o.nilai)"></span>
+                                        </li>
+                                    </template>
+                                </ul>
+                                <p x-show="sel.count > sel.orders.length" class="mt-1 text-body-sm text-on-surface-muted"
+                                   x-text="'Menampilkan ' + num(sel.orders.length) + ' dari ' + num(sel.count)"></p>
+                            </div>
+                        </template>
+                    </div>
+                @endif
+            </x-ui.card>
         </div>
-        <dl class="mt-4 grid gap-y-5 sm:grid-cols-2 xl:grid-cols-4 xl:divide-x xl:divide-on-tile/15">
-            @foreach ([
-                ['Tonase terdaur ulang', Format::number($impact['tonase'], 1), 'ton', 'Dari order yang selesai', false],
-                ['Penghematan biaya', $hematValue, $hematUnit, 'Seller '.Format::rupiahShort($impact['hemat_seller']).' · Buyer '.Format::rupiahShort($impact['hemat_buyer']), false],
-                ['Emisi ditekan', Format::number($impact['co2e_kg'] / 1000, 1), 'ton CO₂e', 'Bersih, setelah emisi angkutan', false],
-                ['Inspector aktif', Format::number($impact['inspector_aktif']), 'dari '.Format::number($impact['inspector_total']), Format::number($impact['sertifikat_berakhir']).' sertifikat berakhir ≤ 30 hari', $impact['sertifikat_berakhir'] > 0],
-            ] as $i => [$label, $value, $unit, $caption, $warn])
-                <div @class(['xl:px-5' => $i > 0, 'xl:pr-5' => $i === 0])>
-                    <dt class="text-label-md text-on-tile-muted">{{ $label }}</dt>
-                    <dd class="mt-1 flex items-baseline gap-1.5 tabular-nums">
-                        <span class="text-headline-lg">{{ $value }}</span>
-                        <span class="text-body-md font-medium">{{ $unit }}</span>
-                    </dd>
-                    <dd @class(['mt-1 text-body-sm', 'text-tile-sun-to' => $warn, 'text-on-tile-muted' => ! $warn])>{{ $caption }}</dd>
-                </div>
-            @endforeach
-        </dl>
     </section>
 </div>

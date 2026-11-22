@@ -1,4 +1,5 @@
-<div>
+{{-- Varian Senja di Sawah (.dash-senja) untuk keempat dashboard peran (panduan dashboard Senja). --}}
+<div @class(['dash-senja' => in_array($role, ['ADMIN', 'SELLER', 'BUYER', 'INSPECTOR'], true)])>
     @php
         // Judul menamai konteks (organisasi atau orang), bukan sapaan (DESIGN.md › Typography, amandemen FND v8).
         $now = \Illuminate\Support\Carbon::now('Asia/Jakarta');

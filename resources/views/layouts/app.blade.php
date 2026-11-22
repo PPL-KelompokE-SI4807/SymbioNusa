@@ -60,7 +60,7 @@
                     <x-ui.icon name="menu" />
                 </button>
                 <a href="{{ route('dashboard') }}" class="flex min-w-0 flex-1 items-center gap-2 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
-                    <span class="flex size-8 shrink-0 items-center justify-center rounded-sm bg-primary text-on-primary" aria-hidden="true">
+                    <span data-brand-mark class="flex size-8 shrink-0 items-center justify-center rounded-sm bg-primary text-on-primary" aria-hidden="true">
                         <x-ui.icon name="loop" class="size-[18px]" />
                     </span>
                     <span class="truncate text-label-md font-semibold">SymbioNusa</span>
