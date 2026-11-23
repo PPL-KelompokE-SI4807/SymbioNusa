@@ -67,24 +67,25 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profil-kompetensi', [InspectorProfileController::class, 'mine'])->name('inspector.profile');
     Route::post('/profil-kompetensi/sertifikat', [InspectorProfileController::class, 'uploadMine'])->name('inspector.profile.certificate');
 
+    // PBI-08 (SYM-12): membuat/mengirim RFQ, PO, dan kebutuhan hanya untuk perusahaan TERVERIFIKASI.
     Route::prefix('rfq')->name('rfq.')->group(function () {
         Route::get('/', [RfqController::class, 'index'])->name('index');
-        Route::get('/create', [RfqController::class, 'create'])->name('create');
-        Route::post('/', [RfqController::class, 'store'])->name('store');
+        Route::get('/create', [RfqController::class, 'create'])->name('create')->middleware('company.verified');
+        Route::post('/', [RfqController::class, 'store'])->name('store')->middleware('company.verified');
         Route::get('/{rfq}', [RfqController::class, 'show'])->name('show');
-        Route::post('/{rfq}/counter', [RfqController::class, 'counter'])->name('counter');
-        Route::post('/{rfq}/accept', [RfqController::class, 'accept'])->name('accept');
+        Route::post('/{rfq}/counter', [RfqController::class, 'counter'])->name('counter')->middleware('company.verified');
+        Route::post('/{rfq}/accept', [RfqController::class, 'accept'])->name('accept')->middleware('company.verified');
         Route::post('/{rfq}/reject', [RfqController::class, 'reject'])->name('reject');
         Route::post('/{rfq}/withdraw', [RfqController::class, 'withdraw'])->name('withdraw');
     });
 
     Route::prefix('po')->name('po.')->group(function () {
         Route::get('/', [PurchaseOrderController::class, 'index'])->name('index');
-        Route::get('/create', [PurchaseOrderController::class, 'create'])->name('create');
-        Route::post('/', [PurchaseOrderController::class, 'store'])->name('store');
+        Route::get('/create', [PurchaseOrderController::class, 'create'])->name('create')->middleware('company.verified');
+        Route::post('/', [PurchaseOrderController::class, 'store'])->name('store')->middleware('company.verified');
         Route::get('/{po}', [PurchaseOrderController::class, 'show'])->name('show');
-        Route::post('/{po}/send', [PurchaseOrderController::class, 'send'])->name('send');
-        Route::post('/{po}/confirm', [PurchaseOrderController::class, 'confirm'])->name('confirm');
+        Route::post('/{po}/send', [PurchaseOrderController::class, 'send'])->name('send')->middleware('company.verified');
+        Route::post('/{po}/confirm', [PurchaseOrderController::class, 'confirm'])->name('confirm')->middleware('company.verified');
         Route::post('/{po}/reject', [PurchaseOrderController::class, 'reject'])->name('reject');
         Route::post('/{po}/cancel', [PurchaseOrderController::class, 'cancel'])->name('cancel');
     });
@@ -110,10 +111,10 @@ Route::middleware(['auth'])->group(function () {
     // PBI-14: Kebutuhan Bahan Baku Sekunder (Buyer & Seller)
     Route::prefix('buyer/kebutuhan')->name('buyer.demands.')->group(function () {
         Route::get('/', [DemandRequestController::class, 'buyerIndex'])->name('index');
-        Route::get('/buat', [DemandRequestController::class, 'create'])->name('create');
-        Route::post('/', [DemandRequestController::class, 'store'])->name('store');
-        Route::get('/{demand}/edit', [DemandRequestController::class, 'edit'])->name('edit');
-        Route::put('/{demand}', [DemandRequestController::class, 'update'])->name('update');
+        Route::get('/buat', [DemandRequestController::class, 'create'])->name('create')->middleware('company.verified');
+        Route::post('/', [DemandRequestController::class, 'store'])->name('store')->middleware('company.verified');
+        Route::get('/{demand}/edit', [DemandRequestController::class, 'edit'])->name('edit')->middleware('company.verified');
+        Route::put('/{demand}', [DemandRequestController::class, 'update'])->name('update')->middleware('company.verified');
         Route::patch('/{demand}/tutup', [DemandRequestController::class, 'close'])->name('close');
         Route::delete('/{demand}', [DemandRequestController::class, 'destroy'])->name('destroy');
     });

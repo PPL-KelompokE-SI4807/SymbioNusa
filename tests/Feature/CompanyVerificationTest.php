@@ -7,8 +7,10 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\TestCase;
 
+#[Group('SYM-12')]
 class CompanyVerificationTest extends TestCase
 {
     use DatabaseTransactions;
@@ -118,6 +120,8 @@ class CompanyVerificationTest extends TestCase
             'file_url' => 'company-documents/sample.pdf',
             'status' => 'PENDING',
         ]);
+        $company->documents()->create(['jenis' => 'IZIN_LINGKUNGAN', 'file_url' => 'company-documents/izin.pdf', 'status' => 'PENDING']);
+        $company->documents()->create(['jenis' => 'SURAT_NON_B3', 'file_url' => 'company-documents/non-b3.pdf', 'status' => 'PENDING']);
 
         $this->actingAs($admin)
             ->post(route('admin.companies.approve', $company))

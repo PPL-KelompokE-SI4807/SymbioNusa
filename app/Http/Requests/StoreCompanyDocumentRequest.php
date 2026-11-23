@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Services\Company\CompanyVerificationService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreCompanyDocumentRequest extends FormRequest
 {
@@ -14,7 +16,7 @@ class StoreCompanyDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'jenis' => ['required', 'string', 'max:45', 'in:NIB,NPWP,AKTA_PENDIRIAN,IZIN_LINGKUNGAN,SURAT_NON_B3'],
+            'jenis' => ['required', 'string', 'max:45', Rule::in(array_keys(CompanyVerificationService::DOCUMENT_TYPES))],
             'berlaku_sampai' => ['nullable', 'date', 'after:today'],
             'dokumen' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ];
