@@ -54,22 +54,22 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Nama Perusahaan *</label>
-                    <input type="text" name="nama" value="{{ old('nama', $company->nama ?? '') }}" required
+                    <label for="company-nama" class="block text-sm font-medium text-gray-700">Nama Perusahaan *</label>
+                    <input type="text" id="company-nama" name="nama" value="{{ old('nama', $company->nama ?? '') }}" required
                         class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
                     @error('nama') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Nomor Induk Berusaha (NIB) *</label>
-                    <input type="text" name="nib" value="{{ old('nib', $company->nib ?? '') }}" required
+                    <label for="company-nib" class="block text-sm font-medium text-gray-700">Nomor Induk Berusaha (NIB) *</label>
+                    <input type="text" id="company-nib" name="nib" value="{{ old('nib', $company->nib ?? '') }}" required
                         class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
                     @error('nib') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Tipe Kemitraan *</label>
-                    <select name="tipe" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                    <label for="company-tipe" class="block text-sm font-medium text-gray-700">Tipe Kemitraan *</label>
+                    <select id="company-tipe" name="tipe" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
                         @foreach (['SELLER' => 'Seller (Penghasil Sisa Produksi)', 'BUYER' => 'Buyer (Pemanfaat Bahan Sekunder)', 'KEDUANYA' => 'Keduanya (Seller & Buyer)'] as $val => $label)
                             <option value="{{ $val }}" @selected(old('tipe', $company->tipe ?? 'SELLER') === $val)>{{ $label }}</option>
                         @endforeach
@@ -78,29 +78,29 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Kontak Resmi (Telepon / WA) *</label>
-                    <input type="text" name="kontak" value="{{ old('kontak', $company->kontak ?? '') }}" required
+                    <label for="company-kontak" class="block text-sm font-medium text-gray-700">Kontak Resmi (Telepon / WA) *</label>
+                    <input type="text" id="company-kontak" name="kontak" value="{{ old('kontak', $company->kontak ?? '') }}" required
                         class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
                     @error('kontak') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700">Alamat Lengkap Pabrik / Gudang *</label>
-                    <input type="text" name="alamat" value="{{ old('alamat', $company->alamat ?? '') }}" required
+                    <label for="company-alamat" class="block text-sm font-medium text-gray-700">Alamat Lengkap Pabrik / Gudang *</label>
+                    <input type="text" id="company-alamat" name="alamat" value="{{ old('alamat', $company->alamat ?? '') }}" required
                         class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
                     @error('alamat') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Latitude (Opsional)</label>
-                    <input type="text" name="lat" value="{{ old('lat', $company->lat ?? '') }}" placeholder="-6.917464"
+                    <label for="company-lat" class="block text-sm font-medium text-gray-700">Latitude (Opsional)</label>
+                    <input type="text" id="company-lat" name="lat" value="{{ old('lat', $company->lat ?? '') }}" placeholder="-6.917464"
                         class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
                     @error('lat') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Longitude (Opsional)</label>
-                    <input type="text" name="lng" value="{{ old('lng', $company->lng ?? '') }}" placeholder="107.619123"
+                    <label for="company-lng" class="block text-sm font-medium text-gray-700">Longitude (Opsional)</label>
+                    <input type="text" id="company-lng" name="lng" value="{{ old('lng', $company->lng ?? '') }}" placeholder="107.619123"
                         class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
                     @error('lng') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
@@ -126,28 +126,38 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-5">
                 <h2 class="text-base font-semibold text-gray-900 border-b pb-3">2. Dokumen Legalitas & Lingkungan (PDF/JPG/PNG, Maks. 5 MB)</h2>
 
+                @if (! empty($missingDocuments))
+                    <div class="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900">
+                        <p class="font-semibold">Dokumen wajib yang belum lengkap atau sudah kedaluwarsa:</p>
+                        <ul class="mt-1 list-disc list-inside">
+                            @foreach ($missingDocuments as $label)
+                                <li>{{ $label }}</li>
+                            @endforeach
+                        </ul>
+                        <p class="mt-1 text-xs">Admin baru dapat memverifikasi perusahaan setelah semua dokumen wajib terunggah dan masih berlaku.</p>
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('companies.documents.store') }}" enctype="multipart/form-data"
                     class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end bg-gray-50 p-4 rounded-lg border border-gray-200">
                     @csrf
                     <div>
-                        <label class="block text-xs font-medium text-gray-700">Jenis Dokumen *</label>
-                        <select name="jenis" required class="mt-1 block w-full rounded-lg border-gray-300 text-sm">
-                            <option value="NIB">NIB / OSS</option>
-                            <option value="NPWP">NPWP Perusahaan</option>
-                            <option value="AKTA_PENDIRIAN">Akta Pendirian</option>
-                            <option value="IZIN_LINGKUNGAN">Izin Lingkungan / UKL-UPL</option>
-                            <option value="SURAT_NON_B3">Surat Pernyataan Non-B3</option>
+                        <label for="company-jenis" class="block text-xs font-medium text-gray-700">Jenis Dokumen *</label>
+                        <select id="company-jenis" name="jenis" required class="mt-1 block w-full rounded-lg border-gray-300 text-sm">
+                            @foreach ($documentTypes as $value => $label)
+                                <option value="{{ $value }}" @selected(old('jenis') === $value)>{{ $label }}</option>
+                            @endforeach
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700">Berlaku Sampai (Opsional)</label>
-                        <input type="date" name="berlaku_sampai" class="mt-1 block w-full rounded-lg border-gray-300 text-sm">
+                        <label for="company-berlaku_sampai" class="block text-xs font-medium text-gray-700">Berlaku Sampai (Opsional)</label>
+                        <input type="date" id="company-berlaku_sampai" name="berlaku_sampai" class="mt-1 block w-full rounded-lg border-gray-300 text-sm">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700">Berkas (PDF/JPG/PNG) *</label>
-                        <input type="file" name="dokumen" accept=".pdf,.jpg,.jpeg,.png" required class="mt-1 block w-full text-xs text-gray-600">
+                        <label for="company-dokumen" class="block text-xs font-medium text-gray-700">Berkas (PDF/JPG/PNG) *</label>
+                        <input type="file" id="company-dokumen" name="dokumen" accept=".pdf,.jpg,.jpeg,.png" required class="mt-1 block w-full text-xs text-gray-600">
                     </div>
 
                     <div class="md:col-span-3 flex justify-end">
@@ -165,7 +175,7 @@
                     </div>
                 @endif
 
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Daftar dokumen legalitas">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">
                             <tr>

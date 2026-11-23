@@ -26,7 +26,7 @@
             ],
             'VERIFIKASI & TRANSAKSI' => [
                 ['label' => 'Verifikasi Mitra', 'icon' => 'building', 'route' => 'admin.companies.index', 'active' => 'admin.companies.*'],
-                ['label' => 'Moderasi Listing', 'icon' => 'clipboard', 'route' => null],
+                ['label' => 'Moderasi Listing', 'icon' => 'clipboard', 'route' => 'admin.listings.index', 'active' => 'admin.listings.*'],
                 ['label' => 'Penugasan Inspeksi', 'icon' => 'calendar', 'route' => 'admin.inspections.index', 'active' => 'admin.inspections.*'],
                 ['label' => 'Sengketa & Klaim', 'icon' => 'scale', 'route' => null],
             ],
@@ -40,7 +40,7 @@
                 ['label' => 'Dashboard', 'icon' => 'grid', 'route' => 'dashboard'],
             ],
             'KATALOG' => [
-                ['label' => 'Listing Saya', 'icon' => 'layers', 'route' => null],
+                ['label' => 'Listing Saya', 'icon' => 'layers', 'route' => 'seller.listings.index', 'active' => 'seller.listings.*'],
                 ['label' => 'Jadwal Pasokan', 'icon' => 'calendar', 'route' => null],
                 ['label' => 'Papan Kebutuhan', 'icon' => 'clipboard', 'route' => 'seller.demands.index', 'active' => 'seller.demands.*'],
             ],
@@ -61,7 +61,7 @@
                 ['label' => 'Dashboard', 'icon' => 'grid', 'route' => 'dashboard'],
             ],
             'PASAR' => [
-                ['label' => 'Katalog Material', 'icon' => 'search', 'route' => null],
+                ['label' => 'Katalog Material', 'icon' => 'search', 'route' => 'catalog.index', 'active' => 'catalog.*'],
                 ['label' => 'Kebutuhan Saya', 'icon' => 'clipboard', 'route' => 'buyer.demands.index', 'active' => 'buyer.demands.*'],
                 ['label' => 'Daftar Pantau', 'icon' => 'eye', 'route' => null],
             ],

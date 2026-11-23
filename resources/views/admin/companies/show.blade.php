@@ -23,6 +23,25 @@
             </div>
         </div>
 
+        @if ($needsReReview)
+            <div class="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900">
+                <strong>Tinjauan Ulang:</strong> perusahaan ini kembali ke antrean karena ada dokumen wajib yang kedaluwarsa.
+            </div>
+        @endif
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-3">
+            <h2 class="text-base font-semibold text-gray-900">Dokumen Wajib ({{ $company->tipe }})</h2>
+            <ul class="text-sm space-y-1">
+                @foreach (array_keys($requiredGroups) as $label)
+                    @php($isMissing = in_array($label, $missingDocuments, true))
+                    <li class="flex items-start gap-2">
+                        <span class="font-semibold {{ $isMissing ? 'text-red-700' : 'text-emerald-700' }}">{{ $isMissing ? 'Belum ada / kedaluwarsa' : 'Lengkap' }}</span>
+                        <span class="text-gray-700">&mdash; {{ $label }}</span>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
             <h2 class="text-base font-semibold text-gray-900">Berkas Legalitas Terunggah</h2>
             <ul class="divide-y divide-gray-100 text-sm">
@@ -47,7 +66,10 @@
                 @csrf
                 <h3 class="font-semibold text-emerald-800 text-sm">Setujui Verifikasi Perusahaan</h3>
                 <p class="text-xs text-gray-500">Perusahaan akan mendapat akses penuh untuk membuat listing dan bertransaksi.</p>
-                <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-700 text-white text-sm font-semibold hover:bg-emerald-800">
+                @if ($missingDocuments !== [])
+                    <p class="text-xs text-red-700">Belum bisa disetujui: dokumen wajib belum lengkap atau kedaluwarsa.</p>
+                @endif
+                <button type="submit" @disabled($missingDocuments !== []) class="px-4 py-2 rounded-lg bg-emerald-700 text-white text-sm font-semibold hover:bg-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed">
                     Setujui (TERVERIFIKASI)
                 </button>
             </form>
