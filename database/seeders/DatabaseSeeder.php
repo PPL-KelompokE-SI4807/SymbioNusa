@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SymbioNusaDemoSeeder::class,
+            RfqSeeder::class,
+            PurchaseOrderSeeder::class,
         ]);
     }
 }

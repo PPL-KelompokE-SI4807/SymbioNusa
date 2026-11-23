@@ -44,11 +44,11 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($admin)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Ringkasan aliran material, dampak, dan antrean tindakan platform.');
+        $response->assertSee('Dinas Lingkungan Hidup');
         $response->assertSee('Tonase terdaur ulang');
-        $response->assertSee('Alur Order');
+        $response->assertSee('Alur order');
         $response->assertSee('Antrean tindakan');
-        $response->assertSee('Modul');
+        $response->assertSee('Material terdaur ulang');
     }
 
     public function test_seller_can_access_dashboard_and_view_metrics(): void
@@ -79,9 +79,9 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Budi Seller Mandiri');
-        $response->assertSee('Listing dipublikasikan');
-        $response->assertSee('Order masuk terbaru');
-        $response->assertSee('Listing terbaru');
+        $response->assertSee('Stok listing aktif');
+        $response->assertSee('Order masuk');
+        $response->assertSee('Listing saya');
     }
 
     public function test_buyer_can_access_dashboard_and_view_metrics(): void
@@ -112,8 +112,8 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Rina Buyer Sekunder');
-        $response->assertSee('Kebutuhan terbuka');
-        $response->assertSee('Order pembelian terbaru');
+        $response->assertSee('Tagihan terbuka');
+        $response->assertSee('Order pembelian');
         $response->assertSee('Kebutuhan saya');
     }
 
@@ -133,8 +133,8 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Dr. Hendra Inspector Mutu');
-        $response->assertSee('Ditugaskan');
-        $response->assertSee('Tugas inspeksi aktif');
+        $response->assertSee('Inspeksi hari ini');
+        $response->assertSee('Jadwal inspeksi');
     }
 
     public function test_dashboard_renders_livewire_component_correctly(): void
@@ -152,7 +152,7 @@ class DashboardTest extends TestCase
         $this->actingAs($admin);
 
         Livewire::test(DashboardOverview::class)
-            ->assertSee('Alur Order')
+            ->assertSee('Alur order')
             ->assertSee('Antrean tindakan')
             ->assertStatus(200);
     }
@@ -184,6 +184,6 @@ class DashboardTest extends TestCase
         $this->actingAs($seller)->get('/dashboard')
             ->assertOk()
             ->assertSee('Akun belum terhubung ke perusahaan')
-            ->assertDontSee('Order masuk terbaru');
+            ->assertDontSee('Order masuk');
     }
 }

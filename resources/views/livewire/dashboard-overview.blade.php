@@ -1,14 +1,28 @@
 <div>
     @php
-        $subtitles = [
-            'ADMIN' => 'Ringkasan aliran material, dampak, dan antrean tindakan platform.',
-            'SELLER' => 'Listing, order masuk, dan tagihan perusahaan Anda.',
-            'BUYER' => 'Kebutuhan bahan baku, order, dan tagihan perusahaan Anda.',
-            'INSPECTOR' => 'Penugasan inspeksi dan laporan mutu Anda.',
-        ];
+        // Judul menamai konteks (organisasi atau orang), bukan sapaan (DESIGN.md › Typography, amandemen FND v8).
+        $now = \Illuminate\Support\Carbon::now('Asia/Jakarta');
+        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        $stamp = 'per '.$now->format('j').' '.$months[$now->month - 1].' '.$now->format('Y, H.i').' WIB';
+        $roleNames = ['ADMIN' => 'Admin', 'SELLER' => 'Seller', 'BUYER' => 'Buyer', 'INSPECTOR' => 'Inspector'];
+        $title = match ($role) {
+            'ADMIN' => 'Dinas Lingkungan Hidup',
+            'SELLER', 'BUYER' => $user->company->nama ?? $user->nama,
+            default => $user->nama,
+        };
+        $subtitle = 'Dashboard '.($roleNames[$role] ?? 'Pengguna').' · '.$stamp;
     @endphp
 
-    <x-ui.page-header title="Dashboard" :subtitle="$subtitles[$role] ?? 'Ringkasan akun Anda.'" />
+    <x-ui.page-header :title="$title" :subtitle="$subtitle">
+        @if ($role === 'BUYER' && Route::has('buyer.demands.create') && $user->id_company)
+            <x-slot:actions>
+                <x-ui.button size="lg" :href="route('buyer.demands.create')">
+                    <x-ui.icon name="plus" class="size-[18px]" />
+                    Ajukan kebutuhan
+                </x-ui.button>
+            </x-slot:actions>
+        @endif
+    </x-ui.page-header>
 
     @if ($failed)
         <x-ui.alert variant="warning" class="mb-6">

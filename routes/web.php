@@ -1,14 +1,17 @@
 <?php
 
 use App\Http\Controllers\Admin\CompanyVerificationController;
+use App\Http\Controllers\Admin\InspectionAssignmentController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanyDocumentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemandRequestController;
+use App\Http\Controllers\DocumentVerificationController;
 use App\Http\Controllers\InspectorProfileController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\RfqController;
 use App\Http\Controllers\Seller\ListingController;
 use Illuminate\Support\Facades\Route;
@@ -75,6 +78,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{rfq}/withdraw', [RfqController::class, 'withdraw'])->name('withdraw');
     });
 
+    Route::prefix('po')->name('po.')->group(function () {
+        Route::get('/', [PurchaseOrderController::class, 'index'])->name('index');
+        Route::get('/create', [PurchaseOrderController::class, 'create'])->name('create');
+        Route::post('/', [PurchaseOrderController::class, 'store'])->name('store');
+        Route::get('/{po}', [PurchaseOrderController::class, 'show'])->name('show');
+        Route::post('/{po}/send', [PurchaseOrderController::class, 'send'])->name('send');
+        Route::post('/{po}/confirm', [PurchaseOrderController::class, 'confirm'])->name('confirm');
+        Route::post('/{po}/reject', [PurchaseOrderController::class, 'reject'])->name('reject');
+        Route::post('/{po}/cancel', [PurchaseOrderController::class, 'cancel'])->name('cancel');
+    });
+
     // PBI-07: Verifikasi Pembayaran (Buyer & Seller)
     Route::prefix('buyer/invoices')->name('buyer.invoices.')->group(function () {
         Route::get('/', [PaymentController::class, 'buyerInvoices'])->name('index');
@@ -108,6 +122,25 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [DemandRequestController::class, 'sellerIndex'])->name('index');
         Route::get('/{demand}', [DemandRequestController::class, 'sellerShow'])->name('show');
     });
+
+    // PBI-17 (SYM-21): Verifikasi Dokumen Legalitas Non-B3 (Inspector)
+    Route::prefix('inspector/verifikasi-dokumen')->name('inspector.verifications.')->group(function () {
+        Route::get('/', [DocumentVerificationController::class, 'index'])->name('index');
+        Route::get('/{verification}', [DocumentVerificationController::class, 'show'])->name('show');
+        Route::post('/{verification}', [DocumentVerificationController::class, 'verify'])->name('verify');
+    });
+
+    // PBI-18 (SYM-22): Penugasan Inspeksi (Admin)
+    Route::prefix('admin/penugasan-inspeksi')->name('admin.inspections.')->group(function () {
+        Route::get('/', [InspectionAssignmentController::class, 'index'])->name('index');
+        Route::get('/{order}/tugaskan', [InspectionAssignmentController::class, 'create'])->name('create');
+        Route::post('/{order}/tugaskan', [InspectionAssignmentController::class, 'store'])->name('store');
+        Route::get('/{inspection}', [InspectionAssignmentController::class, 'show'])->name('show');
+        Route::post('/{inspection}/batalkan', [InspectionAssignmentController::class, 'cancel'])->name('cancel');
+    });
+
+    // PBI-18 (SYM-22): Tugas Inspeksi (Inspector)
+    Route::get('/inspector/tugas-inspeksi', [InspectionAssignmentController::class, 'inspectorTasks'])->name('inspector.tasks.index');
 
     // PBI-09: Listing Sisa Produksi (Seller)
     Route::prefix('seller/listings')->name('seller.listings.')->group(function () {

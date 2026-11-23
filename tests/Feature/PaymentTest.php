@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\OrderStatus;
 use App\Enums\PaymentVerificationStatus;
 use App\Models\Company;
 use App\Models\Invoice;
@@ -52,7 +53,7 @@ class PaymentTest extends TestCase
             'companies_id_buyer' => $this->buyerCompany->id_company,
             'companies_id_seller' => $this->sellerCompany->id_company,
             'rfq_contracts_id_rfq_contract' => $contract->id_rfq_contract,
-            'status' => 'INVOICED',
+            'status' => OrderStatus::INVOICED,
         ]);
 
         $this->invoice = Invoice::factory()->create([
@@ -228,7 +229,7 @@ class PaymentTest extends TestCase
         $this->assertEquals('DIBAYAR', $this->invoice->status);
 
         $this->purchaseOrder->refresh();
-        $this->assertEquals('DIBAYAR', $this->purchaseOrder->status);
+        $this->assertSame(OrderStatus::DIBAYAR, $this->purchaseOrder->status);
 
         // Riwayat status order tercatat
         $this->assertDatabaseHas('order_status_history', [
@@ -268,7 +269,7 @@ class PaymentTest extends TestCase
 
         // Order PO tetap INVOICED
         $this->purchaseOrder->refresh();
-        $this->assertEquals('INVOICED', $this->purchaseOrder->status);
+        $this->assertSame(OrderStatus::INVOICED, $this->purchaseOrder->status);
 
         // Notifikasi penolakan ke Buyer
         $this->assertDatabaseHas('notifications', [

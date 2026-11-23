@@ -43,6 +43,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Masuk 1-klik ke akun demo
+    |--------------------------------------------------------------------------
+    |
+    | Menampilkan tombol masuk tanpa kata sandi untuk akun demo hasil seeder
+    | di halaman login. Default: aktif hanya saat APP_ENV=local. Di server
+    | (staging) nyalakan sementara dengan DEMO_LOGIN=true, misalnya untuk
+    | demo sprint review, lalu jalankan `php artisan config:cache`.
+    |
+    */
+
+    'demo_login' => (bool) env('DEMO_LOGIN', env('APP_ENV', 'production') === 'local'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |
@@ -65,7 +79,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'Asia/Jakarta'),
 
     /*
     |--------------------------------------------------------------------------
@@ -78,7 +92,7 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'id'),
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
