@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CompanyVerificationController;
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanyDocumentController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\DemandRequestController;
 use App\Http\Controllers\InspectorProfileController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RfqController;
+use App\Http\Controllers\Seller\ListingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -105,6 +107,23 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('seller/papan-kebutuhan')->name('seller.demands.')->group(function () {
         Route::get('/', [DemandRequestController::class, 'sellerIndex'])->name('index');
         Route::get('/{demand}', [DemandRequestController::class, 'sellerShow'])->name('show');
+    });
+
+    // PBI-09: Listing Sisa Produksi (Seller)
+    Route::prefix('seller/listings')->name('seller.listings.')->group(function () {
+        Route::get('/', [ListingController::class, 'index'])->name('index');
+        Route::get('/buat', [ListingController::class, 'create'])->name('create');
+        Route::post('/', [ListingController::class, 'store'])->name('store');
+        Route::get('/{listing}', [ListingController::class, 'show'])->name('show');
+        Route::get('/{listing}/edit', [ListingController::class, 'edit'])->name('edit');
+        Route::put('/{listing}', [ListingController::class, 'update'])->name('update');
+        Route::post('/{listing}/arsip', [ListingController::class, 'archive'])->name('archive');
+    });
+
+    // Katalog Material (Publik / Buyer / Semua pengguna terautentikasi)
+    Route::prefix('katalog')->name('catalog.')->group(function () {
+        Route::get('/', [CatalogController::class, 'index'])->name('index');
+        Route::get('/{listing}', [CatalogController::class, 'show'])->name('show');
     });
 });
 

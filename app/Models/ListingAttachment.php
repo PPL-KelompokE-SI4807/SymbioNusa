@@ -2,10 +2,20 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id_listing_attachment
+ * @property string $jenis
+ * @property string $file_url
+ * @property Carbon|null $tanggal_pengambilan
+ * @property int $listings_id_listings
+ * @property string $status
+ * @property-read Listing|null $listing
+ */
 class ListingAttachment extends Model
 {
     use HasFactory;

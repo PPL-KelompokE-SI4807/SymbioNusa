@@ -39,7 +39,7 @@
                 ['label' => 'Dashboard', 'route' => 'dashboard'],
             ],
             'KATALOG' => [
-                ['label' => 'Listing Saya', 'route' => null],
+                ['label' => 'Listing Saya', 'route' => 'seller.listings.index', 'active' => 'seller.listings.*'],
                 ['label' => 'Jadwal Pasokan', 'route' => null],
                 ['label' => 'Papan Kebutuhan', 'route' => 'seller.demands.index', 'active' => 'seller.demands.*'],
             ],
@@ -60,7 +60,7 @@
                 ['label' => 'Dashboard', 'route' => 'dashboard'],
             ],
             'PASAR' => [
-                ['label' => 'Katalog Material', 'route' => null],
+                ['label' => 'Katalog Material', 'route' => 'catalog.index', 'active' => 'catalog.*'],
                 ['label' => 'Kebutuhan Saya', 'route' => 'buyer.demands.index', 'active' => 'buyer.demands.*'],
                 ['label' => 'Daftar Pantau', 'route' => null],
             ],
