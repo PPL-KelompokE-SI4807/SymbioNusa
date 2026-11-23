@@ -2,9 +2,11 @@
 
 namespace App\Services\Listing;
 
+use App\Models\Company;
 use App\Models\Listing;
 use App\Models\ListingAttachment;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +14,17 @@ use Illuminate\Support\Facades\Storage;
 
 class ListingService
 {
+    /**
+     * Jenis lampiran => [nama field unggahan, folder penyimpanan].
+     *
+     * @var array<string, array{0: string, 1: string}>
+     */
+    protected const ATTACHMENT_FIELDS = [
+        'SURAT_NON_B3' => ['surat_non_b3', 'listings/documents'],
+        'FOTO_SAMPEL' => ['foto_sampel', 'listings/photos'],
+        'SERTIFIKAT_LAB' => ['sertifikat_lab', 'listings/certificates'],
+    ];
+
     /**
      * @param  array<string, mixed>  $data
      * @param  array<string, mixed>  $files
@@ -33,7 +46,7 @@ class ListingService
                 'categories_id_categories' => $data['categories_id_categories'],
             ]);
 
-            $this->storeAttachments($listing, $files);
+            $this->storeAttachments($listing, $files, $data);
 
             return $listing->fresh(['attachments', 'category', 'company']) ?? $listing;
         });
@@ -46,9 +59,13 @@ class ListingService
     public function updateListing(Listing $listing, array $data, array $files): Listing
     {
         return DB::transaction(function () use ($listing, $data, $files) {
-            $listing->update([
+            // Baris stok dikunci agar tidak balapan dengan reservasi stok saat konfirmasi PO.
+            /** @var Listing $locked */
+            $locked = Listing::whereKey($listing->id_listings)->lockForUpdate()->firstOrFail();
+
+            $locked->update([
                 'judul' => $data['judul'],
-                'spesifikasi' => $data['spesifikasi'] ?? $listing->spesifikasi,
+                'spesifikasi' => array_key_exists('spesifikasi', $data) ? $data['spesifikasi'] : $locked->spesifikasi,
                 'volume_kg' => $data['volume_kg'],
                 'stok_kg' => $data['stok_kg'],
                 'harga_per_kg' => $data['harga_per_kg'],
@@ -59,9 +76,9 @@ class ListingService
                 'categories_id_categories' => $data['categories_id_categories'],
             ]);
 
-            $this->storeAttachments($listing, $files);
+            $this->storeAttachments($locked, $files, $data);
 
-            return $listing->fresh(['attachments', 'category', 'company']) ?? $listing;
+            return $locked->fresh(['attachments', 'category', 'company']) ?? $locked;
         });
     }
 
@@ -80,22 +97,12 @@ class ListingService
     {
         $query = Listing::query()
             ->where('companies_id_company', $companyId)
-            ->with(['category', 'attachments']);
+            ->with(['category', 'activeAttachments']);
 
-        if (! empty($filters['q'])) {
-            $keyword = '%'.$filters['q'].'%';
-            $query->where(function ($q) use ($keyword) {
-                $q->where('judul', 'like', $keyword)
-                    ->orWhere('lokasi', 'like', $keyword);
-            });
-        }
+        $this->applyKeywordAndCategory($query, $filters);
 
         if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
-        }
-
-        if (! empty($filters['kategori'])) {
-            $query->where('categories_id_categories', $filters['kategori']);
         }
 
         return $query->orderByDesc('id_listings')->paginate($perPage)->withQueryString();
@@ -110,8 +117,44 @@ class ListingService
         $query = Listing::query()
             ->published()
             ->where('stok_kg', '>', 0)
-            ->with(['category', 'company', 'attachments']);
+            // Listing perusahaan yang kembali ke Tinjauan Ulang tidak tampil di katalog (PBI-08).
+            ->whereHas('company', fn ($q) => $q->where('status_verifikasi', Company::STATUS_VERIFIED))
+            ->with(['category', 'company', 'activeAttachments']);
 
+        $this->applyKeywordAndCategory($query, $filters);
+
+        return $query->orderByDesc('id_listings')->paginate($perPage)->withQueryString();
+    }
+
+    /**
+     * Daftar semua listing untuk moderasi Admin.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Listing>
+     */
+    public function getModerationListings(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        $query = Listing::query()->with(['category', 'company']);
+
+        $this->applyKeywordAndCategory($query, $filters);
+
+        if (! empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        return $query
+            ->orderByRaw("FIELD(status, 'PUBLISHED', 'DRAF', 'DIARSIPKAN')")
+            ->orderByDesc('id_listings')
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
+    /**
+     * @param  Builder<Listing>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    protected function applyKeywordAndCategory($query, array $filters): void
+    {
         if (! empty($filters['q'])) {
             $keyword = '%'.$filters['q'].'%';
             $query->where(function ($q) use ($keyword) {
@@ -123,41 +166,34 @@ class ListingService
         if (! empty($filters['kategori'])) {
             $query->where('categories_id_categories', $filters['kategori']);
         }
-
-        return $query->orderByDesc('id_listings')->paginate($perPage)->withQueryString();
     }
 
     /**
+     * Simpan lampiran baru. Lampiran aktif sebelumnya dengan jenis yang sama
+     * dinonaktifkan agar hanya ada satu lampiran aktif per jenis.
+     *
      * @param  array<string, mixed>  $files
+     * @param  array<string, mixed>  $data
      */
-    protected function storeAttachments(Listing $listing, array $files): void
+    protected function storeAttachments(Listing $listing, array $files, array $data): void
     {
-        if (isset($files['surat_non_b3']) && $files['surat_non_b3'] instanceof UploadedFile) {
-            $path = Storage::disk('public')->putFile('listings/documents', $files['surat_non_b3']);
-            ListingAttachment::create([
-                'jenis' => 'SURAT_NON_B3',
-                'file_url' => $path,
-                'listings_id_listings' => $listing->id_listings,
-                'status' => 'AKTIF',
-            ]);
-        }
+        foreach (self::ATTACHMENT_FIELDS as $jenis => [$field, $folder]) {
+            $file = $files[$field] ?? null;
+            if (! $file instanceof UploadedFile) {
+                continue;
+            }
 
-        if (isset($files['foto_sampel']) && $files['foto_sampel'] instanceof UploadedFile) {
-            $path = Storage::disk('public')->putFile('listings/photos', $files['foto_sampel']);
-            ListingAttachment::create([
-                'jenis' => 'FOTO_SAMPEL',
-                'file_url' => $path,
-                'tanggal_pengambilan' => $files['tanggal_pengambilan_sampel'] ?? now()->toDateString(),
-                'listings_id_listings' => $listing->id_listings,
-                'status' => 'AKTIF',
-            ]);
-        }
+            $listing->attachments()
+                ->where('jenis', $jenis)
+                ->where('status', 'AKTIF')
+                ->update(['status' => 'NONAKTIF']);
 
-        if (isset($files['sertifikat_lab']) && $files['sertifikat_lab'] instanceof UploadedFile) {
-            $path = Storage::disk('public')->putFile('listings/certificates', $files['sertifikat_lab']);
             ListingAttachment::create([
-                'jenis' => 'SERTIFIKAT_LAB',
-                'file_url' => $path,
+                'jenis' => $jenis,
+                'file_url' => Storage::disk('public')->putFile($folder, $file),
+                'tanggal_pengambilan' => $jenis === 'FOTO_SAMPEL'
+                    ? ($data['tanggal_pengambilan_sampel'] ?? now('Asia/Jakarta')->toDateString())
+                    : null,
                 'listings_id_listings' => $listing->id_listings,
                 'status' => 'AKTIF',
             ]);

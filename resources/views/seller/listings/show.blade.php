@@ -24,7 +24,7 @@
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <x-ui.button href="{{ route('seller.listings.index') }}" variant="ghost">
+            <x-ui.button href="{{ route('seller.listings.index') }}" variant="secondary">
                 ← Kembali
             </x-ui.button>
             @if ($listing->status !== 'DIARSIPKAN')
@@ -132,7 +132,7 @@
                 </h3>
 
                 <div class="space-y-3">
-                    @forelse ($listing->attachments as $attachment)
+                    @forelse ($listing->activeAttachments as $attachment)
                         <div class="p-3 border border-border rounded-md">
                             <div class="flex items-center justify-between">
                                 <span class="font-semibold text-body-sm text-on-surface">

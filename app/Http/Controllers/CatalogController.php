@@ -28,11 +28,11 @@ class CatalogController extends Controller
 
     public function show(Listing $listing): View
     {
-        if (! $listing->isPublished()) {
+        if (! $listing->isPublished() || ! $listing->company?->isVerified()) {
             abort(404);
         }
 
-        $listing->load(['category', 'company', 'attachments']);
+        $listing->load(['category', 'company', 'activeAttachments']);
 
         return view('catalog.show', compact('listing'));
     }

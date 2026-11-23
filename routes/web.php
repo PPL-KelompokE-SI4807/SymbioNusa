@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CompanyVerificationController;
 use App\Http\Controllers\Admin\InspectionAssignmentController;
+use App\Http\Controllers\Admin\ListingModerationController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
@@ -143,7 +144,7 @@ Route::middleware(['auth'])->group(function () {
     // PBI-18 (SYM-22): Tugas Inspeksi (Inspector)
     Route::get('/inspector/tugas-inspeksi', [InspectionAssignmentController::class, 'inspectorTasks'])->name('inspector.tasks.index');
 
-    // PBI-09: Listing Sisa Produksi (Seller)
+    // PBI-09 (SYM-13): Listing Sisa Produksi (Seller)
     Route::prefix('seller/listings')->name('seller.listings.')->group(function () {
         Route::get('/', [ListingController::class, 'index'])->name('index');
         Route::get('/buat', [ListingController::class, 'create'])->name('create');
@@ -152,6 +153,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{listing}/edit', [ListingController::class, 'edit'])->name('edit');
         Route::put('/{listing}', [ListingController::class, 'update'])->name('update');
         Route::post('/{listing}/arsip', [ListingController::class, 'archive'])->name('archive');
+    });
+
+    // PBI-09 (SYM-13): Moderasi Listing (Admin)
+    Route::prefix('admin/moderasi-listing')->name('admin.listings.')->group(function () {
+        Route::get('/', [ListingModerationController::class, 'index'])->name('index');
+        Route::post('/{listing}/turunkan', [ListingModerationController::class, 'archive'])->name('archive');
     });
 
     // Katalog Material (Publik / Buyer / Semua pengguna terautentikasi)

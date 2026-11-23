@@ -83,6 +83,31 @@ class Listing extends Model
         return $this->hasMany(ListingAttachment::class, 'listings_id_listings', 'id_listings');
     }
 
+    /**
+     * Lampiran yang berlaku (lampiran lama yang sudah diganti berstatus NONAKTIF).
+     */
+    public function activeAttachments(): HasMany
+    {
+        return $this->attachments()->where('status', 'AKTIF');
+    }
+
+    public function rfqContracts(): HasMany
+    {
+        return $this->hasMany(RfqContract::class, 'listings_id_listings', 'id_listings');
+    }
+
+    /**
+     * Listing sedang diinspeksi bila ada PO-nya yang berstatus INSPEKSI;
+     * selama itu lampiran bukti tidak boleh diganti (PBI-09).
+     */
+    public function isUnderInspection(): bool
+    {
+        return PurchaseOrder::query()
+            ->where('status', 'INSPEKSI')
+            ->whereHas('rfqContract', fn ($q) => $q->where('listings_id_listings', $this->id_listings))
+            ->exists();
+    }
+
     public function isPublished(): bool
     {
         return $this->status === 'PUBLISHED';

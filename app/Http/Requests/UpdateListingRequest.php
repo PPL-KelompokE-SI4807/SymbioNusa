@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\ValidatesListingSpecification;
 use App\Models\Category;
 use App\Models\Listing;
 use Illuminate\Foundation\Http\FormRequest;
@@ -9,6 +10,8 @@ use Illuminate\Validation\Validator;
 
 class UpdateListingRequest extends FormRequest
 {
+    use ValidatesListingSpecification;
+
     public function authorize(): bool
     {
         /** @var Listing|null $listing */
@@ -26,7 +29,7 @@ class UpdateListingRequest extends FormRequest
             'judul' => ['required', 'string', 'max:255'],
             'categories_id_categories' => ['required', 'integer', 'exists:categories,id_categories'],
             'volume_kg' => ['required', 'numeric', 'min:0.01'],
-            'stok_kg' => ['required', 'numeric', 'min:0'],
+            'stok_kg' => ['required', 'numeric', 'min:0', 'lte:volume_kg'],
             'harga_per_kg' => ['required', 'numeric', 'min:0'],
             'biaya_buang_per_kg' => ['nullable', 'numeric', 'min:0'],
             'metode_buang_sebelumnya' => ['nullable', 'string', 'max:100'],
@@ -51,6 +54,7 @@ class UpdateListingRequest extends FormRequest
             'categories_id_categories.exists' => 'Kategori material yang dipilih tidak valid.',
             'volume_kg.required' => 'Volume material wajib diisi.',
             'stok_kg.required' => 'Stok material wajib diisi.',
+            'stok_kg.lte' => 'Stok tersedia tidak boleh melebihi volume total.',
             'harga_per_kg.required' => 'Harga per kg wajib diisi.',
             'lokasi.required' => 'Lokasi asal material wajib diisi.',
             'status.required' => 'Status listing wajib dipilih.',
@@ -78,8 +82,21 @@ class UpdateListingRequest extends FormRequest
                 );
             }
 
+            // Draf boleh belum lengkap; spesifikasi wajib ditegakkan saat publikasi.
+            if ($this->input('status') === 'PUBLISHED') {
+                $this->validateRequiredSpecifications($validator, $category);
+            }
+
             /** @var Listing|null $listing */
             $listing = $this->route('listing');
+
+            $replacesAttachment = $this->hasFile('surat_non_b3') || $this->hasFile('foto_sampel') || $this->hasFile('sertifikat_lab');
+            if ($listing && $replacesAttachment && $listing->isUnderInspection()) {
+                $validator->errors()->add(
+                    'surat_non_b3',
+                    'Lampiran bukti tidak dapat diganti selama listing sedang dalam proses inspeksi.'
+                );
+            }
 
             if ($this->input('status') === 'PUBLISHED' && $listing) {
                 $hasSurat = $this->hasFile('surat_non_b3')

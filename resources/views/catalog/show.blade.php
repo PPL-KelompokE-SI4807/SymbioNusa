@@ -13,18 +13,16 @@
 @section('content')
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
                 <h1 class="text-headline-sm font-bold text-on-surface">{{ $listing->judul }}</h1>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-success/10 text-success">
-                    Tersedia
-                </span>
+                <x-ui.badge variant="success">Tersedia</x-ui.badge>
             </div>
             <p class="text-body-sm text-on-surface-muted mt-1">
                 Kategori: {{ $listing->category?->nama ?? '–' }} • Disediakan oleh <strong>{{ $listing->company?->nama ?? 'Perusahaan Mitra' }}</strong>
             </p>
         </div>
-        <div class="flex items-center gap-2">
-            <x-ui.button href="{{ route('catalog.index') }}" variant="ghost">
+        <div class="flex flex-wrap items-center gap-2">
+            <x-ui.button href="{{ route('catalog.index') }}" variant="secondary">
                 ← Kembali ke Katalog
             </x-ui.button>
             @if (auth()->user()?->role === 'BUYER')
@@ -91,7 +89,7 @@
                 </h3>
 
                 <div class="space-y-3">
-                    @forelse ($listing->attachments as $attachment)
+                    @forelse ($listing->activeAttachments as $attachment)
                         <div class="p-3 border border-border rounded-md">
                             <div class="flex items-center justify-between">
                                 <span class="font-semibold text-body-sm text-on-surface">
@@ -102,7 +100,6 @@
                                         default => $attachment->jenis
                                     } }}
                                 </span>
-                                <x-ui.badge variant="success" size="sm">Terverifikasi</x-ui.badge>
                             </div>
                             @if ($attachment->tanggal_pengambilan)
                                 <div class="text-body-xs text-on-surface-muted mt-1">

@@ -187,11 +187,17 @@
                 3. Bukti Material & Lampiran Non-B3
             </h3>
 
-            @if ($listing->attachments->isNotEmpty())
+            @if ($underInspection)
+                <x-ui.alert variant="warning" class="mb-4">
+                    Listing ini sedang dalam proses inspeksi. Lampiran bukti tidak dapat diganti sampai inspeksi selesai.
+                </x-ui.alert>
+            @endif
+
+            @if ($listing->activeAttachments->isNotEmpty())
                 <div class="mb-4 p-3 bg-surface-muted rounded-md space-y-2">
                     <div class="text-label-sm font-semibold text-on-surface">Lampiran yang sudah tersimpan:</div>
                     <ul class="text-body-sm space-y-1">
-                        @foreach ($listing->attachments as $att)
+                        @foreach ($listing->activeAttachments as $att)
                             <li class="flex items-center justify-between text-body-xs">
                                 <span>
                                     <strong>{{ $att->jenis }}</strong> — {{ basename($att->file_url) }}
@@ -262,11 +268,11 @@
         </x-ui.card>
 
         {{-- Aksi Formulir --}}
-        <div class="flex items-center justify-between gap-4 pt-2">
-            <x-ui.button href="{{ route('seller.listings.index') }}" variant="ghost">
+        <div class="flex flex-col-reverse items-start gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
+            <x-ui.button href="{{ route('seller.listings.index') }}" variant="secondary">
                 Batal
             </x-ui.button>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
                 <x-ui.button
                     type="submit"
                     name="status"

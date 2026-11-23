@@ -18,16 +18,21 @@ class ListingPolicy
     }
 
     /**
-     * Menentukan apakah user dapat melihat detail listing tertentu.
+     * Menentukan apakah user dapat melihat detail listing di portal Seller.
+     * Listing perusahaan lain dilihat lewat katalog, bukan portal Seller.
      */
     public function view(User $user, Listing $listing): bool
     {
-        if ($listing->status === 'PUBLISHED') {
-            return true;
-        }
-
         return $user->role === 'SELLER'
             && (int) $user->id_company === (int) $listing->companies_id_company;
+    }
+
+    /**
+     * Admin memoderasi listing: melihat semua listing dan menurunkannya dari katalog.
+     */
+    public function moderate(User $user): bool
+    {
+        return strtoupper($user->role ?? '') === 'ADMIN';
     }
 
     /**

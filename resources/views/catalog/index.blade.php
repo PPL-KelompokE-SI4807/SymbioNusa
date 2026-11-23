@@ -44,7 +44,7 @@
                     Cari Material
                 </x-ui.button>
                 @if (request()->hasAny(['q', 'kategori']))
-                    <x-ui.button href="{{ route('catalog.index') }}" variant="ghost">
+                    <x-ui.button href="{{ route('catalog.index') }}" variant="secondary">
                         Reset
                     </x-ui.button>
                 @endif
@@ -58,7 +58,7 @@
             <x-ui.card class="flex flex-col justify-between hover:border-primary transition-colors">
                 <div>
                     <div class="flex items-start justify-between gap-2 mb-2">
-                        <span class="inline-block px-2 py-0.5 rounded text-xs bg-primary/10 text-primary font-medium">
+                        <span class="inline-block px-2 py-0.5 rounded text-xs bg-surface-muted text-on-surface font-medium">
                             {{ $listing->category?->nama ?? 'Material' }}
                         </span>
                         <span class="text-body-xs text-on-surface-muted">
@@ -83,17 +83,17 @@
                         </div>
                         <div class="flex justify-between text-body-sm">
                             <span class="text-on-surface-muted">Harga Penawaran:</span>
-                            <span class="font-semibold text-primary">{{ \App\Support\Format::rupiah($listing->harga_per_kg) }} / kg</span>
+                            <span class="font-semibold text-on-surface">{{ \App\Support\Format::rupiah($listing->harga_per_kg) }} / kg</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="border-t border-border pt-4 flex items-center justify-between">
                     <div class="flex items-center gap-1.5 text-xs text-on-surface-muted">
-                        @if ($listing->attachments->contains('jenis', 'SURAT_NON_B3'))
+                        @if ($listing->activeAttachments->contains('jenis', 'SURAT_NON_B3'))
                             <span class="text-success font-medium">✓ Bukti Non-B3</span>
                         @endif
-                        @if ($listing->attachments->contains('jenis', 'SERTIFIKAT_LAB'))
+                        @if ($listing->activeAttachments->contains('jenis', 'SERTIFIKAT_LAB'))
                             <span>• Uji Lab</span>
                         @endif
                     </div>

@@ -26,7 +26,7 @@
             ],
             'VERIFIKASI & TRANSAKSI' => [
                 ['label' => 'Verifikasi Mitra', 'icon' => 'building', 'route' => 'admin.companies.index', 'active' => 'admin.companies.*'],
-                ['label' => 'Moderasi Listing', 'icon' => 'clipboard', 'route' => null],
+                ['label' => 'Moderasi Listing', 'icon' => 'clipboard', 'route' => 'admin.listings.index', 'active' => 'admin.listings.*'],
                 ['label' => 'Penugasan Inspeksi', 'icon' => 'calendar', 'route' => 'admin.inspections.index', 'active' => 'admin.inspections.*'],
                 ['label' => 'Sengketa & Klaim', 'icon' => 'scale', 'route' => null],
             ],

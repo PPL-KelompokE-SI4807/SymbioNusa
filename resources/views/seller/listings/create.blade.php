@@ -311,11 +311,11 @@
         </x-ui.card>
 
         {{-- Aksi Formulir --}}
-        <div class="flex items-center justify-between gap-4 pt-2">
-            <x-ui.button href="{{ route('seller.listings.index') }}" variant="ghost">
+        <div class="flex flex-col-reverse items-start gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
+            <x-ui.button href="{{ route('seller.listings.index') }}" variant="secondary">
                 Batal
             </x-ui.button>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
                 <x-ui.button
                     type="submit"
                     name="status"

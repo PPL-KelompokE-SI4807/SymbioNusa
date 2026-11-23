@@ -65,7 +65,7 @@
                     Terapkan Filter
                 </x-ui.button>
                 @if (request()->hasAny(['q', 'kategori', 'status']))
-                    <x-ui.button href="{{ route('seller.listings.index') }}" variant="ghost">
+                    <x-ui.button href="{{ route('seller.listings.index') }}" variant="secondary">
                         Reset
                     </x-ui.button>
                 @endif
@@ -80,7 +80,7 @@
                 <x-slot:head>
                     <th>Material & Kategori</th>
                     <th class="text-right">Stok / Volume (kg)</th>
-                    <th class="text-right">Harga (Rp/kg)</th>
+                    <th class="text-right pr-8">Harga (Rp/kg)</th>
                     <th>Lokasi</th>
                     <th>Bukti Material</th>
                     <th>Status</th>
@@ -104,7 +104,7 @@
                                     dari {{ \App\Support\Format::number($listing->volume_kg) }} kg
                                 </div>
                             </td>
-                            <td class="text-right font-medium">
+                            <td class="text-right font-medium pr-8">
                                 {{ \App\Support\Format::rupiah($listing->harga_per_kg) }}
                             </td>
                             <td class="text-body-sm text-on-surface">
@@ -113,9 +113,9 @@
                             <td>
                                 <div class="flex items-center gap-1.5 text-body-xs">
                                     @php
-                                        $hasNonB3 = $listing->attachments->contains('jenis', 'SURAT_NON_B3');
-                                        $hasFoto = $listing->attachments->contains('jenis', 'FOTO_SAMPEL');
-                                        $hasLab = $listing->attachments->contains('jenis', 'SERTIFIKAT_LAB');
+                                        $hasNonB3 = $listing->activeAttachments->contains('jenis', 'SURAT_NON_B3');
+                                        $hasFoto = $listing->activeAttachments->contains('jenis', 'FOTO_SAMPEL');
+                                        $hasLab = $listing->activeAttachments->contains('jenis', 'SERTIFIKAT_LAB');
                                     @endphp
                                     <span title="Surat Pernyataan Non-B3" class="px-1.5 py-0.5 rounded text-xs {{ $hasNonB3 ? 'bg-primary/10 text-primary font-medium' : 'bg-surface-muted text-on-surface-muted' }}">
                                         Non-B3
@@ -141,16 +141,16 @@
                             </td>
                             <td class="text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    <x-ui.button href="{{ route('seller.listings.show', $listing) }}" variant="ghost" size="sm">
+                                    <x-ui.button href="{{ route('seller.listings.show', $listing) }}" variant="text">
                                         Lihat
                                     </x-ui.button>
                                     @if ($listing->status !== 'DIARSIPKAN')
-                                        <x-ui.button href="{{ route('seller.listings.edit', $listing) }}" variant="ghost" size="sm">
+                                        <x-ui.button href="{{ route('seller.listings.edit', $listing) }}" variant="text">
                                             Ubah
                                         </x-ui.button>
                                         <form method="POST" action="{{ route('seller.listings.archive', $listing) }}" onsubmit="return confirm('Apakah Anda yakin ingin mengarsipkan listing ini?')">
                                             @csrf
-                                            <x-ui.button type="submit" variant="ghost" size="sm" class="text-danger hover:text-danger">
+                                            <x-ui.button type="submit" variant="text-danger">
                                                 Arsipkan
                                             </x-ui.button>
                                         </form>

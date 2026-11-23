@@ -58,7 +58,7 @@ class ListingController extends Controller
     {
         $this->authorize('view', $listing);
 
-        $listing->load(['category', 'attachments', 'company']);
+        $listing->load(['category', 'activeAttachments', 'company']);
 
         return view('seller.listings.show', compact('listing'));
     }
@@ -67,10 +67,11 @@ class ListingController extends Controller
     {
         $this->authorize('update', $listing);
 
-        $listing->load('attachments');
+        $listing->load('activeAttachments');
         $categories = Category::where('status', 'AKTIF')->orderBy('nama')->get();
+        $underInspection = $listing->isUnderInspection();
 
-        return view('seller.listings.edit', compact('listing', 'categories'));
+        return view('seller.listings.edit', compact('listing', 'categories', 'underInspection'));
     }
 
     public function update(UpdateListingRequest $request, Listing $listing): RedirectResponse

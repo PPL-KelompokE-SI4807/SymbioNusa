@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\ValidatesListingSpecification;
 use App\Models\Category;
 use App\Models\Listing;
 use Illuminate\Foundation\Http\FormRequest;
@@ -9,6 +10,8 @@ use Illuminate\Validation\Validator;
 
 class StoreListingRequest extends FormRequest
 {
+    use ValidatesListingSpecification;
+
     public function authorize(): bool
     {
         return $this->user()?->can('create', Listing::class) ?? false;
@@ -79,6 +82,11 @@ class StoreListingRequest extends FormRequest
                     'categories_id_categories',
                     'Kategori material ini termasuk limbah B3 yang dilarang pada platform SymbioNusa.'
                 );
+            }
+
+            // Draf boleh belum lengkap; spesifikasi wajib ditegakkan saat publikasi.
+            if ($this->input('status') === 'PUBLISHED') {
+                $this->validateRequiredSpecifications($validator, $category);
             }
 
             if ($this->input('status') === 'PUBLISHED') {

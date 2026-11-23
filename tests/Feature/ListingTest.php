@@ -75,7 +75,8 @@ class ListingTest extends TestCase
             'status' => 'PUBLISHED',
             'surat_non_b3' => $surat,
             'foto_sampel' => $foto,
-            'tanggal_pengambilan_sampel' => now()->toDateString(),
+            'tanggal_pengambilan_sampel' => '2026-11-10',
+            'spesifikasi' => ['Kadar Air' => '8', 'Tingkat Kebersihan' => 'Bersih'],
         ]);
 
         $response->assertRedirect(route('seller.listings.index'));
@@ -93,6 +94,10 @@ class ListingTest extends TestCase
             'listings_id_listings' => $listing->id_listings,
             'jenis' => 'FOTO_SAMPEL',
         ]);
+
+        // Tanggal pengambilan sampel yang diisi seller tersimpan apa adanya.
+        $foto = $listing->attachments()->where('jenis', 'FOTO_SAMPEL')->firstOrFail();
+        $this->assertSame('2026-11-10', $foto->tanggal_pengambilan?->toDateString());
     }
 
     public function test_listing_creation_fails_if_category_is_b3_prohibited(): void
@@ -152,6 +157,7 @@ class ListingTest extends TestCase
             'status' => 'PUBLISHED',
             'surat_non_b3' => UploadedFile::fake()->create('surat.pdf', 100, 'application/pdf'),
             'sertifikat_lab' => UploadedFile::fake()->create('lab.pdf', 100, 'application/pdf'),
+            'spesifikasi' => ['Kadar Air' => '3', 'Tingkat Kebersihan' => 'Bersih'],
         ]);
 
         $responseSuccess->assertRedirect(route('seller.listings.index'));
