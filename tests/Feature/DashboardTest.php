@@ -47,13 +47,16 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($admin)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Dinas Lingkungan Hidup');
         $response->assertSee('dash-senja');
-        // Urutan wajib (panduan dashboard Senja §5): Sungai Order → Zona 1 → Zona 2 → Zona 3, judul harfiah.
-        $response->assertSeeInOrder(['Sungai Order', 'Perlu tindakan Anda', 'Sedang berjalan', 'Gambaran total tercatat']);
-        $response->assertSee('Tonase terdaur ulang');
-        $response->assertSee('Komposisi material');
-        $response->assertSee('Hasil akhir order');
+        // Varian Kaca (DESIGN.md, amandemen FND v12): hanya dasbor Admin, susunan mengikuti SymbioNusa Lab.
+        $response->assertSee('dash-kaca');
+        $response->assertSee('kaca-backdrop', false);
+        $response->assertSeeInOrder([
+            'Dashboard', 'Perbandingan periode', 'Perlu keputusan Anda', 'Inspeksi', 'Sungai Order', 'Peta pengawasan',
+            'Umur tagihan', 'Aktivitas terbaru', 'Beban Inspector', 'Tonase per kategori', 'Dampak lingkungan tercatat',
+        ]);
+        // Panel yang DDL belum mendukung memakai contoh dan wajib bertanda Data demo.
+        $response->assertSee('Data demo');
         $response->assertSee('data-sidebar', false);
         // Label diagnosis tanpa dasar ambang dilarang.
         $response->assertDontSee('tertahan');
@@ -88,6 +91,8 @@ class DashboardTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Budi Seller Mandiri');
         $response->assertSee('dash-senja');
+        $response->assertDontSee('dash-kaca');
+        $response->assertDontSee('kaca-backdrop', false);
         $response->assertSeeInOrder(['Perlu tindakan Anda', 'Sedang berjalan', 'Gambaran total tercatat']);
         $response->assertSee('Stok listing aktif');
         $response->assertSee('Order Anda per tahap');
@@ -170,7 +175,7 @@ class DashboardTest extends TestCase
 
         Livewire::test(DashboardOverview::class)
             ->assertSee('Sungai Order')
-            ->assertSee('Perlu tindakan Anda')
+            ->assertSee('Perlu keputusan Anda')
             ->assertStatus(200);
     }
 
@@ -188,7 +193,7 @@ class DashboardTest extends TestCase
         $this->actingAs($admin)->get('/dashboard')
             ->assertOk()
             ->assertSee('CV Antre Verifikasi')
-            ->assertSee('Verifikasi mitra');
+            ->assertSee('Verifikasi Mitra');
     }
 
     public function test_admin_flow_counts_rows_and_queue_come_from_one_source(): void

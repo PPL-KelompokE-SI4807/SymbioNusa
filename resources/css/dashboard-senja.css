@@ -460,5 +460,6 @@
 /* ---------- Gerak tereduksi ---------- */
 @media (prefers-reduced-motion: reduce) {
   .dash-highlight { animation: none; }
-  .dash-senja * { transition: none !important; }
+  /* Varian Kaca punya kebijakan sendiri (dashboard-kaca.css): fade tetap jalan, gerak posisi dimatikan. */
+  .dash-senja:not(.dash-kaca) * { transition: none !important; }
 }

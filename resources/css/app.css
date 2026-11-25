@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./dashboard-senja.css";
+@import "./dashboard-kaca.css";
 @import "./sidebar-senja.css";
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -66,11 +67,6 @@
   --color-age-bar-aging: #fbbf24;
   --color-age-bar-stale: #b91c1c;
   --color-chart-lead: #3f6212;
-  --color-category-plastik: #d97706;
-  --color-category-tekstil: #ea580c;
-  --color-category-kayu: #a16207;
-  --color-category-kertas: #57534e;
-  --color-category-pangan: #65a30d;
   --color-photo-label: #1e2a08;
   --color-on-photo-label: #ffffff;
 
@@ -172,6 +168,12 @@
   --color-accent: #c2410c;
   --color-on-accent: #ffffff;
   --color-category-lainnya: #ddd08a;
+  /* Selalu dipancarkan: dipakai lewat var() di SVG/inline style (donat), bukan lewat kelas utilitas. */
+  --color-category-plastik: #d97706;
+  --color-category-tekstil: #ea580c;
+  --color-category-kayu: #a16207;
+  --color-category-kertas: #57534e;
+  --color-category-pangan: #65a30d;
 }
 
 /* FND v10: palet terang dikunci di semua perangkat. Jangan menambah override prefers-color-scheme: dark. */

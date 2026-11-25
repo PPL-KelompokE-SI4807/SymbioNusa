@@ -83,7 +83,7 @@ class DashboardService
         // Tonase order yang masih berjalan di alur (bukan Draf/Selesai/jalur keluar akhir): pembanding untuk tonase selesai.
         $activeKg = (float) PurchaseOrder::whereIn('status', self::ACTIVE_ORDER_STATUSES)->sum('volume_kg');
 
-        return [
+        $data = [
             'flow' => $this->orderFlow($today),
             'queue' => $this->adminQueue($today),
             'running' => $this->adminRunning(),
@@ -101,6 +101,11 @@ class DashboardService
             ],
             'materials' => $this->materialComposition(),
         ];
+
+        // Varian Kaca (DESIGN.md, amandemen FND v12): data dalam bentuk SymbioNusa Lab, dibangun dari hasil di atas.
+        $data['kaca'] = (new AdminKaca)->build($data);
+
+        return $data;
     }
 
     /**

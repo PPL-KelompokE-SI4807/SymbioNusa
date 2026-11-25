@@ -5,7 +5,7 @@
 --}}
 @props(['title' => null, 'padding' => true])
 
-<section {{ $attributes->class(['rounded-lg bg-surface text-on-surface shadow-card', 'p-[18px] sm:p-6' => $padding]) }}>
+<section data-card {{ $attributes->class(['rounded-lg bg-surface text-on-surface shadow-card', 'p-[18px] sm:p-6' => $padding]) }}>
     @if ($title || isset($actions))
         <div @class(['flex flex-wrap items-center justify-between gap-3', 'mb-4' => $padding, 'px-[18px] pt-5 pb-2 sm:px-6' => ! $padding])>
             @if ($title)
