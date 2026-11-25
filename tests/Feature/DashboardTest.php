@@ -51,6 +51,9 @@ class DashboardTest extends TestCase
         // Varian Kaca (DESIGN.md, amandemen FND v12): hanya dasbor Admin, susunan mengikuti SymbioNusa Lab.
         $response->assertSee('dash-kaca');
         $response->assertSee('kaca-backdrop', false);
+        // Pembungkus bersama x-app.kaca membawa tombol jeda gerak latar (WCAG 2.2.2).
+        $response->assertSee('kaca-still-toggle', false);
+        $response->assertSee('Jeda gerak latar');
         $response->assertSeeInOrder([
             'Dashboard', 'Perbandingan periode', 'Perlu keputusan Anda', 'Inspeksi', 'Sungai Order', 'Peta pengawasan',
             'Umur tagihan', 'Aktivitas terbaru', 'Beban Inspector', 'Tonase per kategori', 'Dampak lingkungan tercatat',

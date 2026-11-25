@@ -1,6 +1,7 @@
 {{--
     Strip ringkasan (DESIGN.md › Components › Summary strip; panduan Senja §7.4): SATU permukaan putih berisi 2–4
     metrik x-ui.kpi yang dipisah garis rambut (silang 2×2 di layar sempit), tanpa tile, tint, atau ikon per metrik.
+    Di dalam x-app.kaca permukaannya menjadi kaca (data-card) dan sel-selnya bening dengan garis rambut (data-summary).
     label: nama wilayah untuk pembaca layar. cols: jumlah kolom di layar lebar (2, 3, atau 4).
     Contoh:
     <x-ui.summary-strip label="Ringkasan kategori">
@@ -18,7 +19,7 @@
     };
 @endphp
 
-<section {{ $attributes->class(['overflow-hidden rounded-lg bg-surface shadow-card']) }} @if ($label) aria-label="{{ $label }}" @endif>
+<section data-card data-summary {{ $attributes->class(['overflow-hidden rounded-lg bg-surface shadow-card']) }} @if ($label) aria-label="{{ $label }}" @endif>
     <dl @class(['grid gap-px bg-outline-hairline', $grid])>
         {{ $slot }}
     </dl>

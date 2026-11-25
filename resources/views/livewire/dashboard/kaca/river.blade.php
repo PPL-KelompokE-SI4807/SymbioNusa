@@ -17,7 +17,8 @@
     $path .= ' Z';
     $catColor = fn ($c) => 'var(--color-category-'.($c ?? 'lainnya').')';
     $stageByKey = collect($r['stages'])->concat($r['exits'])->keyBy('key');
-    $exitTone = ['danger' => 'var(--danger)', 'meta' => 'var(--meta)'];
+    // Warna teks (bukan isi): merah teks Kaca #7f1d1d, bukan --danger #b91c1c (4,06:1 di atas kaca).
+    $exitTone = ['danger' => 'var(--color-danger)', 'meta' => 'var(--meta)'];
 @endphp
 <section class="glass p-4 sm:p-6" aria-labelledby="river-title" x-data="kacaRiver('{{ $r['selected'] }}')">
     <div class="flex flex-wrap items-start justify-between gap-3">
@@ -77,7 +78,7 @@
                         @endphp
                         <g>
                             <path d="M {{ $cx }} {{ $CY + $hh }} C {{ $cx }} {{ $CY + $hh + 26 }}, {{ $cx + $dir * 16 }} {{ $CY + $hh + 30 }}, {{ $cx + $dir * 30 }} {{ $CY + $hh + 34 }}" fill="none" stroke="{{ $col }}" stroke-width="1.6" stroke-dasharray="3 3" />
-                            <text x="{{ $cx + $dir * 34 }}" y="{{ $CY + $hh + 39 }}" font-size="14" font-weight="700" text-anchor="{{ $dir < 0 ? 'end' : 'start' }}" fill="{{ $col }}" style="cursor: pointer" @click="select('{{ $x['key'] }}')">{{ $x['label'] }} · {{ $x['count'] }}</text>
+                            <text x="{{ $cx + $dir * 34 }}" y="{{ $CY + $hh + 39 }}" font-size="14" font-weight="700" text-anchor="{{ $dir < 0 ? 'end' : 'start' }}" fill="{{ $col }}" stroke="var(--panel-strong)" stroke-width="4" stroke-linejoin="round" paint-order="stroke" style="cursor: pointer" @click="select('{{ $x['key'] }}')">{{ $x['label'] }} · {{ $x['count'] }}</text>
                         </g>
                     @endif
                 @endforeach

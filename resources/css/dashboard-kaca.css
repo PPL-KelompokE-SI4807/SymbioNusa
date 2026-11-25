@@ -1,10 +1,11 @@
 /*
- * Varian "Kaca" untuk dasbor Admin (DESIGN.md, amandemen FND v12, keputusan PM 25 Nov 2026).
- * Asal: eksperimen SymbioNusa Lab (varian Kaca). Cakupan: pembungkus .dash-kaca di dashboard-overview.blade.php (hanya ADMIN)
- * dan sidebar selama dasbor itu terbuka. Palet Senja tidak berubah; yang berubah hanya material permukaan:
+ * Kaca: design system seluruh aplikasi (DESIGN.md FND v12, keputusan PM 25 Nov 2026; resep di docs/design/PANDUAN_KACA.md).
+ * Asal: eksperimen SymbioNusa Lab (varian Kaca). Dipasang per layar lewat <x-app.kaca> (components/app/kaca.blade.php);
+ * sidebar ikut menjadi kaca selama layar itu terbuka. Palet Senja tidak berubah; yang berubah hanya material permukaan:
  * kartu dan sidebar menjadi kaca di atas empat foto material yang diburamkan.
  *
- * Kait: .dash-kaca (pembungkus), .kaca-backdrop > .kaca-blob (latar), [data-card] (x-ui.card), [data-sidebar].
+ * Kait: .dash-kaca (pembungkus), .kaca-backdrop > .kaca-blob (latar), [data-card] (x-ui.card, x-ui.summary-strip),
+ * [data-summary] (x-ui.summary-strip), [data-table] (x-ui.table), [data-sidebar], .kaca-still (gerak latar dijeda).
  * Kontrol (tombol, input, select) tetap putih buram. Palet terkunci terang: jangan menambah override prefers-color-scheme: dark.
  */
 
@@ -51,6 +52,9 @@
   /* Teks di atas kaca: oranye dan merah sedikit lebih gelap agar tetap >= 4,5:1 di atas foto tergelap. */
   --color-accent-text: #7c2d12;
   --color-danger: #7f1d1d;
+  /* Teks redup komponen x-ui.* (subjudul, label metrik, helper form, kepala tabel) ikut meta Kaca. */
+  --color-on-surface-muted: #33330f;
+  --color-on-surface-subtle: #33330f;
   --info: #1e40af;
   --warning: #92400e;
   --panel-strong: rgb(255 253 242 / 0.84);
@@ -111,8 +115,9 @@ body:has(.dash-kaca) { background: transparent; }
 }
 
 
-/* Teks hijau (delta, status) memakai hijau hutan; isian tombol tetap --primary. */
-.dash-kaca .text-primary { color: var(--color-primary-hover); }
+/* Teks semantik di kaca memakai versi gelap (diukur >= 4,5:1): hijau hutan dan merah tua. Isian tetap --primary / --danger. */
+.dash-kaca :is(.text-primary, .text-success) { color: var(--color-primary-hover); }
+.dash-kaca .text-error { color: var(--color-danger); }
 
 /* ---------- Kartu kaca ---------- */
 .dash-kaca :is([data-card], .glass) {
@@ -275,6 +280,42 @@ body:has(.dash-kaca) [data-sidebar] {
   opacity: 0.9;
 }
 
+/* Penanda teks merah di kaca polos: merah tua di atas kaca tipis bisa turun di bawah 4,5:1 saat latar melayang
+   (terukur 4,33:1), jadi teks merah di kaca polos selalu duduk di alas field kecil (>= 9:1). Bukan pill: radius 6 px. */
+.dash-kaca .kaca-flag { display: inline-block; border-radius: 6px; background: var(--field); padding: 0 6px; }
+
+/* ---------- Komponen bersama di atas kaca ---------- */
+/* x-ui.summary-strip: satu permukaan kaca (lewat data-card); garis pemisah digambar per sel, sel bening. */
+.dash-kaca [data-summary] > dl { gap: 0; background: none; }
+.dash-kaca [data-summary] > dl > * { background: transparent; box-shadow: -1px 0 0 var(--line), 0 -1px 0 var(--line); }
+/* x-ui.table: baris di permukaan kaca, garis rambut hijau. Kolom pertama sticky hanya buram saat tabel bisa digeser (< 1024 px). */
+.dash-kaca [data-table] :is(tr, th, td) { border-color: var(--line); }
+.dash-kaca [data-table] tr > :first-child { background: transparent; }
+@media (max-width: 1023.98px) {
+  .dash-kaca [data-table] tr > :first-child {
+    background: var(--panel-strong);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+}
+
+/* ---------- Tombol jeda gerak latar (WCAG 2.2.2), dari x-app.kaca ---------- */
+.dash-kaca .kaca-still-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  color: var(--ink);
+}
+.dash-kaca .kaca-still-toggle:hover { border-color: var(--line-strong); }
+.dash-kaca.kaca-still .kaca-blob { animation-play-state: paused; }
+.dash-kaca.kaca-still :is(.kaca-ping, .river-flow path) { animation: none !important; }
+
 /* ---------- Cadangan: tanpa kaca, kembali ke kartu putih dan sidebar solid Senja ---------- */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .kaca-backdrop { display: none; }
@@ -295,6 +336,8 @@ body:has(.dash-kaca) [data-sidebar] {
    Fade, perubahan warna, lebar bilah, dan gambar donat tetap berjalan halus, jadi tidak ada yang "meloncat". */
 @media (prefers-reduced-motion: reduce) {
   .kaca-blob, .dash-kaca .kaca-ping, .dash-kaca .shimmer, .dash-kaca .river-flow path { animation: none !important; }
+  /* Gerak berulang sudah berhenti, jadi tombol jedanya tidak perlu. */
+  .dash-kaca .kaca-still-toggle { display: none; }
   .dash-kaca [class*="translate"], .dash-kaca [class*="scale-"] { translate: none !important; scale: none !important; }
   .dash-kaca .kaca-thumb.is-ready { transition: none; }
   .dash-kaca .kaca-spring { transition-property: opacity; transition-duration: 200ms; transition-timing-function: ease-out; }

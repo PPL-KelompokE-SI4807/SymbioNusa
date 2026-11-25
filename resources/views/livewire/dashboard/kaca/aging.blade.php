@@ -45,7 +45,7 @@
                         <p class="truncate text-[14px] font-bold">{{ $inv['buyer'] }}</p>
                         <p class="mono text-[12px] text-meta">{{ $inv['id'] }} · {{ Format::rupiah($inv['amount']) }}</p>
                     </div>
-                    <span class="shrink-0 text-[13px] font-extrabold tabular-nums {{ $inv['days'] > 60 ? 'text-danger' : ($inv['days'] > 0 ? 'text-accent-text' : 'text-meta') }}">
+                    <span class="shrink-0 text-[13px] font-extrabold tabular-nums {{ $inv['days'] > 60 ? 'kaca-flag text-danger' : ($inv['days'] > 0 ? 'text-accent-text' : 'text-meta') }}">
                         {{ $inv['days'] > 0 ? 'lewat '.Format::number($inv['days']).' hari' : ($inv['days'] === 0 ? 'jatuh tempo hari ini' : Format::number(abs($inv['days'])).' hari lagi') }}
                     </span>
                 </li>

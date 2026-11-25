@@ -17,7 +17,7 @@
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path :d="m.value >= m.prev ? 'M7 17 L17 7 M9 7 L17 7 L17 15' : 'M7 7 L17 17 M17 9 L17 17 L9 17'" />
                     </svg>
-                    <span x-text="num(Math.abs((m.value - m.prev) / m.prev) * 100, 0) + '%'"></span>
+                    <span :class="better(m) ? '' : 'kaca-flag'" x-text="num(Math.abs((m.value - m.prev) / m.prev) * 100, 0) + '%'"></span>
                     <span class="font-medium text-meta" x-text="periods[period].compare"></span>
                 </p>
                 <div class="mt-2.5 space-y-1" aria-hidden="true">

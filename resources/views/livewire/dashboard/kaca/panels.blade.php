@@ -3,7 +3,8 @@
 @use('App\Support\DotMatrix')
 @php
     $only = $only ?? null;
-    $tone = ['primary' => 'var(--color-primary-hover)', 'info' => 'var(--info)', 'danger' => 'var(--danger)', 'meta' => 'var(--meta)', 'accent' => 'var(--accent)'];
+    // Warna teks inisial di atas cakram bg-field: versi teks Kaca, bukan warna isi (--danger, --accent).
+    $tone = ['primary' => 'var(--color-primary-hover)', 'info' => 'var(--info)', 'danger' => 'var(--color-danger)', 'meta' => 'var(--meta)', 'accent' => 'var(--color-accent-text)'];
     $mat = $kaca['materials'];
     $R = 70; $C = 2 * M_PI * $R; $off = 0.0; $arcs = [];
     foreach ($mat['rows'] as $i => $row) {
@@ -27,7 +28,7 @@
         <ul class="mt-3 flex-1 space-y-0.5">
             @foreach ($kaca['activity'] as $a)
                 <li class="grid grid-cols-[32px_1fr_auto] items-start gap-3 rounded-[12px] px-1.5 py-2">
-                    <span class="grid size-8 place-items-center rounded-full text-[12px] font-black" style="box-shadow: inset 0 0 0 1.5px {{ $tone[$a['tone']] }}; color: {{ $tone[$a['tone']] }}">{{ $a['initials'] }}</span>
+                    <span class="grid size-8 place-items-center rounded-full bg-field text-[12px] font-black" style="box-shadow: inset 0 0 0 1.5px {{ $tone[$a['tone']] }}; color: {{ $tone[$a['tone']] }}">{{ $a['initials'] }}</span>
                     <p class="text-[14px] leading-snug"><strong class="font-bold">{{ $a['who'] }}</strong> <span class="text-meta">{{ $a['what'] }}</span></p>
                     <span class="mono pt-0.5 text-[12px] text-meta">{{ $a['time'] }}</span>
                 </li>

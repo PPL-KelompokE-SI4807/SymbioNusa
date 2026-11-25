@@ -160,6 +160,30 @@ export function kacaSegment(el) {
     return () => { mo.disconnect(); window.removeEventListener('resize', place); };
 }
 
+/**
+ * Pembungkus layar Kaca (x-app.kaca): kilau kaca yang mengikuti kursor pada [data-card], dan tombol jeda gerak latar
+ * (WCAG 2.2.2: gerak berulang yang berjalan sendiri lebih dari 5 detik harus bisa dihentikan). Pilihan jeda disimpan per
+ * perangkat; tanpa localStorage, gerak tetap berjalan dan tombol tetap berfungsi selama halaman terbuka.
+ */
+export function kacaPage() {
+    let saved = false;
+    try { saved = window.localStorage.getItem('kaca-still') === '1'; } catch { /* penyimpanan diblokir */ }
+    return {
+        still: saved,
+        toggleStill() {
+            this.still = !this.still;
+            try { window.localStorage.setItem('kaca-still', this.still ? '1' : '0'); } catch { /* abaikan */ }
+        },
+        sheen(e) {
+            const card = e.target.closest?.('[data-card]');
+            if (!card) return;
+            const r = card.getBoundingClientRect();
+            card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+            card.style.setProperty('--my', `${e.clientY - r.top}px`);
+        },
+    };
+}
+
 export function kacaAdmin(cfg) {
     return {
         queue: cfg.queue,

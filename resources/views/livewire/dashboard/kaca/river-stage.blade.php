@@ -30,7 +30,7 @@
                                     <span class="block h-full rounded-full" style="width: {{ ($o['age'] / $maxAge) * 100 }}%; background: {{ $o['age'] > 7 ? 'var(--danger)' : ($o['age'] > 3 ? 'var(--accent)' : 'var(--c-plan)') }}"></span>
                                 </span>
                             @endif
-                            <span class="text-[13px] font-bold tabular-nums {{ ($o['age'] ?? 0) > 7 ? 'text-danger' : '' }}">{{ $o['age'] === null ? '–' : Format::number($o['age']).' hari' }}</span>
+                            <span class="text-[13px] font-bold tabular-nums {{ ($o['age'] ?? 0) > 7 ? 'kaca-flag text-danger' : '' }}">{{ $o['age'] === null ? '–' : Format::number($o['age']).' hari' }}</span>
                         </span>
                         <x-ui.icon name="chevron-down" class="hidden size-4 text-meta transition-transform sm:block" ::class="openOrder === '{{ $o['code'] }}' ? 'rotate-180' : ''" />
                     </button>
@@ -50,9 +50,9 @@
                                             <span class="truncate {{ $st['current'] ? 'font-extrabold' : 'text-meta' }}">{{ $st['label'] }}</span>
                                             <span class="relative h-6 rounded-[6px] bg-track">
                                                 @if ($st['current'])
-                                                    <span class="kaca-bar hatch-bg absolute inset-y-0 flex items-center justify-end rounded-[6px] px-1.5 text-[11px] font-bold" style="left: {{ ($acc / $total) * 100 }}%; right: 0; min-width: 34px; background-color: var(--accent); color: var(--accent-ink)">sekarang</span>
+                                                    <span class="kaca-bar hatch-bg absolute inset-y-0 flex items-center justify-end rounded-[6px] px-1.5 text-[12px] font-bold" style="left: {{ ($acc / $total) * 100 }}%; right: 0; min-width: 40px; background-color: var(--accent); color: var(--accent-ink)">sekarang</span>
                                                 @else
-                                                    <span class="kaca-bar absolute inset-y-0 flex items-center justify-end rounded-[6px] px-1.5 text-[11px] font-bold" style="left: {{ ($acc / $total) * 100 }}%; width: {{ max(3.5, ($hrs / $total) * 100) }}%; min-width: 34px; background: var(--c-done); color: var(--primary-ink)">{{ $hrs }} j</span>
+                                                    <span class="kaca-bar absolute inset-y-0 flex items-center justify-end rounded-[6px] px-1.5 text-[12px] font-bold" style="left: {{ ($acc / $total) * 100 }}%; width: {{ max(3.5, ($hrs / $total) * 100) }}%; min-width: 40px; background: var(--c-done); color: var(--primary-ink)">{{ $hrs }} j</span>
                                                 @endif
                                             </span>
                                         </li>
