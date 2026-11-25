@@ -63,11 +63,9 @@ Per 25 Nov 2026 fondasinya **sudah ada**; jangan membuat ulang:
 
 - **Token** di `resources/css/app.css` (`@theme` nilai Senja di Sawah FND v11, `@theme static` warna kategori dan aksen) dan token Kaca di `resources/css/dashboard-kaca.css` (`@theme static` + blok `.dash-kaca`). Nilai di DESIGN.md front matter. Menambah atau mengubah token = berkas bersama → sebut di rencana, butuh persetujuan PM.
 - **Komponen** di `resources/views/components/ui/`: alert, badge (teks + glyph, bukan pill), button, card (`data-card` → kaca di dalam `.dash-kaca`), field, flag, icon, input, kpi, monogram, page-header, password-input, select, summary-strip, table, textarea. Plus `components/app/sidebar.blade.php` dan `notification-bell.blade.php`. Pakai ulang; jangan membuat kartu, tombol, atau badge sendiri.
-- **Kaca** di `resources/css/dashboard-kaca.css` dan `resources/js/dashboard/kaca.js`, didaftarkan di `resources/js/app.js` (`kacaAdmin`, `kacaRiver`, direktif `x-kaca-seg`). Lihat "Resep layar Kaca" di bawah dan `docs/design/PANDUAN_KACA.md`.
+- **Kaca** di `resources/css/dashboard-kaca.css` dan `resources/js/dashboard/kaca.js`, didaftarkan di `resources/js/app.js` (`kacaPage`, `kacaAdmin`, `kacaRiver`, direktif `x-kaca-seg`), dipasang lewat komponen `<x-app.kaca>` (`resources/views/components/app/kaca.blade.php`). `x-ui.card`, `x-ui.summary-strip`, dan `x-ui.table` otomatis menjadi varian Kaca di dalamnya. Lihat "Resep layar Kaca" di bawah dan `docs/design/PANDUAN_KACA.md`.
 
-Celah fondasi yang diketahui (butuh persetujuan PM sebelum disentuh, karena berkas bersama):
-- Pembungkus `.dash-kaca` + `.kaca-backdrop` belum menjadi komponen bersama atau bagian layout; sekarang disalin per layar dari `dashboard-overview.blade.php`.
-- `x-ui.table` memberi kolom pertama sticky latar putih dan `x-ui.summary-strip` masih putih; di layar Kaca pakai daftar ledger dan strip kaca (PANDUAN_KACA.md §6.10) sampai ada varian Kaca.
+Kaca dipasang per layar lewat `<x-app.kaca>`, **bukan** di `layouts/app.blade.php`, supaya layar Senja yang belum dibangun ulang tidak rusak (keputusan 25 Nov 2026, PANDUAN_KACA.md §12).
 
 ## Phase 2 — Rencana (🔒 gerbang)
 
@@ -103,15 +101,15 @@ Aturan halaman:
 
 Ikuti urutan ini untuk setiap layar baru atau yang dibangun ulang. Cuplikan lengkapnya di `docs/design/PANDUAN_KACA.md` §5–§7.
 
-1. **Pembungkus.** Bungkus seluruh isi view dengan `<div class="dash-kaca">` dan taruh `.kaca-backdrop` berisi empat `.kaca-blob` (kain, ampas-tahu, serbuk-kayu, plastik-2, ukuran dan posisi persis seperti `dashboard-overview.blade.php`) sebagai anak pertama. Handler `@pointermove.passive` yang menulis `--mx/--my` ke `[data-card]` opsional (kilau kursor). Jangan memberi latar pekat pada pembungkus. Sidebar otomatis menjadi kaca.
+1. **Pembungkus.** Bungkus seluruh isi view dengan `<x-app.kaca> … </x-app.kaca>` (boleh menjadi akar view Livewire; selalu satu elemen akar). Komponen ini merender `.dash-kaca`, latar empat foto, kilau kursor, dan tombol jeda gerak latar. Untuk Kaca yang bergantung pada peran pakai `:enabled="…"`. Jangan menulis markup `.dash-kaca`/`.kaca-backdrop` sendiri dan jangan memberi latar pekat. Sidebar otomatis menjadi kaca.
 2. **Data.** Buat service bergaya `AdminKaca` di `app/Services/<Modul>/`: satu `build()` yang mengembalikan array bentuk-view; query di service, bukan di view; bagian yang tidak didukung DDL ditulis di docblock dan ditandai `Data demo` di kartunya; URL halaman yang belum ada = `null` + alasan `pending`.
 3. **Kartu.** `x-ui.card` (otomatis kaca lewat `data-card`) atau `<section class="glass p-4 sm:p-5">` dengan judul `.card-title`; grid isi `dash-grid grid gap-4 lg:grid-cols-12`; animasi masuk `data-rise style="--i: n"`.
 4. **Kontrol segmen.** `<div class="kaca-seg …" style="--r: 11px" x-kaca-seg role="group" aria-label="…">` dengan `<span class="kaca-thumb" aria-hidden="true"></span>` sebagai anak pertama dan tombol ber-`:aria-pressed` (string). Hitungan di tombol: `.kaca-count`.
 5. **State Alpine.** `kacaAdmin` dan `kacaRiver` khusus dasbor Admin (`kacaAdmin` butuh `queue`, `periods`, `orders`, `commands`); jangan dipakai ulang. Untuk layar lain buat komponen kecil di `resources/js/<modul>/` yang mengimpor `flip` dan `exit` dari `resources/js/dashboard/kaca.js`, lalu daftarkan di `resources/js/app.js` di dalam `alpine:init` (berkas bersama → sebut di rencana).
 6. **Gerak.** Saringan klien: `await exit(yangKeluar)` lalu `await flip(wadah, () => baris, () => { state = baru }, () => this.$nextTick())`. Overlay: `x-transition:enter="kaca-spring"` + kelas start/end, keluar `transition duration-200 ease-in`. Lipatan: `class="kaca-spring grid"` + `grid-rows-[0fr]/[1fr]` + `:inert`. Jangan menulis easing baru untuk gerak posisi; jangan `transition: none` menyeluruh untuk gerak tereduksi.
 7. **Overlay.** Laci/dialog/palet `.glass-strong` di atas `style="background: var(--scrim)"`, `x-trap.noscroll`, Esc menutup, lembar bawah di < 640 px. Dasbor tidak mengambil keputusan; laci menautkan ke halaman keputusan.
-8. **Warna teks.** Di kaca polos: `text-ink`, `text-meta`, `text-primary`, `text-accent-text`, `text-danger` (pendek, tebal). `text-warning`, `text-info`, `var(--danger)`, `var(--accent)` sebagai teks hanya di `bg-field`, `bg-[var(--panel-strong)]`, atau `.glass-strong`. Di luar kartu hanya ink.
-9. **Uji kontras.** Ukur pada render nyata di 1440 px dan layar sempit, beberapa posisi gulir, dengan prosedur `PANDUAN_KACA.md` Lampiran A; tulis rasio terendah per pasangan di PR.
+8. **Warna teks.** Di kaca polos: `text-ink`, `text-meta`, `text-primary`, `text-accent-text` (pendek, tebal); teks merah kecil `<span class="kaca-flag text-danger">`; label SVG berwarna diberi halo (`stroke="var(--panel-strong)" stroke-width="4" paint-order="stroke"`). `text-warning`, `text-info`, `var(--danger)`, `var(--accent)` sebagai teks hanya di `bg-field`, `bg-[var(--panel-strong)]`, atau `.glass-strong`. Di luar kartu hanya ink.
+9. **Uji kontras.** Ukur pada render nyata di 1440 px dan layar sempit, beberapa posisi gulir dan dua atau lebih waktu animasi latar, dengan prosedur `PANDUAN_KACA.md` Lampiran A; tulis rasio terendah per pasangan di PR.
 10. **Verifikasi.** Lihat Phase 4: test, build, visual 360/1024/1440, gerak dengan dan tanpa *reduced motion*, `forced-colors`.
 
 ## Phase 4 — Verifikasi (sebelum lapor selesai)
@@ -147,7 +145,7 @@ npm run build
 ```
 
 3. **Cek visual:** jalankan aplikasi, ambil screenshot di lebar 360, 1024, dan 1440 px, bandingkan dengan mockup dan dasbor Admin Kaca memakai `01_STITCH_AUDITOR.md` mode AUDIT (atau skill visual QA bila tool punya). Tidak boleh ada overflow horizontal. Sebut apa yang tidak bisa diverifikasi.
-4. **Cek Kaca:** kontras diukur pada render nyata (PANDUAN_KACA.md Lampiran A); gerak diuji dengan klik cepat berulang lalu diulang dengan `prefers-reduced-motion: reduce` (posisi berhenti, fade tetap jalan); `forced-colors: active` membuat kartu putih dan teks tetap terbaca; test fitur menegaskan `dash-kaca` dan `kaca-backdrop` hadir di layar itu (dan memperbarui asersi lama `assertDontSee('dash-kaca')` untuk layar itu).
+4. **Cek Kaca:** kontras diukur pada render nyata (PANDUAN_KACA.md Lampiran A); tombol jeda gerak menghentikan latar; gerak diuji dengan klik cepat berulang lalu diulang dengan `prefers-reduced-motion: reduce` (posisi berhenti, fade tetap jalan); `forced-colors: active` membuat kartu putih dan teks tetap terbaca; test fitur menegaskan `dash-kaca` dan `kaca-backdrop` hadir di layar itu (dan memperbarui asersi lama `assertDontSee('dash-kaca')` untuk layar itu).
 
 ## Phase 5 — Commit & laporan
 
@@ -162,7 +160,7 @@ npm run build
 - [ ] Rencana disetujui sebelum berkas diubah; hot spot disebut dan disetujui
 - [ ] Tidak ada paket baru; tidak ada migrasi lama yang diedit
 - [ ] Hanya kelas token, komponen `x-ui.*`, dan kelas Kaca; tidak ada hex baru, palet Tailwind bawaan, gradien/blur di luar permukaan kaca, atau teks < 12 px
-- [ ] Layar dibungkus `.dash-kaca` + `.kaca-backdrop`; kartu kaca; overlay `.glass-strong`; kontrol putih pekat
+- [ ] Layar dibungkus `<x-app.kaca>` (latar, tombol jeda); kartu kaca; overlay `.glass-strong`; kontrol putih pekat; teks merah kecil di `.kaca-flag`
 - [ ] Kontras diukur pada render nyata dan dilaporkan; teks di luar kartu hanya ink
 - [ ] Gerak memakai kurva spring Kaca; diuji dengan dan tanpa *reduced motion*
 - [ ] Menu sidebar dan teks UI persis dari `STITCH_BRIEF.md`, Bahasa Indonesia
@@ -178,7 +176,8 @@ npm run build
 ## 🚫 Anti-pattern
 
 Kaca (25 Nov 2026):
-- Kartu putih (`bg-surface shadow-card`) di layar Kaca, atau `bg-background` di pembungkus `.dash-kaca` (menutup latar foto).
+- Kartu putih (`bg-surface shadow-card`) di layar Kaca, `bg-background` di pembungkus (menutup latar foto), atau markup `.dash-kaca`/`.kaca-backdrop` yang ditulis tangan alih-alih `<x-app.kaca>`.
+- `@if` di akar view Livewire (Livewire lalu menempelkan `wire:id` ke elemen yang salah).
 - Input, select, atau tombol yang dibuat transparan (`bg-field`, `bg-transparent`) di atas kaca.
 - Teks merah atau jingga dengan `var(--danger)` / `var(--accent)`; itu warna isi. Untuk teks: `text-danger`, `text-accent-text`.
 - Teks meta atau berwarna langsung di atas foto latar (di luar kartu).

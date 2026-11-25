@@ -4,18 +4,18 @@
 >
 > **Keputusan PM (Mayhesa, 25 Nov 2026).** Kaca adalah standar visual untuk **seluruh aplikasi**: semua dasbor, form, tabel, halaman detail, dan halaman autentikasi. Sumber visualnya varian *Kaca* dari eksperimen SymbioNusa Lab (`D:\PPL\SymbioNusa-Lab`, `src/index.css` blok `[data-variant="kaca"]`, `src/App.jsx`, `src/components`, `src/charts`).
 >
-> **Sumber kebenaran kode:** commit `b8a3e24` di branch `mayhesa` — dasbor Admin. Semua nama di panduan ini dicek terhadap kode itu pada 25 Nov 2026.
+> **Sumber kebenaran kode:** dasbor Admin di branch `mayhesa` (commit `b8a3e24`, ditambah perbaikan 25 Nov 2026: pembungkus bersama `x-app.kaca`, varian Kaca `x-ui.table`/`x-ui.summary-strip`, penanda `.kaca-flag`, tombol jeda gerak). Semua nama di panduan ini dicek terhadap kode itu.
 
 ## 1. Status implementasi (jujur)
 
 | Layar | Status per 25 Nov 2026 |
 |---|---|
-| Dasbor Admin (`/dashboard`, peran ADMIN) | **Sudah Kaca.** Satu-satunya layar yang memakai `.dash-kaca`. |
+| Dasbor Admin (`/dashboard`, peran ADMIN) | **Sudah Kaca**, lewat `<x-app.kaca>`. Satu-satunya layar yang sudah memakai Kaca. |
 | Sidebar | Menjadi kaca otomatis **hanya saat** halaman memuat `.dash-kaca` (`body:has(.dash-kaca) [data-sidebar]`). Di halaman lain masih sidebar Senja solid. |
 | Dasbor Seller, Buyer, Inspector | Masih Senja di Sawah (`.dash-senja`, kartu putih). Perlu dibangun ulang mengikuti panduan ini. |
 | Form, tabel, halaman detail (kategori, registri Inspector, verifikasi mitra, dll.) | Masih Senja (kartu putih, `x-ui.*`). Perlu dibangun ulang. |
-| Login, lupa sandi, reset sandi | Masih Senja + panel foto. Perlu dibangun ulang. |
-| Landing | Permukaan publik; ikut Kaca hanya bila PM memutuskan (lihat §12). |
+| Login, lupa sandi, reset sandi | Masih Senja + panel foto. Perlu dibangun ulang: panel foto tetap, sisi form di atas latar Kaca (§12). |
+| Landing | Permukaan publik; tidak diubah ke Kaca (keputusan §12). |
 
 `tests/Feature/DashboardTest.php` saat ini **menegaskan** bahwa dasbor Seller tidak memuat `dash-kaca` (`assertDontSee('dash-kaca')`). Saat dasbor Seller dibangun ulang dengan Kaca, ubah asersi itu di PR yang sama (pemilik test: lihat `AGENTS.md` §4).
 
@@ -41,9 +41,10 @@ Kaca hanya mengganti **material permukaan**. Palet Senja, tipografi Figtree, Led
 | Bahan | Berkas | Keterangan |
 |---|---|---|
 | CSS Kaca | `resources/css/dashboard-kaca.css` (diimpor di `resources/css/app.css`) | Token, latar, kartu, kelas komponen, gerak, cadangan. |
-| Alpine Kaca | `resources/js/dashboard/kaca.js` | `springCurve()`, `flip()`, `exit()`, `kacaRiver()`, `kacaSegment()`, `kacaAdmin()`. |
-| Registrasi | `resources/js/app.js` | `Alpine.data('kacaAdmin')`, `Alpine.data('kacaRiver')`, `Alpine.directive('kaca-seg')`. `flip`/`exit` **diekspor tetapi tidak didaftarkan global**; impor dari modul Anda. |
-| Pembungkus + latar | `resources/views/livewire/dashboard-overview.blade.php` | Markup `.kaca-backdrop` dan handler kilau kursor (`--mx/--my`). Belum dijadikan komponen bersama (lihat §12). |
+| Alpine Kaca | `resources/js/dashboard/kaca.js` | `springCurve()`, `flip()`, `exit()`, `kacaPage()`, `kacaRiver()`, `kacaSegment()`, `kacaAdmin()`. |
+| Komponen bersama | `x-ui.card`, `x-ui.summary-strip`, `x-ui.table` | Otomatis Kaca di dalam `.dash-kaca` lewat kait `data-card`, `data-summary`, `data-table`. |
+| Registrasi | `resources/js/app.js` | `Alpine.data('kacaPage')`, `Alpine.data('kacaAdmin')`, `Alpine.data('kacaRiver')`, `Alpine.directive('kaca-seg')`. `flip`/`exit` **diekspor tetapi tidak didaftarkan global**; impor dari modul Anda. |
+| Pembungkus + latar | `resources/views/components/app/kaca.blade.php` (`<x-app.kaca>`) | `.dash-kaca`, `.kaca-backdrop` (empat foto), kilau kursor, tombol jeda gerak latar. Alpine `kacaPage`. Prop `enabled` untuk layar yang Kaca-nya bergantung pada peran. |
 | Contoh layar lengkap | `resources/views/livewire/dashboard/admin.blade.php` + `resources/views/livewire/dashboard/kaca/*.blade.php` | header, summary, queue, hourly, river, river-stage, region, aging, panels, overlays. |
 | Penyedia data | `app/Services/Dashboard/AdminKaca.php` (dipanggil dari `DashboardService::admin()` sebagai `$data['kaca']`) | Pola: satu kelas `build()` yang meratakan data DB ke bentuk yang dipakai view, dengan tanda demo yang eksplisit. |
 | Angka matriks titik | `app/Support/DotMatrix.php` | `DotMatrix::layout($teks, $dot = 6, $gap = 2.2)` → `width`, `height`, `dots[]` untuk band dampak. |
@@ -54,7 +55,10 @@ Kaca hanya mengganti **material permukaan**. Palet Senja, tipografi Figtree, Led
 
 | Kelas / kait | Fungsi |
 |---|---|
-| `.dash-kaca` | Pembungkus isi halaman. Wajib. Menyalakan token Kaca, kartu kaca, gerak spring, sidebar kaca. |
+| `.dash-kaca` | Pembungkus isi halaman (dirender oleh `<x-app.kaca>`; jangan ditulis tangan). Menyalakan token Kaca, kartu kaca, gerak spring, sidebar kaca. |
+| `.kaca-still` / `.kaca-still-toggle` | Gerak latar dijeda / tombol jedanya (dari `<x-app.kaca>`). |
+| `.kaca-flag` | Alas `bg-field` kecil (radius 6 px) untuk teks merah di kaca polos. |
+| `[data-summary]`, `[data-table]` | Kait varian Kaca `x-ui.summary-strip` (sel bening, garis per sel) dan `x-ui.table` (garis hijau, kolom sticky buram hanya < 1024 px). |
 | `.kaca-backdrop` > `.kaca-blob` ×4 | Latar foto buram. `aria-hidden="true"`, tanpa data. |
 | `[data-card]` (otomatis dari `x-ui.card`) atau `.glass` | Kartu kaca. |
 | `.glass-row` | Tepi cahaya + blur ringan untuk baris yang berdiri sendiri (baris antrean). Pasangkan dengan `bg-field border border-line rounded-[16px]`. |
@@ -85,8 +89,9 @@ Semua nilai di bawah sudah ada di kode; jangan menambah hex baru. Di Blade pakai
 | `--color-ink` / `--ink` | #1c2a0a | #1c2a0a | Teks utama, teks di luar kartu (kepala halaman). |
 | `--color-meta` / `--meta` | **#33330f** | #4a4a1a | Teks sekunder di kaca. |
 | `--color-accent-text` | **#7c2d12** | #9a3412 | Teks jingga (penanda tahap tertahan, "lewat n hari"). |
-| `--color-danger` (kelas `text-danger`) | **#7f1d1d** | #b91c1c | Teks merah. |
-| `.text-primary` | dipetakan ke **#2f3d12** (`--color-primary-hover`) | #3f6212 | Teks hijau (delta baik, status). |
+| `--color-danger` (kelas `text-danger`; `.text-error` juga dipetakan ke sini) | **#7f1d1d** | #b91c1c | Teks merah; di kaca polos selalu di dalam `.kaca-flag`. |
+| `--color-on-surface-muted` / `-subtle` | **#33330f** | #4a4a1a | Teks redup komponen `x-ui.*` (subjudul, label metrik, helper, kepala tabel) otomatis memakai meta Kaca. |
+| `.text-primary`, `.text-success` | dipetakan ke **#2f3d12** (`--color-primary-hover`) | #3f6212 | Teks hijau (delta baik, status). |
 | `--primary` | #3f6212 | — | Isi tombol, thumb segmen, seri utama grafik. |
 | `--accent` | #c2410c | — | Isi kecil: lencana hitungan, penanda "Sekarang", ring fokus, tombol "Lihat n order". **Bukan warna teks.** |
 | `--danger` | #b91c1c | — | **Isi** (ubin peringatan, batang). **Bukan warna teks** — untuk teks pakai `text-danger` / `var(--color-danger)`. |
@@ -109,30 +114,31 @@ Semua nilai di bawah sudah ada di kode; jangan menambah hex baru. Di Blade pakai
 
 ## 5. Resep: membungkus sebuah layar
 
-Tempel di view halaman (Blade Livewire), membungkus seluruh isi. Ini salinan pola di `dashboard-overview.blade.php`:
+Bungkus seluruh isi view dengan komponen bersama `<x-app.kaca>` (`resources/views/components/app/kaca.blade.php`):
 
 ```blade
-<div class="dash-kaca" x-data
-     @pointermove.passive="const c = $event.target.closest('[data-card]'); if (c) { const r = c.getBoundingClientRect(); c.style.setProperty('--mx', ($event.clientX - r.left) + 'px'); c.style.setProperty('--my', ($event.clientY - r.top) + 'px'); }">
-    <div class="kaca-backdrop" aria-hidden="true">
-        <div class="kaca-blob" style="background-image: url('{{ asset('images/material/kain.jpg') }}'); width: 46vw; height: 52vh; left: -6vw; top: -8vh"></div>
-        <div class="kaca-blob" style="background-image: url('{{ asset('images/material/ampas-tahu.jpg') }}'); width: 40vw; height: 46vh; right: -4vw; top: 10vh"></div>
-        <div class="kaca-blob" style="background-image: url('{{ asset('images/material/serbuk-kayu.jpg') }}'); width: 52vw; height: 50vh; left: 22vw; bottom: -14vh"></div>
-        <div class="kaca-blob" style="background-image: url('{{ asset('images/material/plastik-2.jpg') }}'); width: 30vw; height: 36vh; right: 2vw; bottom: 4vh"></div>
-    </div>
-
+<x-app.kaca>
     <x-ui.page-header title="Kategori Material" subtitle="Kelola kategori yang dipakai di listing." />
 
     <div class="dash-grid grid gap-4 lg:grid-cols-12">
         <div class="lg:col-span-12" data-rise style="--i: 1">{{-- kartu kaca --}}</div>
     </div>
-</div>
+</x-app.kaca>
 ```
+
+Komponen itu merender `.dash-kaca`, `.kaca-backdrop` dengan empat foto (`kain`, `ampas-tahu`, `serbuk-kayu`, `plastik-2`, ukuran dan posisi tetap), kilau kursor pada `[data-card]` (Alpine `kacaPage`), dan tombol jeda gerak latar di kanan bawah. Bila Kaca bergantung pada peran (seperti `/dashboard`), pakai `enabled`:
+
+```blade
+<x-app.kaca :enabled="$role === 'ADMIN'" :class="in_array($role, ['ADMIN', 'SELLER', 'BUYER', 'INSPECTOR'], true) ? 'dash-senja' : ''">
+```
+
+Di komponen Livewire, `<x-app.kaca>` boleh menjadi elemen akar: komponen ini selalu merender **satu** `div` akar (lihat §11, jebakan 13).
 
 Catatan:
 - **Jangan mengganti foto atau posisi blob.** Kontras di §9 diukur dengan empat foto dan posisi ini. Foto lain = ukur ulang.
-- `x-data` kosong di pembungkus hanya untuk handler kilau. Kalau layar punya komponen Alpine sendiri, taruh di elemen anak (seperti `admin.blade.php`), jangan di pembungkus yang sama dengan `x-data` lain.
-- Pembungkus ini belum ada sebagai komponen bersama. Sampai PM memutuskan (§12), salin persis; jangan mengubah `layouts/app.blade.php` (hot spot) tanpa izin.
+- Pembungkus sudah memakai `x-data="kacaPage"`. Komponen Alpine layar ditaruh di elemen anak (seperti `admin.blade.php`), tidak di pembungkus.
+- Kaca dipasang per layar, **tidak** lewat `layouts/app.blade.php`: layar Senja yang belum dibangun ulang akan rusak bila tiba-tiba berada di atas foto (kartu putih, teks meta Senja).
+- Tombol jeda menambah ruang 64 px di bawah isi (`pb-16`) supaya tidak menutupi kartu terakhir.
 - Kepala halaman: `x-ui.page-header` boleh dipakai. Di dalam `.dash-kaca`, subjudulnya (`h1 + p`) otomatis memakai tinta, bukan meta, karena teks di luar kartu duduk langsung di atas foto. Dasbor Admin memakai kepala sendiri (`kaca/header.blade.php`: `.title-xl`, bilah atas dengan palet, segmen periode).
 
 ## 6. Cuplikan siap tiru
@@ -153,7 +159,7 @@ Label setiap cuplikan: **[ada]** = salinan atau ringkasan kode yang sudah berjal
 </section>
 ```
 
-Kilau kursor hanya muncul pada `[data-card]` (handler pembungkus mencari `[data-card]`). `section.glass` tetap kaca, tanpa kilau yang mengikuti kursor.
+Kilau kursor hanya muncul pada `[data-card]` (`kacaPage().sheen()` mencari `[data-card]`). `section.glass` tetap kaca, tanpa kilau yang mengikuti kursor.
 
 ### 6.2 Kontrol segmen dengan thumb [ada]
 
@@ -359,7 +365,7 @@ Aturan form Kaca: kartu form adalah kaca (`x-ui.card`); **input, select, textare
 
 Aturan tabel Kaca: baris duduk **langsung di permukaan kaca kartu**, dipisah `divide-line` (garis rambut hijau 14%), bukan kotak putih per baris; baris yang bisa diklik memakai `hover:bg-primary-soft`; baris terpilih `bg-[var(--panel-strong)]`; header tabel 13 px meta; angka `tabular-nums` rata kanan; status tetap `x-ui.badge` (teks + glyph). Baris antrean keputusan yang berdiri sendiri boleh `.glass-row bg-field` (§6.3), daftar biasa tidak.
 
-**Celah komponen yang harus diketahui:** `x-ui.table` membuat kolom pertama *sticky* dengan `bg-surface` putih. Di dalam kaca itu tampak sebagai pita putih. Sampai komponen itu punya varian Kaca (perlu persetujuan PM, berkas bersama), pakai daftar ledger seperti di atas untuk layar Kaca, atau pakai `x-ui.table` hanya bila tabel tidak menggulir horizontal. `x-ui.summary-strip` juga masih putih; untuk strip ringkasan Kaca tiru `kaca/summary.blade.php` (`section.glass` + garis `border-line`).
+**Komponen bersama di Kaca:** `x-ui.table` (kait `data-table`) otomatis memakai garis `--line`; kolom pertama yang *sticky* bening di ≥ 1024 px dan menjadi alas `panel-strong` buram di < 1024 px, saat tabel bisa digeser. `x-ui.summary-strip` (kait `data-card` + `data-summary`) otomatis menjadi satu permukaan kaca dengan sel bening dan garis rambut per sel. `x-ui.kpi` dengan `tone="danger"` memakai `.text-error` yang di Kaca dipetakan ke #7f1d1d; nilainya 32 px / 900 (teks besar), jadi tidak perlu `.kaca-flag`. `tone="warning"` jangan dipakai di Kaca (warning sebagai teks hanya di permukaan pekat, §9).
 
 ### 6.11 Halaman detail [pola]
 
@@ -403,33 +409,38 @@ Ikuti `app/Services/Dashboard/AdminKaca.php`:
 | Angka berganti karena aksi pengguna | hitung ke target (`countTo` di `kacaAdmin`) | Langsung ke nilai akhir |
 | Latar melayang, denyut, arus, kilau | `.kaca-blob`, `.kaca-ping`, `.river-flow`, `.shimmer` | Berhenti |
 | Tekan | `:active` scale .97 (otomatis) | Mati |
+| Jeda gerak latar | Tombol `.kaca-still-toggle` di `<x-app.kaca>` menambah `.kaca-still`: latar berhenti di posisinya, denyut dan arus mati; pilihan disimpan per perangkat (`localStorage` `kaca-still`) | Tombol disembunyikan (gerak berulang sudah berhenti) |
 | Hover warna/latar/bayangan | 150–200 ms `var(--ease-hover)` | Tetap |
+
+Gerak berulang (latar melayang, denyut, arus) memenuhi WCAG 2.2.2 lewat tombol jeda di atas. Jangan menambah gerak berulang baru.
 
 Prinsip: **satu kurva spring** (Lab: stiffness 420, damping 38, mass 0,9) untuk semua gerak tata letak — `--kaca-spring` di CSS, `SPRING` di JS. Jangan menulis `cubic-bezier` atau `ease-out` baru untuk gerak posisi. Angka tidak dihitung naik saat halaman dimuat. Gerak tereduksi mengikuti Lab (`MotionConfig reducedMotion="user"`): yang mati hanya posisi, skala, dan loop; fade, warna, lebar bilah, dan gambar donat tetap jalan, jadi tidak ada yang "meloncat".
 
 ## 9. Aturan kontras
 
-**Diukur, bukan ditebak.** 25 Nov 2026, dasbor Admin dirender di Chrome (viewport 1440×900 di 5 posisi gulir dan 504×844 di 3 posisi; animasi latar dijeda), semua teks dibuat transparan untuk memotret latar, lalu tiap kotak teks diukur dengan rumus WCAG 2.x terhadap persentil 10 luminans latarnya (425 + 141 kotak teks).
+**Diukur, bukan ditebak.** 25 Nov 2026, dasbor Admin dirender di Chrome dan setiap kotak teks diukur dengan rumus WCAG 2.x terhadap persentil 10 luminans latarnya (semua teks dibuat transparan untuk memotret latar). Putaran 1: 1440×900 di 5 posisi gulir dan 504×844 di 3 posisi (566 kotak). Putaran 2 setelah perbaikan: 1440×900 dengan latar melayang dihentikan di tiga waktu animasi berbeda (0, 17 dan 34 detik), karena posisi foto memengaruhi hasil (343 kotak).
 
 | Teks | Permukaan | Rasio terendah terukur | Status |
 |---|---|---|---|
-| ink #1c2a0a | kaca | 6,19:1 | AA |
+| ink #1c2a0a | kaca | 6,17:1 | AA |
 | meta #33330f | kaca | 5,18:1 | AA |
 | ink #1c2a0a | tanah (kepala halaman, di luar kartu) | 5,21:1 (judul 26 px di 504 px: 4,64:1) | AA |
 | hijau #2f3d12 (`.text-primary`) | kaca | 6,82:1 | AA |
 | jingga #7c2d12 (`text-accent-text`) | kaca | 5,13:1 | AA |
-| merah #7f1d1d (`text-danger`) | kaca | 4,68:1 | AA |
+| merah #7f1d1d (`text-danger`) | kaca polos | **4,33:1** pada satu posisi latar (4,68 pada posisi lain) | Tidak aman → wajib `.kaca-flag` |
+| merah #7f1d1d | `.kaca-flag` | 6,93:1 | AA |
+| merah #7f1d1d, label SVG dengan halo `panel-strong` | kaca | 5,85:1 (sebelumnya `var(--danger)` tanpa halo: 4,06:1) | AA |
 | warning #92400e | baris `bg-field` | 6,28:1 | AA |
 | merah #7f1d1d | baris `bg-field` | 9,03:1 | AA |
 | meta #33330f | baris `bg-field` | 11,38:1 | AA |
-| putih | lencana `bg-accent` | 5,18:1 | AA |
+| putih | lencana / tombol `bg-accent` | 5,18:1 | AA |
 | putih | tombol `bg-primary` | 7,08:1 | AA |
 | #e3d99a / #fef9c3 | band dampak | 7,47:1 / 12,24:1 | AA |
-| **#b91c1c (`var(--danger)`) sebagai teks SVG** | kaca | **4,06:1** ("Sengketa · 1", "Ditolak · 2" di Sungai Order) | **Gagal** — lihat §11 |
+| tombol nonaktif (opacity 50–60%) | kaca / baris | 1,6–3,9:1 | Dikecualikan WCAG 1.4.3; wajib membawa alasan |
 
 Batas teoretis (simulasi tanpa renderer, titik foto tergelap tepat di bawah stop kaca tertipis .36) jauh lebih pesimis: meta 4,54:1, tetapi teks berwarna turun ke 2,5–4,1:1. Karena itu aturan di bawah dibuat aman walau posisi kartu dan latar berubah:
 
-1. **Teks di kaca polos** hanya: tinta, meta (#33330f), dan teks berwarna versi Kaca (`text-primary` → #2f3d12, `text-accent-text` → #7c2d12, `text-danger` → #7f1d1d) dalam potongan pendek tebal (≥ 13 px / 700). Kalimat panjang berwarna tidak boleh di kaca polos.
+1. **Teks di kaca polos** hanya: tinta, meta (#33330f), dan teks hijau/jingga versi Kaca (`text-primary` → #2f3d12, `text-accent-text` → #7c2d12) dalam potongan pendek tebal (≥ 13 px / 700). **Teks merah kecil di kaca polos selalu di dalam `.kaca-flag`** (`<span class="kaca-flag text-danger">19 hari</span>`); teks merah besar (≥ 24 px, mis. nilai `x-ui.kpi`) boleh tanpa alas. Label teks di SVG yang berwarna memakai halo: `stroke="var(--panel-strong)" stroke-width="4" stroke-linejoin="round" paint-order="stroke"`. Kalimat panjang berwarna tidak boleh di kaca polos.
 2. **`text-warning`, `text-info`, `text-accent` (#c2410c), dan `var(--danger)` sebagai warna teks** hanya di permukaan yang lebih pekat: baris `bg-field`, `--panel-strong`, atau `.glass-strong`. Di kaca polos mereka hanya boleh sebagai isi (titik, batang, lencana).
 3. **Teks di luar kartu** (kepala halaman, remah roti) hanya tinta. Meta #4a4a1a di tanah hanya 3,0–3,2:1 di atas foto tergelap (audit kontras 25 Nov 2026, dicatat di komentar `dashboard-kaca.css`) — itu sebabnya `.dash-kaca h1 + p` dan `.dash-eyebrow` dipaksa tinta.
 4. **Kontrol** (tombol, input, select) putih pekat atau hijau terisi; jangan transparan.
@@ -440,16 +451,16 @@ Cara mengukur layar baru: Lampiran A.
 
 ## 10. Daftar periksa sebelum PR
 
-- [ ] Isi halaman dibungkus `.dash-kaca` dengan `.kaca-backdrop` (empat foto dan posisi yang sama, §5); sidebar ikut jadi kaca.
+- [ ] Isi halaman dibungkus `<x-app.kaca>` (§5); sidebar ikut jadi kaca; tombol jeda gerak tampil dan berfungsi.
 - [ ] Kartu memakai `x-ui.card` atau `.glass`; laci/dialog/tooltip `.glass-strong`; tidak ada kartu putih tersisa kecuali alert dan kontrol.
 - [ ] Input, select, textarea, tombol putih pekat atau hijau terisi; satu tombol hijau per wilayah.
-- [ ] Tidak ada hex baru; warna dari kelas token atau `var(--…)` di §4. Teks merah memakai `text-danger`/`var(--color-danger)`, bukan `var(--danger)`.
+- [ ] Tidak ada hex baru; warna dari kelas token atau `var(--…)` di §4. Teks merah memakai `text-danger`/`var(--color-danger)`, bukan `var(--danger)`, dan di kaca polos duduk di `.kaca-flag`; label SVG berwarna berhalo.
 - [ ] Teks berwarna di kaca polos hanya versi Kaca dan pendek tebal; warning/info/accent sebagai teks hanya di `bg-field`/`panel-strong`/`glass-strong` (§9).
 - [ ] Teks di luar kartu hanya tinta.
 - [ ] Tidak ada pill di isi (kecuali tanda "Data demo" dan lencana hitungan); status = teks + glyph.
 - [ ] Data dari service bergaya `AdminKaca`; bagian yang tidak didukung DDL bertanda "Data demo" di kartunya; tidak ada label diagnosis tanpa ambang.
 - [ ] Gerak: spring dari `--kaca-spring`/`flip()`; diuji dengan klik cepat berulang (tidak meloncat); diuji ulang dengan *prefers-reduced-motion: reduce* (posisi mati, fade jalan).
-- [ ] Kontras diukur pada render nyata di 1440 dan ≤ 504 px, beberapa posisi gulir; hasil ditulis di PR. Yang tidak sempat diukur disebut.
+- [ ] Kontras diukur pada render nyata di 1440 dan ≤ 504 px, beberapa posisi gulir, dan dua atau lebih waktu animasi latar; hasil ditulis di PR. Yang tidak sempat diukur disebut.
 - [ ] `forced-colors: active` (Windows kontras tinggi): kartu kembali putih, latar hilang, teks terbaca.
 - [ ] 360 px: tidak ada gulir horizontal halaman; grafik lebar menggulir di dalam kartunya (`-mx-4 overflow-x-auto px-4`).
 - [ ] Keyboard: semua kontrol tercapai Tab, fokus terlihat (ring jingga 2 px), Esc menutup laci/dialog, `x-trap` di overlay.
@@ -459,7 +470,7 @@ Cara mengukur layar baru: Lampiran A.
 
 ## 11. Jebakan yang sudah ditemukan
 
-1. **`var(--danger)` vs `text-danger`.** Di dalam `.dash-kaca`, `--danger` = #b91c1c (isi), sedangkan `--color-danger` (kelas `text-danger`) = #7f1d1d (teks). Label keluar Sungai Order di `kaca/river.blade.php` memakai `fill="var(--danger)"` untuk teks dan terukur 4,06–4,26:1 (gagal AA). Untuk teks selalu pakai `text-danger` atau `var(--color-danger)`; hal yang sama berlaku untuk `--accent` (isi) vs `--color-accent-text` (teks). Perbaikan kode itu tercatat sebagai tindak lanjut, bukan bagian panduan.
+1. **`var(--danger)` vs `text-danger`.** Di dalam `.dash-kaca`, `--danger` = #b91c1c (isi), sedangkan `--color-danger` (kelas `text-danger`) = #7f1d1d (teks). Label keluar Sungai Order dulu memakai `fill="var(--danger)"` dan terukur 4,06:1; sudah diganti `var(--color-danger)` + halo (5,85:1). Hal yang sama berlaku untuk `--accent` (isi) vs `--color-accent-text` (teks). **Merah tua pun tidak cukup di kaca polos** pada semua posisi latar (4,33:1 terukur), karena itu `.kaca-flag`.
 2. **`.glass` memaksa radius 22 px.** Untuk tombol/kapsul kaca kecil di bilah atas, timpa dengan `rounded-[14px]!` (tanda `!` Tailwind 4), seperti di `kaca/header.blade.php`.
 3. **Gerak tereduksi di Windows.** PC dengan "Animation effects" mati melaporkan `prefers-reduced-motion: reduce`. Jangan mematikan semua transisi (`transition: none` gaya Senja) — itu membuat semuanya meloncat. Kebijakan Kaca hanya mematikan posisi/skala/loop. `dashboard-senja.css` sengaja memakai `.dash-senja:not(.dash-kaca) *` untuk aturan `transition: none`-nya.
 4. **Transparansi Windows.** `prefers-reduced-transparency` sengaja **tidak** diikuti (keputusan PM). Jangan menambah aturan media itu; keterbacaan dijaga lantai alpha dan aturan §9.
@@ -468,19 +479,27 @@ Cara mengukur layar baru: Lampiran A.
 7. **Animasi yang tertahan di tab latar.** `exit()` dan `kacaRiver` memakai batas waktu (`settled`) supaya state tidak macet ketika browser menahan linimasa animasi; pertahankan pola itu di komponen baru.
 8. **Kelas arbitrer di `x-transition`** (`translate-x-[108%]`, `scale-[.97]`) hanya terbentuk bila tertulis utuh di Blade; jangan menyusunnya dari string dinamis.
 9. **`body:has(.dash-kaca)` membuat body bening.** Latar krem datang dari `<html>`. Jangan memberi `bg-background` pada pembungkus isi; latar foto akan tertutup.
-10. **`x-ui.table` dan `x-ui.summary-strip` masih putih** (§6.10).
+10. **Komponen putih lama.** `x-ui.table` dan `x-ui.summary-strip` sudah punya varian Kaca otomatis (§6.10). Komponen lain yang memakai `bg-surface` sebagai kartu (bukan kontrol) harus diberi `data-card` atau diganti `x-ui.card`.
 11. **`kacaAdmin` bukan komponen umum.** Inisialisasinya membaca `cfg.periods['Hari ini']`; dipakai di layar tanpa data itu, Alpine gagal.
 12. **Data demo di produksi.** Kepala dasbor dan band dampak menyembunyikan tanda demo di `production`; panel yang isinya contoh (strip periode, peta) menampilkan tanda di semua lingkungan. Jangan menyembunyikan tanda pada data yang memang contoh.
+13. **`@if` di akar komponen Livewire.** Livewire menempelkan `wire:id` ke tag pertama yang ditemukannya. `@if` di akar menghasilkan penanda `<!--[if BLOCK]>` sehingga `wire:id` jatuh ke elemen anak (pernah terjadi: ke `.kaca-backdrop`). Elemen akar harus selalu satu tag tanpa `@if` di depannya; `<x-app.kaca>` menangani ini dengan menyusun atribut di `@php`.
+14. **Teks redup komponen lama.** Di dalam `.dash-kaca`, `text-on-surface-muted`/`-subtle` otomatis menjadi #33330f dan `.text-error`/`.text-success` menjadi versi gelap. Jangan menimpa kembali dengan hex.
 
-## 12. Yang menunggu keputusan PM
+## 12. Keputusan 25 Nov 2026 (diambil atas delegasi PM)
 
-- Memindahkan pembungkus `.dash-kaca` + `.kaca-backdrop` ke satu komponen bersama atau ke `layouts/app.blade.php` (hot spot), supaya layar tidak menyalin markup latar.
-- Varian Kaca untuk `x-ui.table` (kolom sticky) dan `x-ui.summary-strip` (berkas bersama `components/ui`).
-- Ekstraksi palet Ctrl K dan laci menjadi komponen bersama (`kacaPalette`, `kacaDrawer`) bila layar lain membutuhkannya.
-- Apakah halaman autentikasi dan landing ikut latar foto buram Kaca atau tetap panel foto + overlay hutan.
-- Perbaikan label SVG `var(--danger)` di `kaca/river.blade.php` (§11.1).
-- Teks 11 px di label batang riwayat status (`kaca/river-stage.blade.php`, "sekarang" dan "n j") melanggar batas minimum 12 px; perlu dinaikkan.
-- Gerak berulang (latar melayang, denyut, arus Sungai Order) belum punya tombol jeda (WCAG 2.2.2). Saat ini hanya berhenti bila gerak tereduksi. Perlu keputusan: tombol jeda, atau berhenti setelah 5 detik.
+| Soal | Keputusan | Alasan |
+|---|---|---|
+| Pembungkus Kaca | Komponen bersama `<x-app.kaca>` dipasang per layar; **tidak** di `layouts/app.blade.php`. | Satu sumber markup latar dan foto (kontras diukur di atasnya); layar Senja yang belum dibangun ulang tidak rusak; tidak menyentuh hot spot layout. |
+| `x-ui.table`, `x-ui.summary-strip` | Varian Kaca otomatis lewat kait `data-table` / `data-card` + `data-summary`; tampilan di luar Kaca tidak berubah. | Satu komponen untuk kedua material; layar yang dibangun ulang tidak perlu markup tabel sendiri. |
+| Teks redup dan semantik di komponen lama | Di dalam `.dash-kaca`: `--color-on-surface-muted/-subtle` → #33330f, `.text-error` → #7f1d1d, `.text-success` → #2f3d12. | Semua `x-ui.*` langsung terbaca di kaca tanpa kelas khusus. |
+| Teks merah di kaca polos | Selalu `.kaca-flag` (alas `bg-field`, radius 6 px); label SVG berwarna diberi halo. | Terukur 4,33:1 pada posisi latar tertentu; dengan alas 6,93:1. Bentuknya sama dengan tag ID, bukan pill. |
+| Gerak berulang (WCAG 2.2.2) | Tombol jeda 44 px di kanan bawah setiap layar Kaca, pilihan disimpan per perangkat; tersembunyi saat *reduced motion*. | Memenuhi 2.2.2 tanpa menghapus gerak yang disukai PM. |
+| Teks 11 px di batang riwayat | Dinaikkan ke 12 px (lebar minimum batang 40 px). | Batas minimum 12 px. |
+| Dasbor Seller, Buyer, Inspector | Tetap struktur "Tiga pertanyaan" (DESIGN.md › Layout), dibangun ulang dengan material Kaca; susunan ala Lab hanya untuk Admin. | Isi tiap peran sudah disetujui per peran pada 22 Nov; Lab hanya punya rancangan Admin. |
+| Login, lupa sandi, reset sandi | Panel foto + overlay hutan di kiri tetap; sisi form memakai latar Kaca (`<x-app.kaca>`) dan form di kartu kaca. Landing tidak diubah (permukaan publik). | Panel foto adalah identitas yang sudah ada; form tetap konsisten dengan aplikasi. |
+| Palet Ctrl K dan laci untuk layar lain | Tetap di `kacaAdmin` sampai ada layar kedua yang membutuhkannya; saat itu diekstrak menjadi komponen bersama, bukan disalin. | Tidak membuat abstraksi sebelum ada pemakai kedua. |
+
+Yang masih harus dikerjakan (bukan keputusan): membangun ulang layar selain dasbor Admin dengan `<x-app.kaca>`, dan memperbarui asersi `assertDontSee('dash-kaca')` di `tests/Feature/DashboardTest.php` saat dasbor Seller dibangun ulang.
 
 ## Lampiran A. Mengukur kontras di atas kaca
 
@@ -511,7 +530,13 @@ Kaca tidak punya satu warna latar, jadi rasio dari dua hex tidak cukup. Ukur pad
 })();
 ```
 
-2. Sembunyikan teks dan potret viewport yang sama (`bg_N.png`):
+Ulangi langkah 1–3 pada dua atau lebih waktu animasi latar, karena posisi foto memengaruhi hasil (teks merah pernah lolos di satu posisi dan gagal di posisi lain):
+
+```js
+for (const b of document.querySelectorAll('.kaca-blob')) for (const a of b.getAnimations()) { a.pause(); a.currentTime = 17000; } // juga 0 dan 34000
+```
+
+2. Sembunyikan teks dan potret viewport yang sama (`bg_N.png`). Halo label SVG (`stroke`) sengaja tidak disembunyikan: halo adalah latar langsung teks itu.
 
 ```js
 document.head.insertAdjacentHTML('beforeend', '<style>.dash-kaca *{color:transparent!important;-webkit-text-fill-color:transparent!important}.dash-kaca svg text{fill:transparent!important}.dash-kaca img{visibility:hidden!important}</style>');
