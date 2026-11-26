@@ -63,6 +63,28 @@
             </dl>
         </x-ui.card>
 
+        @if ($needsReReview)
+            <x-ui.alert variant="warning" title="Tinjauan Ulang" class="mb-6">
+                Perusahaan ini kembali ke antrean karena ada dokumen wajib yang kedaluwarsa.
+            </x-ui.alert>
+        @endif
+
+        {{-- Dokumen wajib per tipe mitra (CompanyVerificationService::requiredDocumentGroups); status = teks + glyph, tanpa pill. --}}
+        <x-ui.card :title="'Dokumen wajib · '.ucfirst(strtolower((string) $company->tipe))" :padding="false" class="mb-6">
+            <ul class="divide-y divide-outline-hairline border-t border-outline-hairline">
+                @foreach (array_keys($requiredGroups) as $label)
+                    @php($isMissing = in_array($label, $missingDocuments, true))
+                    <li class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-[18px] py-3 sm:px-6">
+                        <span class="text-body-md text-on-surface">{{ $label }}</span>
+                        <span @class(['flex items-center gap-1.5 text-label-md font-bold', 'text-error' => $isMissing, 'text-success' => ! $isMissing])>
+                            <x-ui.icon :name="$isMissing ? 'alert' : 'check'" class="size-4 shrink-0" />
+                            {{ $isMissing ? 'Belum ada / kedaluwarsa' : 'Lengkap' }}
+                        </span>
+                    </li>
+                @endforeach
+            </ul>
+        </x-ui.card>
+
         <x-ui.card :title="'Berkas legalitas · '.$company->documents->count()" :padding="false" class="mb-6">
             <ul class="divide-y divide-outline-hairline border-t border-outline-hairline">
                 @forelse ($company->documents as $doc)
@@ -96,14 +118,14 @@
                     @csrf
                     <h3 class="text-dash-sub text-on-surface">Setujui verifikasi</h3>
                     <p class="text-body-sm text-on-surface-muted">Perusahaan mendapat akses penuh untuk membuat listing dan bertransaksi.</p>
-                    {{-- Server menolak persetujuan tanpa dokumen; tombol tidak menjanjikan aksi yang pasti gagal (DESIGN.md › Action resolution). --}}
-                    @php($noDocuments = $company->documents->isEmpty())
-                    <x-ui.button type="submit" :disabled="$noDocuments" :aria-describedby="$noDocuments ? 'approve-blocked' : null">
+                    {{-- Server menolak persetujuan bila dokumen wajib kurang/kedaluwarsa; tombol tidak menjanjikan aksi yang pasti gagal (DESIGN.md › Action resolution). --}}
+                    @php($approveBlocked = $missingDocuments !== [])
+                    <x-ui.button type="submit" :disabled="$approveBlocked" :aria-describedby="$approveBlocked ? 'approve-blocked' : null">
                         <x-ui.icon name="check" class="size-[18px]" />
                         Setujui
                     </x-ui.button>
-                    @if ($noDocuments)
-                        <p id="approve-blocked" class="text-body-sm font-medium text-warning">Belum bisa disetujui: belum ada berkas legalitas.</p>
+                    @if ($approveBlocked)
+                        <p id="approve-blocked" class="text-body-sm font-medium text-warning">Belum bisa disetujui: dokumen wajib belum lengkap atau kedaluwarsa.</p>
                     @endif
                 </form>
 

@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read DemandRequest|null $demandRequest
  * @property-read Collection<int, RfqOffer> $offers
  * @property-read RfqOffer|null $latestOffer
+ * @property-read PurchaseOrder|null $purchaseOrder
  */
 class RfqContract extends Model
 {
@@ -107,6 +108,14 @@ class RfqContract extends Model
     {
         return $this->hasOne(RfqOffer::class, 'rfq_contracts_id_rfq_contract', 'id_rfq_contract')
             ->latestOfMany('urutan');
+    }
+
+    /**
+     * @return HasOne<PurchaseOrder, $this>
+     */
+    public function purchaseOrder(): HasOne
+    {
+        return $this->hasOne(PurchaseOrder::class, 'rfq_contracts_id_rfq_contract', 'id_rfq_contract');
     }
 
     public function isExpired(): bool

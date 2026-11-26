@@ -1,14 +1,20 @@
 <?php
 
 use App\Http\Controllers\Admin\CompanyVerificationController;
+use App\Http\Controllers\Admin\InspectionAssignmentController;
+use App\Http\Controllers\Admin\ListingModerationController;
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanyDocumentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemandRequestController;
+use App\Http\Controllers\DocumentVerificationController;
 use App\Http\Controllers\InspectorProfileController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\RfqController;
+use App\Http\Controllers\Seller\ListingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -62,15 +68,27 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profil-kompetensi', [InspectorProfileController::class, 'mine'])->name('inspector.profile');
     Route::post('/profil-kompetensi/sertifikat', [InspectorProfileController::class, 'uploadMine'])->name('inspector.profile.certificate');
 
+    // PBI-08 (SYM-12): membuat/mengirim RFQ, PO, dan kebutuhan hanya untuk perusahaan TERVERIFIKASI.
     Route::prefix('rfq')->name('rfq.')->group(function () {
         Route::get('/', [RfqController::class, 'index'])->name('index');
-        Route::get('/create', [RfqController::class, 'create'])->name('create');
-        Route::post('/', [RfqController::class, 'store'])->name('store');
+        Route::get('/create', [RfqController::class, 'create'])->name('create')->middleware('company.verified');
+        Route::post('/', [RfqController::class, 'store'])->name('store')->middleware('company.verified');
         Route::get('/{rfq}', [RfqController::class, 'show'])->name('show');
-        Route::post('/{rfq}/counter', [RfqController::class, 'counter'])->name('counter');
-        Route::post('/{rfq}/accept', [RfqController::class, 'accept'])->name('accept');
+        Route::post('/{rfq}/counter', [RfqController::class, 'counter'])->name('counter')->middleware('company.verified');
+        Route::post('/{rfq}/accept', [RfqController::class, 'accept'])->name('accept')->middleware('company.verified');
         Route::post('/{rfq}/reject', [RfqController::class, 'reject'])->name('reject');
         Route::post('/{rfq}/withdraw', [RfqController::class, 'withdraw'])->name('withdraw');
+    });
+
+    Route::prefix('po')->name('po.')->group(function () {
+        Route::get('/', [PurchaseOrderController::class, 'index'])->name('index');
+        Route::get('/create', [PurchaseOrderController::class, 'create'])->name('create')->middleware('company.verified');
+        Route::post('/', [PurchaseOrderController::class, 'store'])->name('store')->middleware('company.verified');
+        Route::get('/{po}', [PurchaseOrderController::class, 'show'])->name('show');
+        Route::post('/{po}/send', [PurchaseOrderController::class, 'send'])->name('send')->middleware('company.verified');
+        Route::post('/{po}/confirm', [PurchaseOrderController::class, 'confirm'])->name('confirm')->middleware('company.verified');
+        Route::post('/{po}/reject', [PurchaseOrderController::class, 'reject'])->name('reject');
+        Route::post('/{po}/cancel', [PurchaseOrderController::class, 'cancel'])->name('cancel');
     });
 
     // PBI-07: Verifikasi Pembayaran (Buyer & Seller)
@@ -94,10 +112,10 @@ Route::middleware(['auth'])->group(function () {
     // PBI-14: Kebutuhan Bahan Baku Sekunder (Buyer & Seller)
     Route::prefix('buyer/kebutuhan')->name('buyer.demands.')->group(function () {
         Route::get('/', [DemandRequestController::class, 'buyerIndex'])->name('index');
-        Route::get('/buat', [DemandRequestController::class, 'create'])->name('create');
-        Route::post('/', [DemandRequestController::class, 'store'])->name('store');
-        Route::get('/{demand}/edit', [DemandRequestController::class, 'edit'])->name('edit');
-        Route::put('/{demand}', [DemandRequestController::class, 'update'])->name('update');
+        Route::get('/buat', [DemandRequestController::class, 'create'])->name('create')->middleware('company.verified');
+        Route::post('/', [DemandRequestController::class, 'store'])->name('store')->middleware('company.verified');
+        Route::get('/{demand}/edit', [DemandRequestController::class, 'edit'])->name('edit')->middleware('company.verified');
+        Route::put('/{demand}', [DemandRequestController::class, 'update'])->name('update')->middleware('company.verified');
         Route::patch('/{demand}/tutup', [DemandRequestController::class, 'close'])->name('close');
         Route::delete('/{demand}', [DemandRequestController::class, 'destroy'])->name('destroy');
     });
@@ -105,6 +123,48 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('seller/papan-kebutuhan')->name('seller.demands.')->group(function () {
         Route::get('/', [DemandRequestController::class, 'sellerIndex'])->name('index');
         Route::get('/{demand}', [DemandRequestController::class, 'sellerShow'])->name('show');
+    });
+
+    // PBI-17 (SYM-21): Verifikasi Dokumen Legalitas Non-B3 (Inspector)
+    Route::prefix('inspector/verifikasi-dokumen')->name('inspector.verifications.')->group(function () {
+        Route::get('/', [DocumentVerificationController::class, 'index'])->name('index');
+        Route::get('/{verification}', [DocumentVerificationController::class, 'show'])->name('show');
+        Route::post('/{verification}', [DocumentVerificationController::class, 'verify'])->name('verify');
+    });
+
+    // PBI-18 (SYM-22): Penugasan Inspeksi (Admin)
+    Route::prefix('admin/penugasan-inspeksi')->name('admin.inspections.')->group(function () {
+        Route::get('/', [InspectionAssignmentController::class, 'index'])->name('index');
+        Route::get('/{order}/tugaskan', [InspectionAssignmentController::class, 'create'])->name('create');
+        Route::post('/{order}/tugaskan', [InspectionAssignmentController::class, 'store'])->name('store');
+        Route::get('/{inspection}', [InspectionAssignmentController::class, 'show'])->name('show');
+        Route::post('/{inspection}/batalkan', [InspectionAssignmentController::class, 'cancel'])->name('cancel');
+    });
+
+    // PBI-18 (SYM-22): Tugas Inspeksi (Inspector)
+    Route::get('/inspector/tugas-inspeksi', [InspectionAssignmentController::class, 'inspectorTasks'])->name('inspector.tasks.index');
+
+    // PBI-09 (SYM-13): Listing Sisa Produksi (Seller)
+    Route::prefix('seller/listings')->name('seller.listings.')->group(function () {
+        Route::get('/', [ListingController::class, 'index'])->name('index');
+        Route::get('/buat', [ListingController::class, 'create'])->name('create');
+        Route::post('/', [ListingController::class, 'store'])->name('store');
+        Route::get('/{listing}', [ListingController::class, 'show'])->name('show');
+        Route::get('/{listing}/edit', [ListingController::class, 'edit'])->name('edit');
+        Route::put('/{listing}', [ListingController::class, 'update'])->name('update');
+        Route::post('/{listing}/arsip', [ListingController::class, 'archive'])->name('archive');
+    });
+
+    // PBI-09 (SYM-13): Moderasi Listing (Admin)
+    Route::prefix('admin/moderasi-listing')->name('admin.listings.')->group(function () {
+        Route::get('/', [ListingModerationController::class, 'index'])->name('index');
+        Route::post('/{listing}/turunkan', [ListingModerationController::class, 'archive'])->name('archive');
+    });
+
+    // Katalog Material (Publik / Buyer / Semua pengguna terautentikasi)
+    Route::prefix('katalog')->name('catalog.')->group(function () {
+        Route::get('/', [CatalogController::class, 'index'])->name('index');
+        Route::get('/{listing}', [CatalogController::class, 'show'])->name('show');
     });
 });
 

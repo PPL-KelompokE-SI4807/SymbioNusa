@@ -163,10 +163,21 @@
                             {{ \App\Support\StatusMap::label('rfq_contracts.status', $statusValue) }}
                         </x-ui.badge>
                     </td>
-                    <td class="px-4 py-3 text-right whitespace-nowrap">
-                        <x-ui.button href="{{ route('rfq.show', $rfq) }}" variant="secondary">
+                    <td class="px-4 py-3 text-right whitespace-nowrap space-x-2">
+                        <x-ui.button href="{{ route('rfq.show', $rfq) }}" variant="secondary" size="sm">
                             Lihat
                         </x-ui.button>
+                        @if (auth()->user()?->role === 'BUYER' && $statusValue === 'DISEPAKATI')
+                            @if (! $rfq->purchaseOrder)
+                                <x-ui.button href="{{ route('po.create', ['rfq_id' => $rfq->id_rfq_contract]) }}" variant="primary" size="sm">
+                                    Buat PO
+                                </x-ui.button>
+                            @else
+                                <x-ui.button href="{{ route('po.show', $rfq->purchaseOrder) }}" variant="secondary" size="sm">
+                                    Lihat PO
+                                </x-ui.button>
+                            @endif
+                        @endif
                     </td>
                 </tr>
             @empty

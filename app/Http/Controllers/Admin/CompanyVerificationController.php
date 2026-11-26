@@ -5,13 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\CompanyDocument;
+use App\Services\Company\CompanyVerificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class CompanyVerificationController extends Controller
 {
+    public function __construct(
+        protected CompanyVerificationService $verification
+    ) {}
+
     public function index(Request $request): View
     {
         Gate::authorize('verify', Company::class);
@@ -34,14 +40,14 @@ class CompanyVerificationController extends Controller
     {
         Gate::authorize('verify', Company::class);
 
-        $company->documents()
-            ->whereNotNull('berlaku_sampai')
-            ->whereDate('berlaku_sampai', '<', now()->toDateString())
-            ->update(['status' => CompanyDocument::STATUS_EXPIRED]);
+        $this->verification->markExpiredDocuments($company);
 
         $company->load(['documents', 'users']);
+        $requiredGroups = $this->verification->requiredDocumentGroups($company);
+        $missingDocuments = $this->verification->missingRequiredDocuments($company);
+        $needsReReview = $this->verification->needsReReview($company);
 
-        return view('admin.companies.show', compact('company'));
+        return view('admin.companies.show', compact('company', 'requiredGroups', 'missingDocuments', 'needsReReview'));
     }
 
     public function approve(Company $company): RedirectResponse
@@ -52,22 +58,19 @@ class CompanyVerificationController extends Controller
             return back()->with('error', 'Perusahaan belum mengunggah dokumen legalitas apa pun.');
         }
 
-        $hasExpired = $company->documents()
-            ->whereNotNull('berlaku_sampai')
-            ->whereDate('berlaku_sampai', '<', now()->toDateString())
-            ->exists();
+        $this->verification->markExpiredDocuments($company);
 
-        if ($hasExpired) {
-            $company->documents()
-                ->whereNotNull('berlaku_sampai')
-                ->whereDate('berlaku_sampai', '<', now()->toDateString())
-                ->update(['status' => CompanyDocument::STATUS_EXPIRED]);
-
-            return back()->with('error', 'Terdapat dokumen yang sudah kedaluwarsa. Perusahaan harus memperbarui dokumen sebelum disetujui.');
+        $missing = $this->verification->missingRequiredDocuments($company);
+        if ($missing !== []) {
+            return back()->with('error', 'Dokumen wajib belum lengkap atau sudah kedaluwarsa: '.implode(', ', $missing).'.');
         }
 
-        $company->update(['status_verifikasi' => Company::STATUS_VERIFIED]);
-        $company->documents()->update(['status' => CompanyDocument::STATUS_VALID]);
+        DB::transaction(function () use ($company) {
+            $company->update(['status_verifikasi' => Company::STATUS_VERIFIED]);
+            $company->documents()
+                ->where('status', '!=', CompanyDocument::STATUS_EXPIRED)
+                ->update(['status' => CompanyDocument::STATUS_VALID]);
+        });
 
         return redirect()
             ->route('admin.companies.index')

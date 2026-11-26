@@ -2,14 +2,17 @@
 
 namespace App\Services\Payment;
 
+use App\Enums\OrderStatus;
 use App\Enums\PaymentVerificationStatus;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\User;
 use App\Services\Notification\NotificationService;
+use App\Services\OrderStateMachine;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 
 class PaymentService
@@ -101,20 +104,19 @@ class PaymentService
                 }
 
                 if ($po) {
-                    $dariStatus = $po->status;
-                    // TODO(SYM-5/SYM-9): panggil OrderStateMachine setelah tersedia oleh Dhafi
-                    $po->status = 'DIBAYAR';
-                    $po->save();
+                    if (! OrderStateMachine::canTransition($po->status, OrderStatus::DIBAYAR)) {
+                        throw ValidationException::withMessages([
+                            'status' => 'Status order saat ini tidak mengizinkan pembayaran diverifikasi.',
+                        ]);
+                    }
 
-                    // Catat ke riwayat status order sesuai DDL order_status_history
-                    DB::table('order_status_history')->insert([
-                        'dari' => $dariStatus,
-                        'ke' => 'DIBAYAR',
-                        'alasan' => 'Bukti pembayaran transfer telah diverifikasi valid oleh Seller.',
-                        'waktu' => now(),
-                        'purchase_orders_id_purchase_order' => $po->id_purchase_order,
-                        'users_id_user' => $actor?->id_user,
-                    ]);
+                    // Perubahan status order hanya lewat OrderStateMachine (riwayat ikut tercatat).
+                    OrderStateMachine::transition(
+                        $po,
+                        OrderStatus::DIBAYAR,
+                        $actor,
+                        'Bukti pembayaran transfer telah diverifikasi valid oleh Seller.'
+                    );
                 }
 
                 if ($buyerUser) {

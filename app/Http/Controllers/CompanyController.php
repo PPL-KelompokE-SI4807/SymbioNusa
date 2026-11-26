@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateCompanyProfileRequest;
 use App\Models\Company;
+use App\Services\Company\CompanyVerificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,12 +13,14 @@ use Illuminate\View\View;
 
 class CompanyController extends Controller
 {
-    public function edit(Request $request): View
+    public function edit(Request $request, CompanyVerificationService $verification): View
     {
         $user = $request->user();
         $company = $user->company?->load('documents');
+        $documentTypes = CompanyVerificationService::DOCUMENT_TYPES;
+        $missingDocuments = $company ? $verification->missingRequiredDocuments($company) : [];
 
-        return view('companies.edit', compact('user', 'company'));
+        return view('companies.edit', compact('user', 'company', 'documentTypes', 'missingDocuments'));
     }
 
     public function update(UpdateCompanyProfileRequest $request): RedirectResponse

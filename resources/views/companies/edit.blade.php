@@ -107,16 +107,27 @@
                     <span class="text-body-sm text-on-surface-muted">PDF, JPG, atau PNG, maks. 5 MB</span>
                 </x-slot:actions>
 
+                @if (! empty($missingDocuments))
+                    <div class="border-t border-outline-hairline px-[18px] pt-5 sm:px-6">
+                        <x-ui.alert variant="warning" title="Dokumen wajib yang belum lengkap atau sudah kedaluwarsa">
+                            <ul class="mt-1 list-disc pl-5">
+                                @foreach ($missingDocuments as $label)
+                                    <li>{{ $label }}</li>
+                                @endforeach
+                            </ul>
+                            <p class="mt-2">Admin baru dapat memverifikasi perusahaan setelah semua dokumen wajib terunggah dan masih berlaku.</p>
+                        </x-ui.alert>
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('companies.documents.store') }}" enctype="multipart/form-data"
-                    class="grid grid-cols-1 items-start gap-4 border-t border-outline-hairline px-[18px] py-5 sm:px-6 md:grid-cols-3">
+                    @class(['grid grid-cols-1 items-start gap-4 px-[18px] py-5 sm:px-6 md:grid-cols-3', 'border-t border-outline-hairline' => empty($missingDocuments)])>
                     @csrf
                     <x-ui.field label="Jenis dokumen" for="jenis" name="jenis" required>
                         <x-ui.select id="jenis" name="jenis" required class="h-11">
-                            <option value="NIB">NIB / OSS</option>
-                            <option value="NPWP">NPWP Perusahaan</option>
-                            <option value="AKTA_PENDIRIAN">Akta Pendirian</option>
-                            <option value="IZIN_LINGKUNGAN">Izin Lingkungan / UKL-UPL</option>
-                            <option value="SURAT_NON_B3">Surat Pernyataan Non-B3</option>
+                            @foreach ($documentTypes as $value => $label)
+                                <option value="{{ $value }}" @selected(old('jenis') === $value)>{{ $label }}</option>
+                            @endforeach
                         </x-ui.select>
                     </x-ui.field>
 

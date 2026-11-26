@@ -63,6 +63,15 @@
                     <p class="mt-2 text-body-sm">
                         Volume dan harga terkunci untuk pembuatan Purchase Order resmi.
                     </p>
+                    @if ($user && $user->role === 'BUYER' && $rfq->companies_id_company === $user->id_company)
+                        <div class="mt-3">
+                            @if ($rfq->purchaseOrder)
+                                <x-ui.button href="{{ route('po.show', $rfq->purchaseOrder) }}">Lihat PO</x-ui.button>
+                            @else
+                                <x-ui.button href="{{ route('po.create', ['rfq_id' => $rfq->id_rfq_contract]) }}">Buat Purchase Order</x-ui.button>
+                            @endif
+                        </div>
+                    @endif
                 </x-ui.alert>
             @endif
 
