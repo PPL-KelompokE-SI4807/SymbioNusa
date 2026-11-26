@@ -307,6 +307,9 @@ body:has(.dash-kaca) [data-sidebar] {
 .dash-kaca [data-summary] > dl { gap: 0; background: none; }
 .dash-kaca [data-summary] > dl > * { background: transparent; box-shadow: -1px 0 0 var(--line), 0 -1px 0 var(--line); }
 /* x-ui.table: baris di permukaan kaca, garis rambut hijau. Kolom pertama sticky hanya buram saat tabel bisa digeser (< 1024 px). */
+/* contain: paint — tanpa ini, sel sticky ber-backdrop-filter membuat Chrome melebarkan viewport seluler selebar tabel
+   (diukur 26 Nov 2026 di /pengiriman, 360 px: dokumen 834 px), walau tabel sudah di dalam wadah overflow-x-auto. */
+.dash-kaca [data-table] { contain: paint; }
 .dash-kaca [data-table] :is(tr, th, td) { border-color: var(--line); }
 .dash-kaca [data-table] tr > :first-child { background: transparent; }
 @media (max-width: 1023.98px) {
