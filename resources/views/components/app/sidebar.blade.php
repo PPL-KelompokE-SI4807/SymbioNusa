@@ -48,7 +48,7 @@
                 ['label' => 'RFQ Masuk', 'icon' => 'chat', 'route' => 'rfq.index', 'active' => 'rfq.*'],
                 ['label' => 'Purchase Order', 'icon' => 'file', 'route' => 'po.index', 'active' => 'po.*'],
                 ['label' => 'Invoice', 'icon' => 'receipt', 'route' => 'seller.invoices.index', 'active' => ['seller.invoices.*', 'seller.payments.*']],
-                ['label' => 'Pengiriman', 'icon' => 'truck', 'route' => null],
+                ['label' => 'Pengiriman', 'icon' => 'truck', 'route' => 'shipments.index', 'active' => 'shipments.*'],
                 ['label' => 'Sengketa', 'icon' => 'scale', 'route' => null],
             ],
             'AKUN' => [

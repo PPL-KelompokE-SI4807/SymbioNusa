@@ -57,6 +57,12 @@ final class StatusMap
             'MINGGUAN' => ['Mingguan', 'info'],
             'BULANAN' => ['Bulanan', 'info'],
         ],
+        'shipments_manifests.status' => [
+            'DRAF' => ['Draf', 'warning'],
+            'DALAM_PERJALANAN' => ['Dalam Perjalanan', 'info'],
+            'TIBA' => ['Tiba', 'success'],
+            'DIBATALKAN' => ['Dibatalkan', 'neutral'],
+        ],
         'invoices.status' => [
             'TERBIT' => ['Menunggu Pembayaran', 'warning'],
             'DIBAYAR' => ['Dibayar', 'success'],

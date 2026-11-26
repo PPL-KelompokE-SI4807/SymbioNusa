@@ -15,6 +15,8 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\RfqController;
 use App\Http\Controllers\Seller\ListingController;
+use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\ShipmentDocumentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -159,6 +161,22 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('admin/moderasi-listing')->name('admin.listings.')->group(function () {
         Route::get('/', [ListingModerationController::class, 'index'])->name('index');
         Route::post('/{listing}/turunkan', [ListingModerationController::class, 'archive'])->name('archive');
+    });
+
+    // PBI-11 (SYM-15): Pengiriman & Manifes Angkut (Seller mengelola; Buyer, Admin, Inspector melihat)
+    Route::prefix('pengiriman')->name('shipments.')->group(function () {
+        Route::get('/', [ShipmentController::class, 'index'])->name('index');
+        Route::get('/buat', [ShipmentController::class, 'create'])->name('create')->middleware('company.verified');
+        Route::post('/', [ShipmentController::class, 'store'])->name('store')->middleware('company.verified');
+        Route::get('/{shipment}', [ShipmentController::class, 'show'])->name('show');
+        Route::get('/{shipment}/ubah', [ShipmentController::class, 'edit'])->name('edit')->middleware('company.verified');
+        Route::put('/{shipment}', [ShipmentController::class, 'update'])->name('update')->middleware('company.verified');
+        Route::post('/{shipment}/terbitkan', [ShipmentController::class, 'issue'])->name('issue')->middleware('company.verified');
+        Route::post('/{shipment}/tiba', [ShipmentController::class, 'arrive'])->name('arrive');
+        Route::post('/{shipment}/batalkan', [ShipmentController::class, 'cancel'])->name('cancel');
+        Route::get('/{shipment}/manifes', [ShipmentController::class, 'manifest'])->name('manifest');
+        Route::get('/{shipment}/dokumen/{document}', [ShipmentDocumentController::class, 'download'])->name('documents.download');
+        Route::delete('/{shipment}/dokumen/{document}', [ShipmentDocumentController::class, 'destroy'])->name('documents.destroy');
     });
 
     // Katalog Material (Publik / Buyer / Semua pengguna terautentikasi)
