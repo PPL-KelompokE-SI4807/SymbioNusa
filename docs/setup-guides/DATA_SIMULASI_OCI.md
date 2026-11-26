@@ -1,11 +1,12 @@
 # Data simulasi untuk server demo (OCI VM)
 
-Seeder: `database/seeders/DemoScenarioSeeder.php` (dipanggil otomatis oleh `DatabaseSeeder`).
+Seeder: `database/seeders/DemoScenarioSeeder.php`. Sengaja **tidak** dipanggil oleh `DatabaseSeeder`: CI menjalankan
+`migrate:fresh --seed` sebelum tes, dan tes dasbor mengasumsikan data CI yang hampir kosong. Jalankan dengan `--class`.
 Semua data fiktif: nama perusahaan, orang, NIB, plat nomor, dan rekening bukan data nyata.
 
 ## Isi
 
-| Bagian | Jumlah (setelah `migrate:fresh --seed`) |
+| Bagian | Jumlah (data dasar + data simulasi) |
 |---|---|
 | Perusahaan | 18 (Seller, Buyer, Keduanya; 3 menunggu verifikasi, 1 ditolak) |
 | Kategori | 9 (7 aktif dengan `spec_schema` + faktor dampak versi 1 dan 2, 1 B3 terlarang, 1 arsip) |
