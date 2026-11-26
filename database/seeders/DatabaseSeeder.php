@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             SymbioNusaDemoSeeder::class,
             RfqSeeder::class,
             PurchaseOrderSeeder::class,
+            DemoScenarioSeeder::class,
         ]);
     }
 }
