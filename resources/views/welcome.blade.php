@@ -27,16 +27,16 @@
     <header class="relative overflow-hidden bg-secondary text-on-secondary">
         <img src="{{ asset('images/material/kardus-besar.jpg') }}" alt="Bongkahan kardus bekas terkompresi di fasilitas daur ulang"
              class="absolute inset-0 h-full w-full object-cover" fetchpriority="high">
-        <div class="absolute inset-0 bg-secondary/85" aria-hidden="true"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(168deg,rgb(71_88_28/0.86),rgb(30_42_8/0.95)_72%)]" aria-hidden="true"></div>
 
         <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {{-- Bar atas --}}
             <div class="flex h-16 items-center justify-between gap-4">
                 <a href="{{ url('/') }}" class="flex items-center gap-2.5 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-secondary">
-                    <span class="flex size-9 items-center justify-center rounded-sm bg-primary-container text-on-primary-container" aria-hidden="true">
+                    <span data-brand-mark class="flex size-9 items-center justify-center" aria-hidden="true">
                         <x-ui.icon name="loop" class="size-5" />
                     </span>
-                    <span class="text-headline-md">SymbioNusa</span>
+                    <span class="text-dash-title">SymbioNusa</span>
                 </a>
                 <nav class="hidden items-center gap-7 text-label-md md:flex" aria-label="Navigasi halaman">
                     <a href="#papan" class="rounded-sm hover:underline hover:underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-secondary">Papan material</a>
@@ -54,7 +54,7 @@
             {{-- Pernyataan utama + kartu foto --}}
             <div class="grid items-end gap-10 pt-14 pb-16 lg:grid-cols-12 lg:pt-20 lg:pb-24">
                 <div class="lg:col-span-7">
-                    <h1 class="text-[clamp(2.875rem,6vw,5.75rem)] leading-[1.02] font-semibold text-balance">
+                    <h1 class="text-[clamp(2.875rem,6vw,5.75rem)] leading-[1.02] font-black text-balance">
                         Sisa produksi satu industri, bahan baku industri lain.
                     </h1>
                     <p class="mt-6 max-w-xl text-body-lg text-on-secondary-muted">
@@ -91,7 +91,7 @@
         {{-- ================= KATALOG FOTO MATERIAL ================= --}}
         <section class="mx-auto max-w-7xl px-4 pt-16 sm:px-6 lg:px-8 lg:pt-24" aria-labelledby="katalog-judul">
             <div class="flex flex-wrap items-end justify-between gap-4">
-                <h2 id="katalog-judul" class="max-w-md text-headline-lg">Material yang benar-benar diperdagangkan</h2>
+                <h2 id="katalog-judul" class="max-w-md text-headline-lg font-black">Material yang benar-benar diperdagangkan</h2>
                 <p class="max-w-sm text-body-md text-on-surface-muted">
                     Bukan ilustrasi stok: ini foto residu yang kategorinya terdaftar di platform,
                     lengkap dengan harga yang terbentuk lewat RFQ.
@@ -139,7 +139,7 @@
             <div class="rounded-lg bg-surface p-6 shadow-card sm:p-8">
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <div>
-                        <h2 id="papan-judul" class="text-headline-lg">Papan material</h2>
+                        <h2 id="papan-judul" class="text-headline-lg font-black">Papan material</h2>
                         <p class="mt-1 text-body-md text-on-surface-muted">Listing Seller dan kebutuhan Buyer yang sedang terbuka.</p>
                     </div>
                     <span class="inline-flex h-8 items-center rounded-full border border-outline bg-surface px-3 text-body-sm font-medium text-on-surface-muted">Data demo</span>
@@ -149,21 +149,23 @@
                 <div class="mt-6 flex flex-wrap gap-2" role="group" aria-label="Filter kategori material">
                     @foreach (['semua' => 'Semua', 'plastik' => 'Plastik', 'tekstil' => 'Tekstil', 'pangan' => 'Pangan', 'kayu' => 'Kayu', 'kertas' => 'Kertas'] as $value => $label)
                         <button type="button" data-filter="{{ $value }}" aria-pressed="{{ $value === 'semua' ? 'true' : 'false' }}"
-                                class="filter-chip flex h-10 items-center rounded-full border px-4 text-label-md transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring {{ $value === 'semua' ? 'border-primary bg-primary font-semibold text-on-primary' : 'border-outline-control bg-surface text-on-surface hover:bg-surface-muted' }}">
+                                class="filter-chip flex h-10 items-center rounded-sm border px-4 text-label-md transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring {{ $value === 'semua' ? 'border-primary bg-primary font-semibold text-on-primary' : 'border-outline-control bg-surface text-on-surface hover:bg-surface-muted' }}">
                             {{ $label }}
                         </button>
                     @endforeach
                 </div>
 
-                <div class="mt-4 overflow-x-auto">
-                    <table class="w-full min-w-[640px] border-collapse text-left">
+                {{-- Wadah scroll bisa difokus agar tabel lebar tetap bisa digeser dengan keyboard (WCAG 2.1.1). --}}
+                <div class="mt-4 overflow-x-auto rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+                     tabindex="0" role="region" aria-label="Tabel papan material, geser ke samping untuk kolom lain">
+                    <table class="w-full border-collapse text-left sm:min-w-[640px]">
                         <thead>
-                            <tr class="border-b border-outline text-body-sm text-on-surface-subtle">
+                            <tr class="border-b border-outline-hairline text-body-sm text-on-surface-subtle">
                                 <th scope="col" class="py-3 pr-4 font-medium">Material</th>
-                                <th scope="col" class="py-3 pr-4 font-medium">Perusahaan</th>
-                                <th scope="col" class="py-3 pr-4 text-right font-medium">Volume</th>
-                                <th scope="col" class="py-3 pr-4 text-right font-medium">Harga</th>
-                                <th scope="col" class="py-3 font-medium">Status</th>
+                                <th scope="col" class="hidden py-3 pr-4 font-medium sm:table-cell">Perusahaan</th>
+                                <th scope="col" class="hidden py-3 pr-4 text-right font-medium sm:table-cell">Volume</th>
+                                <th scope="col" class="hidden py-3 pr-4 text-right font-medium sm:table-cell">Harga</th>
+                                <th scope="col" class="hidden py-3 font-medium sm:table-cell">Status</th>
                             </tr>
                         </thead>
                         <tbody class="text-data-tabular tabular-nums">
@@ -175,20 +177,23 @@
                                 ['tekstil', 'kain.jpg', 'Kain perca katun', 'Listing Seller', 'CV Tekstil Jaya', '2.000 kg', 'Rp 3.500/kg', 'Dipublikasikan', 'success'],
                                 ['pangan', 'ampas-tahu.jpg', 'Ampas tahu', 'Listing Seller', 'UD Tahu Sari', '5.000 kg', 'Rp 600/kg', 'Dipublikasikan', 'success'],
                             ] as [$category, $photo, $name, $kind, $company, $volume, $price, $status, $variant])
-                                <tr data-category="{{ $category }}" class="{{ $loop->last ? '' : 'border-b border-outline' }}">
+                                <tr data-category="{{ $category }}" class="{{ $loop->last ? '' : 'border-b border-outline-hairline' }}">
                                     <td class="py-4 pr-4">
                                         <span class="flex items-center gap-3">
                                             <img src="{{ asset('images/material/'.$photo) }}" alt="" class="size-12 shrink-0 rounded-sm object-cover">
                                             <span>
-                                                <span class="block font-semibold whitespace-nowrap">{{ $name }}</span>
-                                                <span class="block text-body-sm text-on-surface-subtle">{{ $kind }}</span>
+                                                <span class="block font-semibold sm:whitespace-nowrap">{{ $name }}</span>
+                                                <span class="block text-body-sm text-on-surface-subtle">{{ $kind }}<span class="sm:hidden"> · {{ $company }}</span></span>
+                                                {{-- Di bawah 640 px kolom lain dilipat ke dalam sel ini, bukan disembunyikan di area gulir. --}}
+                                                <span class="mt-1 block text-body-sm text-on-surface sm:hidden">{{ $volume }} · {{ $price }}</span>
+                                                <span class="mt-1 block sm:hidden"><x-ui.badge :variant="$variant">{{ $status }}</x-ui.badge></span>
                                             </span>
                                         </span>
                                     </td>
-                                    <td class="py-4 pr-4">{{ $company }}</td>
-                                    <td class="py-4 pr-4 text-right whitespace-nowrap">{{ $volume }}</td>
-                                    <td class="py-4 pr-4 text-right whitespace-nowrap">{{ $price }}</td>
-                                    <td class="py-4"><x-ui.badge :variant="$variant">{{ $status }}</x-ui.badge></td>
+                                    <td class="hidden py-4 pr-4 sm:table-cell">{{ $company }}</td>
+                                    <td class="hidden py-4 pr-4 text-right whitespace-nowrap sm:table-cell">{{ $volume }}</td>
+                                    <td class="hidden py-4 pr-4 text-right whitespace-nowrap sm:table-cell">{{ $price }}</td>
+                                    <td class="hidden py-4 sm:table-cell"><x-ui.badge :variant="$variant">{{ $status }}</x-ui.badge></td>
                                 </tr>
                             @endforeach
                             <tr data-empty class="hidden">
@@ -208,7 +213,7 @@
 
         {{-- ================= CARA KERJA ================= --}}
         <section id="cara-kerja" class="mx-auto max-w-7xl scroll-mt-8 px-4 pt-20 sm:px-6 lg:px-8 lg:pt-28" aria-labelledby="cara-judul">
-            <h2 id="cara-judul" class="max-w-md text-headline-lg">Satu order, dari RFQ sampai selesai</h2>
+            <h2 id="cara-judul" class="max-w-md text-headline-lg font-black">Satu order, dari RFQ sampai selesai</h2>
             <p class="mt-2 max-w-xl text-body-md text-on-surface-muted">
                 Alur yang sama untuk semua transaksi — status berpindah hanya lewat evaluasi sistem, bukan diubah manual.
             </p>
@@ -221,11 +226,11 @@
                     ['Mutu & pembayaran', ['Inspeksi', 'Lolos Inspeksi', 'Menunggu Pembayaran', 'Dibayar'], 'Inspector memeriksa mutu sebelum invoice terbit. Buyer mentransfer dan mengunggah bukti, Seller memverifikasinya.'],
                     ['Pengiriman', ['Dalam Pengiriman', 'Diterima', 'Selesai'], null],
                 ] as [$group, $steps, $note])
-                    <div class="rounded-lg bg-surface-muted p-6">
-                        <p class="text-label-md font-semibold text-on-surface-muted">{{ $group }}</p>
+                    <div class="rounded-lg bg-surface p-6 shadow-card">
+                        <p class="text-label-md font-bold text-on-surface-muted">{{ $group }}</p>
                         <ol class="mt-4 space-y-3">
                             @foreach ($steps as $step)
-                                <li class="rounded-sm bg-surface px-4 py-3 text-label-md font-medium shadow-card">{{ $step }}</li>
+                                <li class="border-t border-outline-hairline pt-3 text-label-md font-semibold">{{ $step }}</li>
                             @endforeach
                         </ol>
                         @if ($note)
@@ -246,7 +251,7 @@
         <section id="aturan" class="mx-auto max-w-7xl scroll-mt-8 px-4 pt-20 sm:px-6 lg:px-8 lg:pt-28">
             <div class="grid gap-10 lg:grid-cols-12">
                 <div class="lg:col-span-5">
-                    <h2 class="text-headline-lg">Aturan main</h2>
+                    <h2 class="text-headline-lg font-black">Aturan main</h2>
                     <p class="mt-2 max-w-sm text-body-md text-on-surface-muted">
                         Empat aturan ini ditegakkan sistem, bukan sekadar himbauan — dan berlaku sama untuk semua perusahaan.
                     </p>
@@ -258,10 +263,10 @@
                         ['Pembayaran meninggalkan jejak', 'Platform tidak memegang uang. Buyer mentransfer ke rekening Seller dan mengunggah bukti; Seller memverifikasinya terhadap invoice.'],
                         ['Sengketa diputus dari data', 'Bila tonase atau kadar air saat penerimaan di luar toleransi, order berpindah ke Sengketa dan tiket sengketa terbuka otomatis. Admin/DLH memediasi berdasarkan hasil inspeksi, data penerimaan, dan riwayat status yang tercatat.'],
                     ] as $i => [$title, $desc])
-                        <li class="flex gap-5 border-t border-outline py-6 {{ $loop->last ? 'border-b' : '' }}">
-                            <span class="text-headline-md font-semibold text-on-surface-subtle tabular-nums">{{ $i + 1 }}</span>
+                        <li class="flex gap-5 border-t border-outline-hairline py-6 {{ $loop->last ? 'border-b' : '' }}">
+                            <span class="text-headline-md font-black text-on-surface-subtle tabular-nums">{{ $i + 1 }}</span>
                             <div>
-                                <h3 class="text-headline-md">{{ $title }}</h3>
+                                <h3 class="text-dash-title">{{ $title }}</h3>
                                 <p class="mt-1 max-w-xl text-body-md text-on-surface-muted">{{ $desc }}</p>
                             </div>
                         </li>
@@ -269,14 +274,15 @@
                 </ol>
             </div>
 
-            <div id="peran" class="mt-16 scroll-mt-8 overflow-x-auto rounded-lg bg-surface shadow-card">
-                <table class="w-full min-w-[640px] border-collapse text-left">
-                    <caption class="px-6 pt-6 pb-2 text-left text-headline-md">Empat peran, satu rantai</caption>
+            <div id="peran" class="mt-16 scroll-mt-8 overflow-x-auto rounded-lg bg-surface shadow-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+                 tabindex="0" role="region" aria-labelledby="peran-judul">
+                <table class="w-full border-collapse text-left sm:min-w-[640px]">
+                    <caption id="peran-judul" class="px-[18px] pt-6 pb-2 text-left text-dash-title sm:px-6">Empat peran, satu rantai</caption>
                     <thead>
-                        <tr class="border-b border-outline text-body-sm text-on-surface-subtle">
-                            <th scope="col" class="px-6 py-3 font-medium">Peran</th>
-                            <th scope="col" class="px-6 py-3 font-medium">Tanggung jawab</th>
-                            <th scope="col" class="px-6 py-3 font-medium">Pekerjaan pertama di dashboard</th>
+                        <tr class="border-b border-outline-hairline text-body-sm text-on-surface-subtle">
+                            <th scope="col" class="px-[18px] py-3 font-medium sm:px-6">Peran</th>
+                            <th scope="col" class="hidden px-6 py-3 font-medium sm:table-cell">Tanggung jawab</th>
+                            <th scope="col" class="hidden px-6 py-3 font-medium sm:table-cell">Pekerjaan pertama di dashboard</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -286,10 +292,15 @@
                             ['Inspector', 'Menguji mutu dan mencatat hasil inspeksi', 'Mengerjakan tugas inspeksi'],
                             ['Admin/DLH', 'Memverifikasi mitra dan mengawasi kepatuhan', 'Meninjau antrean verifikasi'],
                         ] as [$role, $duty, $first])
-                            <tr class="border-b border-outline last:border-0">
-                                <td class="px-6 py-4 font-semibold">{{ $role }}</td>
-                                <td class="px-6 py-4">{{ $duty }}</td>
-                                <td class="px-6 py-4 text-on-surface-muted">{{ $first }}</td>
+                            <tr class="border-b border-outline-hairline last:border-0">
+                                <td class="px-[18px] py-4 sm:px-6">
+                                    <span class="block font-semibold">{{ $role }}</span>
+                                    {{-- Di bawah 640 px kolom lain dilipat ke sel ini, bukan disembunyikan di area gulir. --}}
+                                    <span class="mt-1 block sm:hidden">{{ $duty }}</span>
+                                    <span class="block text-body-sm text-on-surface-muted sm:hidden">Pertama di dashboard: {{ $first }}</span>
+                                </td>
+                                <td class="hidden px-6 py-4 sm:table-cell">{{ $duty }}</td>
+                                <td class="hidden px-6 py-4 text-on-surface-muted sm:table-cell">{{ $first }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -298,27 +309,27 @@
         </section>
 
         {{-- ================= BAND DAMPAK ================= --}}
-        <section class="mt-20 bg-secondary text-on-secondary lg:mt-28" aria-labelledby="dampak-judul">
+        <section class="mt-20 bg-linear-to-br from-band-forest-from to-band-forest-to text-on-secondary lg:mt-28" aria-labelledby="dampak-judul">
             <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
                 <div class="flex flex-wrap items-center justify-between gap-4">
-                    <h2 id="dampak-judul" class="text-headline-lg">Dampak yang tercatat</h2>
+                    <h2 id="dampak-judul" class="text-headline-lg font-black">Dampak yang tercatat</h2>
                     <span class="inline-flex h-8 items-center rounded-full border border-on-secondary/25 px-3 text-body-sm font-medium text-on-secondary-muted">Data demo &middot; bukan capaian produksi</span>
                 </div>
                 <div class="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
-                        <p class="text-[clamp(2.5rem,4vw,4.5rem)] leading-none font-semibold whitespace-nowrap tabular-nums">128,4<span class="ml-2 text-headline-lg font-medium">ton</span></p>
+                        <p class="text-[clamp(2.5rem,4vw,4.5rem)] leading-none font-black whitespace-nowrap tabular-nums">128,4<span class="ml-2 text-headline-lg font-medium">ton</span></p>
                         <p class="mt-2 text-body-md text-on-secondary-muted">Residu teralihkan dari pembuangan</p>
                     </div>
                     <div>
-                        <p class="text-[clamp(2.5rem,4vw,4.5rem)] leading-none font-semibold whitespace-nowrap tabular-nums"><span class="mr-2 text-headline-lg font-medium">Rp</span>214,6<span class="ml-2 text-headline-lg font-medium">jt</span></p>
+                        <p class="text-[clamp(2.5rem,4vw,4.5rem)] leading-none font-black whitespace-nowrap tabular-nums"><span class="mr-2 text-headline-lg font-medium">Rp</span>214,6<span class="ml-2 text-headline-lg font-medium">jt</span></p>
                         <p class="mt-2 text-body-md text-on-secondary-muted">Penghematan bahan baku Buyer</p>
                     </div>
                     <div>
-                        <p class="text-[clamp(2.5rem,4vw,4.5rem)] leading-none font-semibold whitespace-nowrap tabular-nums">96,3<span class="ml-2 text-headline-lg font-medium">ton</span></p>
-                        <p class="mt-2 text-body-md text-on-secondary-muted">CO<sub>2</sub>e bersih terhindarkan</p>
+                        <p class="text-[clamp(2.5rem,4vw,4.5rem)] leading-none font-black whitespace-nowrap tabular-nums">96,3<span class="ml-2 text-headline-lg font-medium">ton</span></p>
+                        <p class="mt-2 text-body-md text-on-secondary-muted">CO<sub class="text-[12px]">2</sub>e bersih terhindarkan</p>
                     </div>
                     <div>
-                        <p class="text-[clamp(2.5rem,4vw,4.5rem)] leading-none font-semibold whitespace-nowrap tabular-nums">19<span class="ml-2 text-headline-lg font-medium">/ 24</span></p>
+                        <p class="text-[clamp(2.5rem,4vw,4.5rem)] leading-none font-black whitespace-nowrap tabular-nums">19<span class="ml-2 text-headline-lg font-medium">/ 24</span></p>
                         <p class="mt-2 text-body-md text-on-secondary-muted">Inspector aktif dari total terdaftar</p>
                     </div>
                 </div>
@@ -329,7 +340,7 @@
         <section id="akses" class="mx-auto max-w-7xl scroll-mt-8 px-4 py-16 sm:px-6 lg:px-8 lg:py-24" aria-labelledby="akses-judul">
             <div class="grid items-start gap-10 lg:grid-cols-12">
                 <div class="lg:col-span-7">
-                    <h2 id="akses-judul" class="max-w-lg text-headline-lg">Akun diterbitkan setelah perusahaan Anda terverifikasi</h2>
+                    <h2 id="akses-judul" class="max-w-lg text-headline-lg font-black">Akun diterbitkan setelah perusahaan Anda terverifikasi</h2>
                     <p class="mt-3 max-w-xl text-body-md text-on-surface-muted">
                         Tidak ada pendaftaran mandiri. Admin/DLH memeriksa legalitas perusahaan terlebih dahulu,
                         sehingga setiap Seller dan Buyer di papan material adalah perusahaan yang nyata dan dapat ditelusur.
@@ -347,9 +358,9 @@
                         ['Mulai bertransaksi', 'Pasang listing, kirim RFQ, dan ikuti alur order sampai selesai.'],
                     ] as $i => [$title, $desc])
                         <li class="flex gap-4">
-                            <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-container font-semibold text-on-primary-container tabular-nums">{{ $i + 1 }}</span>
+                            <span class="flex size-9 shrink-0 items-center justify-center rounded-sm bg-primary-container font-black text-on-primary-container tabular-nums">{{ $i + 1 }}</span>
                             <div>
-                                <h3 class="text-headline-md">{{ $title }}</h3>
+                                <h3 class="text-dash-title">{{ $title }}</h3>
                                 <p class="mt-0.5 text-body-md text-on-surface-muted">{{ $desc }}</p>
                             </div>
                         </li>
@@ -364,7 +375,7 @@
         <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
             <div class="flex flex-wrap items-start justify-between gap-6">
                 <div class="flex items-center gap-2.5">
-                    <span class="flex size-9 items-center justify-center rounded-sm bg-primary-container text-on-primary-container" aria-hidden="true">
+                    <span data-brand-mark class="flex size-9 items-center justify-center" aria-hidden="true">
                         <x-ui.icon name="loop" class="size-5" />
                     </span>
                     <div>
@@ -402,7 +413,7 @@
                 document.querySelectorAll('[data-filter]').forEach(function (other) {
                     var active = other === chip;
                     other.setAttribute('aria-pressed', active ? 'true' : 'false');
-                    other.className = 'filter-chip flex h-10 items-center rounded-full border px-4 text-label-md transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring ' + (active
+                    other.className = 'filter-chip flex h-10 items-center rounded-sm border px-4 text-label-md transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring ' + (active
                         ? 'border-primary bg-primary font-semibold text-on-primary'
                         : 'border-outline-control bg-surface text-on-surface hover:bg-surface-muted');
                 });

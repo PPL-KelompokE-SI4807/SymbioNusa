@@ -31,7 +31,7 @@
                 <div class="mb-2">
                     <x-ui.badge :variant="$status->badge()">{{ $status->label() }}</x-ui.badge>
                 </div>
-                <h1 class="text-headline-lg text-on-surface">{{ $inspector->user->nama }}</h1>
+                <h1 class="page-title text-on-surface">{{ $inspector->user->nama }}</h1>
                 <p class="mt-1 text-body-md text-on-surface-muted">
                     {{ $inspector->user->email }}
                     <span aria-hidden="true">·</span>
@@ -70,7 +70,7 @@
                 @if ($history->isEmpty())
                     <p class="text-body-sm text-on-surface-muted">Belum ada riwayat tercatat.</p>
                 @else
-                    <ol class="divide-y divide-outline">
+                    <ol class="divide-y divide-outline-hairline">
                         @foreach ($history as $log)
                             @php
                                 $data = json_decode($log->nilai_baru ?? 'null', true);

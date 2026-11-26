@@ -14,9 +14,9 @@
 2. `.claude/skills/symbionusa-playbook/SKILL.md` bila ada: versi stack dari lock file, path milik owner, hot spot.
 3. `composer.lock` dan `package.json`: **sumber kebenaran versi**. Per 17 Nov 2026: Laravel 13, Livewire 4, Tailwind CSS 4 lewat `@tailwindcss/vite`, Vite 8, PHPUnit 12 (tanpa Pest), Pint, Larastan. Versi di `AGENTS.md` §2 (Laravel 11, Livewire 3, Pest) sudah ketinggalan.
 4. `docs/DDL ERD SymbioNusa.sql`: nama tabel, kolom, ENUM.
-5. `docs/design/DESIGN.md`, `STITCH_BRIEF.md`, entri `SCREENS.md` untuk layar yang dikerjakan, dan PNG di `mockups/`.
+5. `docs/design/DESIGN.md` (FND v12 "Kaca"), `docs/design/PANDUAN_KACA.md` (resep Kaca siap tiru), `STITCH_BRIEF.md`, entri `SCREENS.md` untuk layar yang dikerjakan, dan PNG di `mockups/` (mockup menunjukkan isi dan susunan; materialnya sekarang Kaca, bukan kartu putih di mockup).
 6. `docs/design/prompts/02_ATURAN_UI_SYMBIONUSA.md` dan `03_STATUS_MAP.md`.
-7. Untuk Dashboard Admin: `docs/design/prototype/DIRECTION.md` dan `dashboard-admin-v2.html` (komposisi yang sudah dikunci PM).
+7. Contoh layar Kaca yang sudah jadi: dasbor Admin (`resources/views/livewire/dashboard/admin.blade.php` + `resources/views/livewire/dashboard/kaca/*.blade.php`, data dari `app/Services/Dashboard/AdminKaca.php`). Rujukan visualnya SymbioNusa Lab (`D:\PPL\SymbioNusa-Lab`, varian Kaca). `docs/design/prototype/DIRECTION.md` dan `dashboard-admin-v2.html` adalah riwayat komposisi Admin sebelum Kaca.
 
 Kalau salah satu berkas desain tidak bisa dibaca, **berhenti dan tanyakan**. Jangan menebak token atau status.
 
@@ -28,7 +28,7 @@ Kalau salah satu berkas desain tidak bisa dibaca, **berhenti dan tanyakan**. Jan
 2. **Hot spot butuh persetujuan yang menyebut berkasnya:** `resources/views/layouts/`, `routes/web.php`, `config/`, `database/migrations/`, `AGENTS.md`, `docs/DDL ERD SymbioNusa.sql`. `resources/css/app.css` dan `resources/views/components/ui/` dipakai seluruh tim, jadi perubahannya juga harus disebut di rencana.
 3. **Kepemilikan.** Hanya ubah berkas dalam cakupan PBI ini dan milik anggota yang sedang bekerja (AGENTS.md §4). Berkas milik anggota lain → berhenti, usulkan koordinasi. Jangan pernah mengedit migrasi yang sudah ada.
 4. **Stack tetap.** Tidak ada scaffold baru, tidak ada paket Composer/NPM baru tanpa persetujuan PM. Sintaks Livewire 4 atau Tailwind 4 yang belum pasti → cek dokumentasi resmi (Context7 atau situs resmi) dulu.
-5. **DESIGN.md verbatim lewat token.** Di Blade yang dibuat atau diubah hanya boleh kelas token (`bg-primary`, `text-on-surface-muted`, `border-outline`, `rounded-md`, `text-headline-lg`). **Dilarang:** hex mentah, palet bawaan Tailwind (`emerald-*`, `slate-*`, `teal-*`, `purple-*`, `rose-*`, `gray-*`), gradien, bayangan di kartu, teks < 12 px, nilai arbitrer `[...]` kecuali token belum ada (laporkan sebagai celah).
+5. **DESIGN.md verbatim lewat token dan kelas Kaca.** Di Blade yang dibuat atau diubah hanya boleh kelas token (`bg-primary`, `text-ink`, `text-meta`, `border-line`, `bg-field`, `text-accent-text`, `text-danger`), komponen `x-ui.*`, kelas Kaca dari `resources/css/dashboard-kaca.css` (`.glass`, `.glass-row`, `.glass-strong`, `.card-title`, `.kaca-seg`, `.kaca-spring`, …), dan `var(--…)` token Kaca di SVG/`style`. Nilai arbitrer hanya untuk ukuran yang tercantum di DESIGN.md (radius Kaca 6/9–12/14/16/22/24/26 px, ukuran huruf yang diizinkan) dan kelas `x-transition`; tidak untuk warna baru. **Dilarang:** hex baru, palet bawaan Tailwind (`emerald-*`, `slate-*`, `teal-*`, `purple-*`, `rose-*`, `gray-*`), gradien atau blur di luar permukaan kaca yang sudah didefinisikan, kartu putih di layar Kaca, kontrol transparan, teks < 12 px (SVG < 13 px). Token yang belum ada → laporkan sebagai celah.
 6. **Data nyata.** Semua daftar, tabel, dan detail dari Eloquent atau service. Dilarang array PHP berisi baris palsu di komponen atau view. Data contoh lewat seeder (`DemoScenarioSeeder`), dan angka dampak demo diberi label "data demo".
 7. **Schema-first.** Nama tabel dan kolom persis DDL; model mendeklarasikan `$table`, `$primaryKey`, `$fillable`, `public $timestamps = false` (kecuali tabel punya kolom waktu); relasi dengan kunci eksplisit. Butuh kolom baru → berhenti, usulkan ke PM dan pemilik migrasi.
 8. **Status dari `03_STATUS_MAP.md`.** Label dan varian badge lewat method Enum `label()` dan `badge()`. Perubahan status order hanya lewat `OrderStateMachine` dan tercatat di `order_status_history`.
@@ -57,151 +57,15 @@ Phase 5  Commit + log AI; laporan singkat apa yang berubah dan apa yang belum te
 - Cek kepemilikan berkas (AGENTS.md §4, playbook). Cek komponen yang sudah ada di `resources/views/components/` dan Livewire di `app/Livewire/`. **Pakai ulang sebelum membuat baru.**
 - Bandingkan kebutuhan layar dengan DDL dan `03_STATUS_MAP.md` (lihat bagian "Keputusan" di tiap tabel). Fitur bertanda ⏳ menunggu migrasi di `91_USULAN_PERUBAHAN_SKEMA.md`: cek apakah migrasinya sudah ada di `database/migrations/`; kalau belum, jangan implementasikan bagian itu dan laporkan. Bila layar butuh status atau kolom lain yang tidak ada di DDL, laporkan sebelum merencanakan.
 
-## Phase 1 — Lapisan token & komponen (fondasi bersama)
+## Phase 1 — Lapisan token, komponen, dan Kaca (fondasi bersama)
 
-Cek apakah `resources/css/app.css` sudah memuat token DESIGN.md. Per 17 Nov 2026 **belum**: berkas itu masih memakai Instrument Sans dan mencampur `@import "tailwindcss"` (v4) dengan `@tailwind base/components/utilities` (sintaks v3 yang sudah dihapus di v4).
+Per 25 Nov 2026 fondasinya **sudah ada**; jangan membuat ulang:
 
-Kalau belum ada, ini **tugas terpisah** yang harus disetujui PM, bukan disisipkan diam-diam di PBI fitur. Isinya:
+- **Token** di `resources/css/app.css` (`@theme` nilai Senja di Sawah FND v11, `@theme static` warna kategori dan aksen) dan token Kaca di `resources/css/dashboard-kaca.css` (`@theme static` + blok `.dash-kaca`). Nilai di DESIGN.md front matter. Menambah atau mengubah token = berkas bersama → sebut di rencana, butuh persetujuan PM.
+- **Komponen** di `resources/views/components/ui/`: alert, badge (teks + glyph, bukan pill), button, card (`data-card` → kaca di dalam `.dash-kaca`), field, flag, icon, input, kpi, monogram, page-header, password-input, select, summary-strip, table, textarea. Plus `components/app/sidebar.blade.php` dan `notification-bell.blade.php`. Pakai ulang; jangan membuat kartu, tombol, atau badge sendiri.
+- **Kaca** di `resources/css/dashboard-kaca.css` dan `resources/js/dashboard/kaca.js`, didaftarkan di `resources/js/app.js` (`kacaPage`, `kacaAdmin`, `kacaRiver`, direktif `x-kaca-seg`), dipasang lewat komponen `<x-app.kaca>` (`resources/views/components/app/kaca.blade.php`). `x-ui.card`, `x-ui.summary-strip`, dan `x-ui.table` otomatis menjadi varian Kaca di dalamnya. Lihat "Resep layar Kaca" di bawah dan `docs/design/PANDUAN_KACA.md`.
 
-**a) Token di `resources/css/app.css`** (nilai persis dari DESIGN.md):
-
-```css
-@import "tailwindcss";
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-
-  --color-primary: #15803d;
-  --color-primary-hover: #166534;
-  --color-on-primary: #ffffff;
-  --color-primary-container: #dcfce7;
-  --color-on-primary-container: #166534;
-  --color-secondary: #14532d;
-  --color-secondary-hover: #166534;
-  --color-on-secondary: #ffffff;
-  --color-on-secondary-muted: #bbf7d0;
-  --color-tertiary: #1e40af;
-  --color-on-tertiary: #ffffff;
-  --color-neutral: #71717a;
-  --color-background: #f4f4f5;
-  --color-surface: #ffffff;
-  --color-on-surface: #18181b;
-  --color-on-surface-muted: #52525b;
-  --color-outline: #e4e4e7;
-  --color-outline-input: #71717a;
-  --color-focus-ring: #15803d;
-  --color-error: #b91c1c;
-  --color-error-container: #fee2e2;
-  --color-on-error-container: #991b1b;
-  --color-warning: #b45309;
-  --color-warning-container: #fef3c7;
-  --color-on-warning-container: #92400e;
-  --color-success-container: #dcfce7;
-  --color-on-success-container: #166534;
-  --color-info-container: #dbeafe;
-  --color-on-info-container: #1e40af;
-  --color-neutral-container: #e4e4e7;
-  --color-on-neutral-container: #3f3f46;
-
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-
-  --text-headline-lg: 26px;
-  --text-headline-lg--line-height: 1.2;
-  --text-headline-lg--letter-spacing: -0.01em;
-  --text-headline-lg--font-weight: 600;
-  --text-headline-md: 18px;
-  --text-headline-md--line-height: 1.3;
-  --text-headline-md--font-weight: 600;
-  --text-display-metric: 28px;
-  --text-display-metric--line-height: 1.1;
-  --text-display-metric--font-weight: 700;
-  --text-body-lg: 16px;
-  --text-body-lg--line-height: 1.5;
-  --text-body-md: 14px;
-  --text-body-md--line-height: 1.5;
-  --text-body-sm: 13px;
-  --text-body-sm--line-height: 1.45;
-  --text-label-md: 14px;
-  --text-label-md--line-height: 1.2;
-  --text-label-md--font-weight: 500;
-  --text-label-sm: 12px;
-  --text-label-sm--line-height: 1.3;
-  --text-label-sm--font-weight: 500;
-  --text-label-caps: 12px;
-  --text-label-caps--line-height: 1.2;
-  --text-label-caps--letter-spacing: 0.06em;
-  --text-label-caps--font-weight: 600;
-  --text-data-tabular: 14px;
-  --text-data-tabular--line-height: 1.4;
-}
-```
-
-Catatan:
-- Mengubah `--radius-sm/md/lg` juga mengubah tampilan `rounded-sm/md/lg` di view lama. Itu disengaja, tetapi sebut di rencana.
-- Ukuran tata letak memakai skala bawaan Tailwind 4 (kelipatan 4 px): sidebar `w-60` (240), topbar `h-16` (64), kontrol `h-10` (40), header tabel `h-11` (44), baris tabel `min-h-13` (52), padding kartu `p-6` (24), KPI `p-5` (20), margin halaman `px-8` (32), gutter `gap-4` (16).
-- Angka: `tabular-nums`. Label grup sidebar: `text-label-caps uppercase`.
-- Font Inter: belum terpasang. Pilihan tanpa paket baru: `<link>` Google Fonts di layout (hot spot), atau file woff2 di `public/fonts` + `@font-face`. Paket npm (`@fontsource/inter`) butuh persetujuan PM.
-- Setelah semua view lama pindah ke token, palet bawaan bisa dikunci dengan `--color-*: initial;` di awal `@theme` supaya kelas seperti `emerald-700` tidak lagi terbangun (tambahkan kembali `--color-white: #ffffff;` karena ring fokus di sidebar gelap memakainya). Jangan lakukan sebelum migrasi selesai; view lama akan rusak.
-
-**b) Komponen dasar Blade** di `resources/views/components/ui/` (anonymous component). Varian didefinisikan sekali di `match`, lalu digabung dengan `$attributes->class()`. Ini pengganti `cva()` + `cn()`.
-
-```blade
-{{-- resources/views/components/ui/badge.blade.php --}}
-@props(['variant' => 'neutral'])
-
-@php
-    $variantClasses = match ($variant) {
-        'success' => 'bg-success-container text-on-success-container',
-        'warning' => 'bg-warning-container text-on-warning-container',
-        'danger'  => 'bg-error-container text-on-error-container',
-        'info'    => 'bg-info-container text-on-info-container',
-        default   => 'bg-neutral-container text-on-neutral-container',
-    };
-@endphp
-
-<span {{ $attributes->class(['inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-label-sm', $variantClasses]) }}>
-    {{ $slot }}
-</span>
-```
-
-```blade
-{{-- resources/views/components/ui/button.blade.php --}}
-@props(['variant' => 'primary', 'type' => 'button'])
-
-@php
-    $variantClasses = match ($variant) {
-        'primary'     => 'h-10 px-3 bg-primary text-on-primary hover:bg-primary-hover',
-        'secondary'   => 'h-10 px-3 bg-surface text-on-surface border border-outline-input hover:bg-background',
-        'danger'      => 'h-10 px-3 bg-surface text-error border border-error hover:bg-error-container',
-        'text'        => 'text-primary hover:underline',
-        'text-danger' => 'text-error hover:underline',
-    };
-@endphp
-
-<button type="{{ $type }}" {{ $attributes->class([
-    'inline-flex items-center justify-center gap-2 rounded-sm text-label-md transition-colors',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring',
-    'disabled:cursor-not-allowed disabled:opacity-50',
-    $variantClasses,
-]) }}>
-    {{ $slot }}
-</button>
-```
-
-Komponen minimum lain (buat saat dibutuhkan, bukan sekaligus): `card`, `kpi`, `field` (label + helper + error), `input`, `select`, `textarea`, `table` (slot empty/loading/error), `pagination` ("Menampilkan 1–20 dari N"), `dialog` (Alpine, tombol destruktif terakhir), `stepper`, `icon` (SVG inline, outline 1,5–2 px, `currentColor`). Struktur bertingkat:
-
-```
-resources/views/components/ui/        atom   (button, badge, input, icon, …)
-resources/views/components/           molekul (filter-bar, field-group, kpi-strip, page-header, …)
-app/Livewire/ + resources/views/livewire/   organisme (tabel antrean, form RFQ, …) — ikuti konvensi kelas yang sudah ada
-resources/views/layouts/              template (app shell: sidebar + topbar) — hot spot
-```
-
-**c) App shell** (`layouts/app.blade.php`, hot spot): sidebar 240 px dengan logo "S", label grup caps, menu per peran **persis** dari `STITCH_BRIEF.md`, kartu user + "Keluar"; topbar 64 px dengan breadcrumb, "Notifikasi" + badge merah, avatar; konten di atas `bg-background` dengan margin 32 px; di bawah 1024 px sidebar jadi drawer (Alpine). Sidebar hijau tua (`bg-secondary`) hanya bila PM memilih komposisi itu (Dashboard Admin v2): teks dan ikon `text-on-secondary`, label grup `text-on-secondary-muted`, hover `hover:bg-secondary-hover`, item aktif `bg-primary-container text-on-primary-container`, focus ring putih (`focus-visible:outline-white`).
+Kaca dipasang per layar lewat `<x-app.kaca>`, **bukan** di `layouts/app.blade.php`, supaya layar Senja yang belum dibangun ulang tidak rusak (keputusan 25 Nov 2026, PANDUAN_KACA.md §12).
 
 ## Phase 2 — Rencana (🔒 gerbang)
 
@@ -224,13 +88,29 @@ Tutup dengan: *"Boleh saya mulai?"* Jangan lanjut tanpa jawaban setuju.
 Urut per AGENTS.md §8.4: Model → Form Request + Policy → Service (`app/Services/<Modul>/`) → komponen Livewire atau controller tipis → view → test.
 
 Aturan halaman:
-- **Pola halaman DESIGN.md:** judul `text-headline-lg` + subjudul satu baris `text-body-md text-on-surface-muted` + satu aksi utama kanan atas → KPI opsional → filter bar → tabel di kartu putih → paginasi. Detail: kartu utama ⅔ + kartu aksi ⅓ (bertumpuk di bawah 1024 px).
+- **Pola halaman (FND v12 Kaca):** isi dibungkus `.dash-kaca` + `.kaca-backdrop` → `x-ui.page-header` (judul menamai konteks, subjudul satu baris, satu aksi utama kanan atas) → strip ringkasan kaca opsional → kontrol saringan (`.kaca-seg`) → daftar/tabel di kartu kaca → paginasi. Detail: kartu kaca utama ⅔ + kartu kaca aksi ⅓ (bertumpuk di bawah 1024 px).
 - **Livewire:** ikuti konvensi repo (kelas di `app/Livewire/`, view di `resources/views/livewire/`). Query di computed property atau method render yang sempit; paginasi 20 baris; filter lewat properti publik (cek docs Livewire 4 untuk `#[Url]`, `#[Computed]`, `#[Validate]`); `wire:loading` untuk skeleton.
-- **Tabel:** header `h-11 text-label-sm text-on-surface-muted`, baris `min-h-13` dengan garis `border-outline`, angka rata kanan + `tabular-nums`, aksi di kolom terakhir, empty state berisi penjelasan + aksi utama, error state berisi pesan umum.
-- **Form:** label di atas setiap field, helper `text-body-sm text-on-surface-muted`, error merah di bawah field, nilai otomatis sebagai teks read-only, aksi kanan bawah ("Simpan Draf" secondary + aksi utama). Unggahan PDF/JPG/PNG maksimal 5 MB lewat `Storage`; kolom menyimpan path.
+- **Tabel di kaca:** baris langsung di permukaan kartu kaca dengan `divide-y divide-line`, baris bisa-klik `hover:bg-primary-soft`, terpilih `bg-[var(--panel-strong)]`, header 13 px `text-meta`, angka rata kanan + `tabular-nums`, aksi seragam di kolom terakhir, `wire:key` di setiap baris, empty state (judul + sebab + aksi) dan error state (pesan umum). Baris tidak dijadikan kartu sendiri; hanya baris keputusan yang berdiri sendiri memakai `.glass-row bg-field`.
+- **Form di kaca:** form di dalam `x-ui.card` (kaca); field lewat `x-ui.field` + `x-ui.input`/`x-ui.select`/`x-ui.textarea` yang **tetap putih pekat**; label di atas, helper 13 px meta, error `text-danger` di bawah field, nilai otomatis sebagai teks read-only, aksi di kaki kartu dipisah `border-line` ("Simpan Draf" secondary + aksi utama). Unggahan PDF/JPG/PNG maksimal 5 MB lewat `Storage`; kolom menyimpan path.
 - **Dialog destruktif:** menyebut objek ("Void invoice INV-2026-0012?"), menjelaskan akibat, meminta alasan bila aturan PBI memintanya, tombol destruktif terakhir.
-- **Format angka dan tanggal:** `Rp 3.000.000`, `5.000 kg`, `128,40 ton`, `27 Okt 2026, 14:00` WIB. Pakai satu helper bersama; kalau belum ada, usulkan di rencana (berkas bersama → koordinasi).
+- **Format angka dan tanggal:** `Rp 3.000.000`, `5.000 kg`, `128,4 ton`, `27 Okt 2026, 14.00 WIB` (jam memakai titik). Pakai helper bersama `App\Support\Format` (`number`, `rupiah`, `kg`) dan `resources/js/dashboard/format.js` di Alpine.
 - **Status:** `<x-ui.badge :variant="$status->badge()">{{ $status->label() }}</x-ui.badge>`; jangan menulis warna status di view.
+
+
+### Resep layar Kaca (Blade + Livewire + Alpine)
+
+Ikuti urutan ini untuk setiap layar baru atau yang dibangun ulang. Cuplikan lengkapnya di `docs/design/PANDUAN_KACA.md` §5–§7.
+
+1. **Pembungkus.** Bungkus seluruh isi view dengan `<x-app.kaca> … </x-app.kaca>` (boleh menjadi akar view Livewire; selalu satu elemen akar). Komponen ini merender `.dash-kaca`, latar empat foto, kilau kursor, dan tombol jeda gerak latar. Untuk Kaca yang bergantung pada peran pakai `:enabled="…"`. Jangan menulis markup `.dash-kaca`/`.kaca-backdrop` sendiri dan jangan memberi latar pekat. Sidebar otomatis menjadi kaca.
+2. **Data.** Buat service bergaya `AdminKaca` di `app/Services/<Modul>/`: satu `build()` yang mengembalikan array bentuk-view; query di service, bukan di view; bagian yang tidak didukung DDL ditulis di docblock dan ditandai `Data demo` di kartunya; URL halaman yang belum ada = `null` + alasan `pending`.
+3. **Kartu.** `x-ui.card` (otomatis kaca lewat `data-card`) atau `<section class="glass p-4 sm:p-5">` dengan judul `.card-title`; grid isi `dash-grid grid gap-4 lg:grid-cols-12`; animasi masuk `data-rise style="--i: n"`.
+4. **Kontrol segmen.** `<div class="kaca-seg …" style="--r: 11px" x-kaca-seg role="group" aria-label="…">` dengan `<span class="kaca-thumb" aria-hidden="true"></span>` sebagai anak pertama dan tombol ber-`:aria-pressed` (string). Hitungan di tombol: `.kaca-count`.
+5. **State Alpine.** `kacaAdmin` dan `kacaRiver` khusus dasbor Admin (`kacaAdmin` butuh `queue`, `periods`, `orders`, `commands`); jangan dipakai ulang. Untuk layar lain buat komponen kecil di `resources/js/<modul>/` yang mengimpor `flip` dan `exit` dari `resources/js/dashboard/kaca.js`, lalu daftarkan di `resources/js/app.js` di dalam `alpine:init` (berkas bersama → sebut di rencana).
+6. **Gerak.** Saringan klien: `await exit(yangKeluar)` lalu `await flip(wadah, () => baris, () => { state = baru }, () => this.$nextTick())`. Overlay: `x-transition:enter="kaca-spring"` + kelas start/end, keluar `transition duration-200 ease-in`. Lipatan: `class="kaca-spring grid"` + `grid-rows-[0fr]/[1fr]` + `:inert`. Jangan menulis easing baru untuk gerak posisi; jangan `transition: none` menyeluruh untuk gerak tereduksi.
+7. **Overlay.** Laci/dialog/palet `.glass-strong` di atas `style="background: var(--scrim)"`, `x-trap.noscroll`, Esc menutup, lembar bawah di < 640 px. Dasbor tidak mengambil keputusan; laci menautkan ke halaman keputusan.
+8. **Warna teks.** Di kaca polos: `text-ink`, `text-meta`, `text-primary`, `text-accent-text` (pendek, tebal); teks merah kecil `<span class="kaca-flag text-danger">`; label SVG berwarna diberi halo (`stroke="var(--panel-strong)" stroke-width="4" paint-order="stroke"`). `text-warning`, `text-info`, `var(--danger)`, `var(--accent)` sebagai teks hanya di `bg-field`, `bg-[var(--panel-strong)]`, atau `.glass-strong`. Di luar kartu hanya ink.
+9. **Uji kontras.** Ukur pada render nyata di 1440 px dan layar sempit, beberapa posisi gulir dan dua atau lebih waktu animasi latar, dengan prosedur `PANDUAN_KACA.md` Lampiran A; tulis rasio terendah per pasangan di PR.
+10. **Verifikasi.** Lihat Phase 4: test, build, visual 360/1024/1440, gerak dengan dan tanpa *reduced motion*, `forced-colors`.
 
 ## Phase 4 — Verifikasi (sebelum lapor selesai)
 
@@ -264,7 +144,8 @@ php vendor/bin/phpstan analyse --memory-limit=1G --no-progress
 npm run build
 ```
 
-3. **Cek visual:** jalankan aplikasi, ambil screenshot di lebar 360, 1024, dan 1440 px, bandingkan dengan mockup memakai `01_STITCH_AUDITOR.md` mode AUDIT (atau skill visual QA bila tool punya). Tidak boleh ada overflow horizontal. Sebut apa yang tidak bisa diverifikasi.
+3. **Cek visual:** jalankan aplikasi, ambil screenshot di lebar 360, 1024, dan 1440 px, bandingkan dengan mockup dan dasbor Admin Kaca memakai `01_STITCH_AUDITOR.md` mode AUDIT (atau skill visual QA bila tool punya). Tidak boleh ada overflow horizontal. Sebut apa yang tidak bisa diverifikasi.
+4. **Cek Kaca:** kontras diukur pada render nyata (PANDUAN_KACA.md Lampiran A); tombol jeda gerak menghentikan latar; gerak diuji dengan klik cepat berulang lalu diulang dengan `prefers-reduced-motion: reduce` (posisi berhenti, fade tetap jalan); `forced-colors: active` membuat kartu putih dan teks tetap terbaca; test fitur menegaskan `dash-kaca` dan `kaca-backdrop` hadir di layar itu (dan memperbarui asersi lama `assertDontSee('dash-kaca')` untuk layar itu).
 
 ## Phase 5 — Commit & laporan
 
@@ -278,7 +159,10 @@ npm run build
 
 - [ ] Rencana disetujui sebelum berkas diubah; hot spot disebut dan disetujui
 - [ ] Tidak ada paket baru; tidak ada migrasi lama yang diedit
-- [ ] Hanya kelas token; tidak ada hex, palet Tailwind bawaan, gradien, atau teks < 12 px
+- [ ] Hanya kelas token, komponen `x-ui.*`, dan kelas Kaca; tidak ada hex baru, palet Tailwind bawaan, gradien/blur di luar permukaan kaca, atau teks < 12 px
+- [ ] Layar dibungkus `<x-app.kaca>` (latar, tombol jeda); kartu kaca; overlay `.glass-strong`; kontrol putih pekat; teks merah kecil di `.kaca-flag`
+- [ ] Kontras diukur pada render nyata dan dilaporkan; teks di luar kartu hanya ink
+- [ ] Gerak memakai kurva spring Kaca; diuji dengan dan tanpa *reduced motion*
 - [ ] Menu sidebar dan teks UI persis dari `STITCH_BRIEF.md`, Bahasa Indonesia
 - [ ] Status dari Enum `label()`/`badge()` sesuai `03_STATUS_MAP.md`
 - [ ] Data dari Eloquent/service; tidak ada array baris palsu; data demo berlabel
@@ -289,7 +173,20 @@ npm run build
 - [ ] Cek visual 360/1024/1440 px tanpa overflow; yang belum dicek disebut
 - [ ] Commit `feat(SYM-x)` + trailer AI-Assisted; log AI dibuat
 
-## 🚫 Anti-pattern (termasuk contoh nyata di repo per 17 Nov 2026)
+## 🚫 Anti-pattern
+
+Kaca (25 Nov 2026):
+- Kartu putih (`bg-surface shadow-card`) di layar Kaca, `bg-background` di pembungkus (menutup latar foto), atau markup `.dash-kaca`/`.kaca-backdrop` yang ditulis tangan alih-alih `<x-app.kaca>`.
+- `@if` di akar view Livewire (Livewire lalu menempelkan `wire:id` ke elemen yang salah).
+- Input, select, atau tombol yang dibuat transparan (`bg-field`, `bg-transparent`) di atas kaca.
+- Teks merah atau jingga dengan `var(--danger)` / `var(--accent)`; itu warna isi. Untuk teks: `text-danger`, `text-accent-text`.
+- Teks meta atau berwarna langsung di atas foto latar (di luar kartu).
+- Menyalin `kacaAdmin` ke layar lain, atau menulis `cubic-bezier`/`ease-out` baru untuk gerak posisi.
+- `transition: none` untuk semua elemen saat *reduced motion*, atau menambah `prefers-reduced-transparency`.
+- Mengganti foto latar atau menurunkan alfa kaca/kerudung tanpa ukur ulang kontras.
+- Overlay dari kaca tipis (`.glass`) alih-alih `.glass-strong`.
+
+Contoh lama di repo per 17 Nov 2026 (sebagian sudah diperbaiki; tetap anti-pattern):
 
 - Warna palet bawaan di PHP/Blade, mis. `'color' => 'purple'`, `'teal'`, `'rose'` di `app/Livewire/DashboardOverview.php`. Ganti dengan varian status atau token.
 - Menampilkan pesan exception ke pengguna, mis. `'Gagal memuat sebagian data metrik: '.$e->getMessage()` di komponen yang sama.

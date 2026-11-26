@@ -13,11 +13,6 @@
 @section('content')
     <x-ui.page-header title="Ajukan RFQ Baru" subtitle="Kirim penawaran volume dan harga material sisa produksi kepada Seller." />
 
-    @if ($errors->any())
-        <x-ui.alert variant="danger" class="mb-6">
-            Terdapat kesalahan pada isian formulir. Mohon periksa kembali input Anda di bawah ini.
-        </x-ui.alert>
-    @endif
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {{-- Formulir Utama --}}
@@ -39,8 +34,8 @@
                         </x-ui.field>
                     </div>
 
-                    <div class="border-t border-outline pt-6">
-                        <h3 class="mb-4 text-headline-sm text-on-surface">Rincian Penawaran</h3>
+                    <div class="border-t border-outline-hairline pt-6">
+                        <h3 class="mb-4 text-dash-sub text-on-surface">Rincian Penawaran</h3>
 
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
@@ -75,7 +70,7 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-end gap-3 border-t border-outline pt-6">
+                    <div class="flex items-center justify-end gap-3 border-t border-outline-hairline pt-6">
                         <x-ui.button href="{{ route('rfq.index') }}" variant="secondary">
                             Batal
                         </x-ui.button>
@@ -104,7 +99,7 @@
                             <span class="block text-label-sm text-on-surface-muted">Kategori Material</span>
                             <span class="font-medium text-on-surface">{{ $selectedListing->category?->nama ?? '–' }}</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 border-t border-outline pt-3">
+                        <div class="grid grid-cols-2 gap-2 border-t border-outline-hairline pt-3">
                             <div>
                                 <span class="block text-label-sm text-on-surface-muted">Stok Tersedia</span>
                                 <span class="font-semibold text-primary tabular-nums">{{ \App\Support\Format::number($selectedListing->stok_kg) }} kg</span>
@@ -114,14 +109,14 @@
                                 <span class="font-semibold text-on-surface tabular-nums">{{ \App\Support\Format::rupiah($selectedListing->harga_per_kg) }}/kg</span>
                             </div>
                         </div>
-                        <div class="border-t border-outline pt-3">
+                        <div class="border-t border-outline-hairline pt-3">
                             <span class="block text-label-sm text-on-surface-muted">Lokasi</span>
                             <span class="text-on-surface">{{ $selectedListing->lokasi ?? '–' }}</span>
                         </div>
                         @if ($selectedListing->spesifikasi && is_array($selectedListing->spesifikasi))
-                            <div class="border-t border-outline pt-3">
+                            <div class="border-t border-outline-hairline pt-3">
                                 <span class="block text-label-sm text-on-surface-muted mb-1">Spesifikasi</span>
-                                <ul class="list-disc pl-4 space-y-0.5 text-body-xs text-on-surface-muted">
+                                <ul class="list-disc pl-4 space-y-0.5 text-body-sm text-on-surface-muted">
                                     @foreach ($selectedListing->spesifikasi as $key => $val)
                                         <li><strong class="text-on-surface">{{ $key }}:</strong> {{ is_array($val) ? json_encode($val) : $val }}</li>
                                     @endforeach

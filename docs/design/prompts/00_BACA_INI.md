@@ -17,7 +17,7 @@ Paket ini menyimpan mekanisme yang bagus dari bundel asli (DESIGN.md sebagai kon
 |---|---|---|---|
 | `01_STITCH_AUDITOR.md` | Tiga mode: **AUDIT** (screenshot vs DESIGN.md), **INSPIRASI** (ambil pola dari gambar luar tanpa mengganti token), **LAYAR BARU** (prompt Stitch format `SCREENS.md`) | Chat AI yang bisa membaca gambar | `STITCH_PROMPT_GENERATOR.md`, skill Gemini |
 | `02_ATURAN_UI_SYMBIONUSA.md` | 10 aturan kamus yang sudah diputuskan terhadap DESIGN.md, urutan prioritas sumber, aturan untuk celah (focus, disabled, ikon) | Ditempel bersama 01 atau 04 | Bagian "RULES" di `UIUX_TECHNICAL_DICTIONARY.md` |
-| `03_STATUS_MAP.md` | ENUM DDL → label UI → varian badge, plus daftar selisih dengan paket Stitch | Ditempel bersama 01 dan 04; dipakai di Enum PHP | (baru) |
+| `03_STATUS_MAP.md` | ENUM DDL → label UI → varian status (dirender sebagai teks berwarna + glyph), plus daftar selisih dengan paket Stitch | Ditempel bersama 01 dan 04; dipakai di Enum PHP | (baru) |
 | `04_AGENT_LARAVEL_LIVEWIRE_BUILDER.md` | Membangun layar jadi Blade + Livewire per PBI, dengan blok token `@theme` siap pakai | Coding agent di repo (Claude Code, Antigravity, Codex, OpenCode) | `AGENT_FULLSTACK_BUILDER_SUPABASE_v2.md`, `SUPABASE_BUILDER.md` |
 | `90_TEMUAN_DAN_USULAN.md` | Hasil audit paket Stitch, keputusan atas selisih DDL, usulan yang tersisa | Dibaca PM dan tim | (baru) |
 | `91_USULAN_PERUBAHAN_SKEMA.md` | Dua migrasi yang diajukan (draf kebutuhan; rating aspek + waktu ulasan) dan keputusan yang sengaja tanpa perubahan skema | Inaya, Zacky, PM | (baru) |
@@ -25,7 +25,7 @@ Paket ini menyimpan mekanisme yang bagus dari bundel asli (DESIGN.md sebagai kon
 ## Urutan prioritas sumber
 
 1. DDL (`docs/DDL ERD SymbioNusa.sql`) dan aturan bisnis `AGENTS.md` §5–6
-2. `DESIGN.md`
+2. `DESIGN.md` (FND v12 "Kaca"), dengan `PANDUAN_KACA.md` sebagai resep praktisnya (kalau keduanya berbeda, DESIGN.md menang dan selisihnya dilaporkan)
 3. `03_STATUS_MAP.md`
 4. `STITCH_BRIEF.md`, `SCREENS.md`, prototipe `docs/design/prototype/`
 5. `02_ATURAN_UI_SYMBIONUSA.md`
@@ -56,7 +56,7 @@ Sebelum layar pertama dibangun, ada satu tugas fondasi: token DESIGN.md di `app.
 - **Audit hasil Stitch atau halaman jadi:** buka chat baru → tempel `01`, `02`, `03`, dan isi `DESIGN.md` → kirim screenshot + sebut nomor layar `SCREENS.md` dan sumbernya.
 - **Prompt layar baru** (mis. Login, Katalog Material, Tugas Inspeksi): tempel `01`, `03`, `DESIGN.md`, `STITCH_BRIEF.md` → tulis "Mode LAYAR BARU: [nama layar], peran [..], PBI [..]".
 - **Ambil pola dari inspirasi:** tempel `01`, `02`, `DESIGN.md` → kirim gambar → "Mode INSPIRASI".
-- **Membangun di repo:** buka agent di root repo SymbioNusa → tempel `04` → "Kerjakan SYM-x, layar SCREENS NN". Agent membaca sendiri berkas lain lewat path yang disebut di `04`.
+- **Membangun di repo:** buka agent di root repo SymbioNusa → tempel `04` → "Kerjakan SYM-x, layar SCREENS NN". Agent membaca sendiri berkas lain lewat path yang disebut di `04`, termasuk `docs/design/PANDUAN_KACA.md` (cuplikan Kaca siap tiru, token, aturan gerak dan kontras, daftar periksa sebelum PR).
 
 ## Yang sengaja tidak dibawa dari bundel asli
 
@@ -70,6 +70,7 @@ Sebelum layar pertama dibangun, ada satu tugas fondasi: token DESIGN.md di `app.
 
 ## Status
 
+- **25 Nov 2026: Kaca (FND v12) menjadi standar seluruh aplikasi** (keputusan PM). `DESIGN.md`, `02` dan `04` sudah diselaraskan; resep praktisnya di `docs/design/PANDUAN_KACA.md`. Yang sudah dibangun dengan Kaca baru dasbor Admin; layar lain dibangun ulang mengikuti panduan itu.
 - `03_STATUS_MAP.md` **DISETUJUI** (17 Nov 2026, diputuskan atas delegasi PM). Baris bertanda ⏳ menunggu migrasi di `91_USULAN_PERUBAHAN_SKEMA.md`.
 - `STITCH_BRIEF.md` (stepper 10 langkah, kosakata status) dan `SCREENS.md` (layar 03, 07, 18, 20, 24, 26, 27, 30, 31) sudah disamakan dengan peta status.
 - Usulan bagian B di `90_TEMUAN_DAN_USULAN.md` (token `warning`, `focus-ring`, `secondary-hover`, `on-secondary-muted`, `label-caps` 12 px, aturan States/Icons/tabel) **sudah diterapkan** ke `DESIGN.md` pada 17 Nov 2026. Impor ulang DESIGN.md di Stitch.

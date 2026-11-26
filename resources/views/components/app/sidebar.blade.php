@@ -47,7 +47,7 @@
             'TRANSAKSI' => [
                 ['label' => 'RFQ Masuk', 'icon' => 'chat', 'route' => 'rfq.index', 'active' => 'rfq.*'],
                 ['label' => 'Purchase Order', 'icon' => 'file', 'route' => 'po.index', 'active' => 'po.*'],
-                ['label' => 'Invoice', 'icon' => 'receipt', 'route' => 'seller.invoices.index', 'active' => 'seller.*'],
+                ['label' => 'Invoice', 'icon' => 'receipt', 'route' => 'seller.invoices.index', 'active' => ['seller.invoices.*', 'seller.payments.*']],
                 ['label' => 'Pengiriman', 'icon' => 'truck', 'route' => null],
                 ['label' => 'Sengketa', 'icon' => 'scale', 'route' => null],
             ],
@@ -68,7 +68,7 @@
             'TRANSAKSI' => [
                 ['label' => 'RFQ & Negosiasi', 'icon' => 'chat', 'route' => 'rfq.index', 'active' => 'rfq.*'],
                 ['label' => 'Purchase Order', 'icon' => 'file', 'route' => 'po.index', 'active' => 'po.*'],
-                ['label' => 'Invoice & Pembayaran', 'icon' => 'receipt', 'route' => 'buyer.invoices.index', 'active' => 'buyer.*'],
+                ['label' => 'Invoice & Pembayaran', 'icon' => 'receipt', 'route' => 'buyer.invoices.index', 'active' => 'buyer.invoices.*'],
                 ['label' => 'Penerimaan Barang', 'icon' => 'truck', 'route' => null],
                 ['label' => 'Sengketa', 'icon' => 'scale', 'route' => null],
             ],
@@ -115,20 +115,24 @@
     $ring = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-secondary';
 @endphp
 
-<div class="flex h-full flex-col overflow-hidden rounded-lg bg-secondary text-on-secondary">
+{{-- data-sidebar*: kait gaya sidebar Senja di Sawah (resources/css/sidebar-senja.css), berlaku di semua halaman. --}}
+<div data-sidebar class="flex h-full flex-col overflow-hidden rounded-lg bg-secondary text-on-secondary">
     {{-- Logo --}}
     <a href="{{ route('dashboard') }}" class="mx-3.5 mt-5 flex items-center gap-2.5 rounded-sm px-2 py-1 {{ $ring }}">
-        <span class="flex size-9 shrink-0 items-center justify-center rounded-sm bg-primary-container text-on-primary-container" aria-hidden="true">
+        <span data-brand-mark class="flex size-9 shrink-0 items-center justify-center rounded-sm bg-primary-container text-on-primary-container" aria-hidden="true">
             <x-ui.icon name="loop" class="size-5" />
         </span>
-        <span class="text-headline-md">SymbioNusa</span>
+        <span class="min-w-0">
+            <span class="block text-headline-md">SymbioNusa</span>
+            <span data-brand-tagline class="block text-body-sm text-on-secondary-muted">Sirkular industri Nusantara</span>
+        </span>
     </a>
 
     {{-- Navigasi --}}
     <nav class="mt-6 flex-1 space-y-5 overflow-y-auto px-3.5 pb-4" aria-label="Navigasi utama">
         @foreach ($groups as $group => $items)
             <div>
-                <p class="mb-1.5 px-2.5 text-label-group text-secondary-label">{{ \Illuminate\Support\Str::ucfirst(mb_strtolower($group)) }}</p>
+                <p data-nav-label class="mb-1.5 px-2.5 text-label-group text-secondary-label">{{ \Illuminate\Support\Str::ucfirst(mb_strtolower($group)) }}</p>
                 <ul class="space-y-0.5">
                     @foreach ($items as $item)
                         @php($active = request()->routeIs($item['active'] ?? $item['route']))
@@ -155,7 +159,7 @@
                         class="flex h-10 w-full items-center gap-3 rounded-sm bg-on-secondary/5 px-3 text-label-md text-on-secondary-muted hover:bg-secondary-hover {{ $ring }}">
                     <x-ui.icon name="clock" class="text-secondary-label" />
                     <span class="flex-1 text-left">Segera hadir</span>
-                    <span class="text-body-sm text-secondary-label">{{ count($upcoming) }}</span>
+                    <span data-nav-count class="text-body-sm text-secondary-label">{{ count($upcoming) }}</span>
                     <x-ui.icon name="chevron-down" class="size-4 text-secondary-label transition-transform" ::class="open && 'rotate-180'" />
                 </button>
                 <ul :id="$id('segera-hadir')" x-show="open" x-cloak class="mt-1 space-y-0.5 pl-11">
@@ -168,9 +172,9 @@
     </nav>
 
     {{-- Kartu pengguna --}}
-    <div class="m-3.5 space-y-2 rounded-md bg-on-secondary/5 p-2.5">
+    <div data-user-card class="m-3.5 space-y-2 rounded-md bg-on-secondary/5 p-2.5">
         <div class="flex items-center gap-2.5">
-            <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-container text-body-sm font-semibold text-on-primary-container" aria-hidden="true">{{ $initials }}</span>
+            <span data-avatar class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-container text-body-sm font-semibold text-on-primary-container" aria-hidden="true">{{ $initials }}</span>
             <div class="min-w-0 flex-1">
                 <p class="truncate text-label-md font-semibold">{{ $user->nama }}</p>
                 <p class="truncate text-body-sm text-on-secondary-muted">{{ $roleLabels[$role] ?? 'Pengguna' }}</p>

@@ -1,227 +1,224 @@
 @extends('layouts.app')
+@use('App\Support\Format')
+@use('App\Support\StatusMap')
+
+@section('title', 'Profil Perusahaan')
+
+@section('breadcrumb')
+    <a href="{{ route('dashboard') }}" class="hover:text-on-surface hover:underline">Dashboard</a>
+    <span class="mx-2" aria-hidden="true">/</span>
+    <span class="text-on-surface" aria-current="page">Profil Perusahaan</span>
+@endsection
+
+@php
+    $status = $company->status_verifikasi ?? 'PENDING';
+    // Status berkas (ENUM company_documents.status) sebagai teks berwarna + glyph; belum ada baris STATUS_MAP-nya.
+    $docVariant = fn ($s) => match ((string) $s) {
+        'VALID' => 'success',
+        'KEDALUWARSA' => 'danger',
+        default => 'warning',
+    };
+@endphp
 
 @section('content')
-    <div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
-        @if (session('success'))
-            <div class="rounded-lg bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-800">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-800">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <h1 class="text-xl font-bold text-gray-900">Profil & Verifikasi Legalitas Perusahaan</h1>
-                <p class="text-sm text-gray-500 mt-1">Kelola identitas badan usaha, koordinat lokasi, tipe kemitraan, dan dokumen legalitas Non-B3.</p>
-            </div>
-
-            <div class="flex items-center gap-3">
-                @php
-                    $status = $company->status_verifikasi ?? 'PENDING';
-                    $badgeClass = match ($status) {
-                        'TERVERIFIKASI' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
-                        'DITOLAK' => 'bg-red-100 text-red-800 border-red-200',
-                        default => 'bg-amber-100 text-amber-800 border-amber-200',
-                    };
-                @endphp
-                <span class="px-3 py-1 rounded-full text-xs font-semibold border {{ $badgeClass }}">
-                    Status: {{ $status }}
-                </span>
+    <div class="max-w-5xl">
+        <x-ui.page-header title="Profil & Verifikasi Legalitas Perusahaan"
+            subtitle="Kelola identitas badan usaha, koordinat lokasi, tipe kemitraan, dan dokumen legalitas Non-B3.">
+            <x-slot:actions>
+                <x-ui.badge :variant="StatusMap::badge('companies.status_verifikasi', $status)">
+                    {{ StatusMap::label('companies.status_verifikasi', $status) }}
+                </x-ui.badge>
 
                 @if ($company && $company->tipe === 'KEDUANYA')
                     <form method="POST" action="{{ route('companies.switch-role') }}">
                         @csrf
                         @php $nextRole = $user->activeRole() === 'SELLER' ? 'BUYER' : 'SELLER'; @endphp
                         <input type="hidden" name="role" value="{{ $nextRole }}">
-                        <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-white hover:bg-slate-700">
-                            Beralih ke Mode {{ $nextRole }}
-                        </button>
+                        <x-ui.button type="submit" variant="secondary">
+                            Beralih ke mode {{ ucfirst(strtolower($nextRole)) }}
+                        </x-ui.button>
                     </form>
                 @endif
-            </div>
-        </div>
+            </x-slot:actions>
+        </x-ui.page-header>
 
-        <form method="POST" action="{{ route('companies.update') }}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-5">
+        <form method="POST" action="{{ route('companies.update') }}" class="mb-6">
             @csrf
             @method('PUT')
 
-            <h2 class="text-base font-semibold text-gray-900 border-b pb-3">1. Identitas Badan Usaha</h2>
+            <x-ui.card title="Identitas badan usaha">
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <x-ui.field label="Nama perusahaan" for="nama" name="nama" required>
+                        <x-ui.input id="nama" name="nama" :value="old('nama', $company->nama ?? '')" required />
+                    </x-ui.field>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                    <label for="company-nama" class="block text-sm font-medium text-gray-700">Nama Perusahaan *</label>
-                    <input type="text" id="company-nama" name="nama" value="{{ old('nama', $company->nama ?? '') }}" required
-                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                    @error('nama') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    <x-ui.field label="Nomor Induk Berusaha (NIB)" for="nib" name="nib" required>
+                        <x-ui.input id="nib" name="nib" :value="old('nib', $company->nib ?? '')" required class="tabular-nums" />
+                    </x-ui.field>
+
+                    <x-ui.field label="Tipe kemitraan" for="tipe" name="tipe" required>
+                        <x-ui.select id="tipe" name="tipe" required class="h-11">
+                            @foreach (['SELLER' => 'Seller (Penghasil Sisa Produksi)', 'BUYER' => 'Buyer (Pemanfaat Bahan Sekunder)', 'KEDUANYA' => 'Keduanya (Seller & Buyer)'] as $val => $label)
+                                <option value="{{ $val }}" @selected(old('tipe', $company->tipe ?? 'SELLER') === $val)>{{ $label }}</option>
+                            @endforeach
+                        </x-ui.select>
+                    </x-ui.field>
+
+                    <x-ui.field label="Kontak resmi (telepon / WA)" for="kontak" name="kontak" required>
+                        <x-ui.input id="kontak" name="kontak" type="tel" :value="old('kontak', $company->kontak ?? '')" required />
+                    </x-ui.field>
+
+                    <x-ui.field label="Alamat lengkap pabrik / gudang" for="alamat" name="alamat" required class="md:col-span-2">
+                        <x-ui.input id="alamat" name="alamat" :value="old('alamat', $company->alamat ?? '')" required />
+                    </x-ui.field>
+
+                    <x-ui.field label="Latitude (opsional)" for="lat" name="lat">
+                        <x-ui.input id="lat" name="lat" :value="old('lat', $company->lat ?? '')" placeholder="-6.917464" class="tabular-nums" />
+                    </x-ui.field>
+
+                    <x-ui.field label="Longitude (opsional)" for="lng" name="lng">
+                        <x-ui.input id="lng" name="lng" :value="old('lng', $company->lng ?? '')" placeholder="107.619123" class="tabular-nums" />
+                    </x-ui.field>
                 </div>
 
-                <div>
-                    <label for="company-nib" class="block text-sm font-medium text-gray-700">Nomor Induk Berusaha (NIB) *</label>
-                    <input type="text" id="company-nib" name="nib" value="{{ old('nib', $company->nib ?? '') }}" required
-                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                    @error('nib') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                <div class="mt-6 border-t border-outline-hairline pt-5">
+                    <label class="flex items-start gap-3 text-body-md text-on-surface">
+                        <input type="checkbox" name="tos_accepted" value="1" @checked(old('tos_accepted', (bool) ($company?->tos_disetujui_pada)))
+                            @error('tos_accepted') aria-invalid="true" aria-describedby="tos_accepted-error" @enderror
+                            class="mt-0.5 size-5 shrink-0 rounded-sm accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
+                        <span>Saya menyatakan seluruh data perusahaan benar dan menyetujui <strong>Syarat & Ketentuan SymbioNusa (v1.0-2026)</strong> bahwa seluruh material yang diperdagangkan merupakan sisa produksi industri <strong>Non-B3</strong>.</span>
+                    </label>
+                    @error('tos_accepted')
+                        <p id="tos_accepted-error" class="mt-2 flex items-center gap-1.5 text-body-sm font-medium text-error">
+                            <x-ui.icon name="alert" class="size-4 shrink-0" /> {{ $message }}
+                        </p>
+                    @enderror
                 </div>
 
-                <div>
-                    <label for="company-tipe" class="block text-sm font-medium text-gray-700">Tipe Kemitraan *</label>
-                    <select id="company-tipe" name="tipe" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                        @foreach (['SELLER' => 'Seller (Penghasil Sisa Produksi)', 'BUYER' => 'Buyer (Pemanfaat Bahan Sekunder)', 'KEDUANYA' => 'Keduanya (Seller & Buyer)'] as $val => $label)
-                            <option value="{{ $val }}" @selected(old('tipe', $company->tipe ?? 'SELLER') === $val)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                    @error('tipe') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                <div class="mt-6 flex justify-end">
+                    <x-ui.button type="submit">Simpan Profil Perusahaan</x-ui.button>
                 </div>
-
-                <div>
-                    <label for="company-kontak" class="block text-sm font-medium text-gray-700">Kontak Resmi (Telepon / WA) *</label>
-                    <input type="text" id="company-kontak" name="kontak" value="{{ old('kontak', $company->kontak ?? '') }}" required
-                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                    @error('kontak') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                </div>
-
-                <div class="md:col-span-2">
-                    <label for="company-alamat" class="block text-sm font-medium text-gray-700">Alamat Lengkap Pabrik / Gudang *</label>
-                    <input type="text" id="company-alamat" name="alamat" value="{{ old('alamat', $company->alamat ?? '') }}" required
-                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                    @error('alamat') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                </div>
-
-                <div>
-                    <label for="company-lat" class="block text-sm font-medium text-gray-700">Latitude (Opsional)</label>
-                    <input type="text" id="company-lat" name="lat" value="{{ old('lat', $company->lat ?? '') }}" placeholder="-6.917464"
-                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                    @error('lat') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                </div>
-
-                <div>
-                    <label for="company-lng" class="block text-sm font-medium text-gray-700">Longitude (Opsional)</label>
-                    <input type="text" id="company-lng" name="lng" value="{{ old('lng', $company->lng ?? '') }}" placeholder="107.619123"
-                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                    @error('lng') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                </div>
-            </div>
-
-            <div class="pt-2">
-                <label class="inline-flex items-start gap-2 text-sm text-gray-700">
-                    <input type="checkbox" name="tos_accepted" value="1" @checked(old('tos_accepted', (bool) ($company?->tos_disetujui_pada)))
-                        class="mt-1 rounded border-gray-300 text-emerald-700 focus:ring-emerald-600">
-                    <span>Saya menyatakan seluruh data perusahaan benar dan menyetujui <strong>Syarat & Ketentuan SymbioNusa (v1.0-2026)</strong> bahwa seluruh material yang diperdagangkan merupakan sisa produksi industri <strong>Non-B3</strong>.</span>
-                </label>
-                @error('tos_accepted') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-            </div>
-
-            <div class="flex justify-end">
-                <button type="submit" class="px-5 py-2.5 rounded-lg bg-emerald-700 text-white text-sm font-semibold hover:bg-emerald-800">
-                    Simpan Profil Perusahaan
-                </button>
-            </div>
+            </x-ui.card>
         </form>
 
         @if ($company)
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-5">
-                <h2 class="text-base font-semibold text-gray-900 border-b pb-3">2. Dokumen Legalitas & Lingkungan (PDF/JPG/PNG, Maks. 5 MB)</h2>
+            <x-ui.card title="Dokumen legalitas & lingkungan" :padding="false">
+                <x-slot:actions>
+                    <span class="text-body-sm text-on-surface-muted">PDF, JPG, atau PNG, maks. 5 MB</span>
+                </x-slot:actions>
 
                 @if (! empty($missingDocuments))
-                    <div class="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900">
-                        <p class="font-semibold">Dokumen wajib yang belum lengkap atau sudah kedaluwarsa:</p>
-                        <ul class="mt-1 list-disc list-inside">
-                            @foreach ($missingDocuments as $label)
-                                <li>{{ $label }}</li>
-                            @endforeach
-                        </ul>
-                        <p class="mt-1 text-xs">Admin baru dapat memverifikasi perusahaan setelah semua dokumen wajib terunggah dan masih berlaku.</p>
+                    <div class="border-t border-outline-hairline px-[18px] pt-5 sm:px-6">
+                        <x-ui.alert variant="warning" title="Dokumen wajib yang belum lengkap atau sudah kedaluwarsa">
+                            <ul class="mt-1 list-disc pl-5">
+                                @foreach ($missingDocuments as $label)
+                                    <li>{{ $label }}</li>
+                                @endforeach
+                            </ul>
+                            <p class="mt-2">Admin baru dapat memverifikasi perusahaan setelah semua dokumen wajib terunggah dan masih berlaku.</p>
+                        </x-ui.alert>
                     </div>
                 @endif
 
                 <form method="POST" action="{{ route('companies.documents.store') }}" enctype="multipart/form-data"
-                    class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    @class(['grid grid-cols-1 items-start gap-4 px-[18px] py-5 sm:px-6 md:grid-cols-3', 'border-t border-outline-hairline' => empty($missingDocuments)])>
                     @csrf
-                    <div>
-                        <label for="company-jenis" class="block text-xs font-medium text-gray-700">Jenis Dokumen *</label>
-                        <select id="company-jenis" name="jenis" required class="mt-1 block w-full rounded-lg border-gray-300 text-sm">
+                    <x-ui.field label="Jenis dokumen" for="jenis" name="jenis" required>
+                        <x-ui.select id="jenis" name="jenis" required class="h-11">
                             @foreach ($documentTypes as $value => $label)
                                 <option value="{{ $value }}" @selected(old('jenis') === $value)>{{ $label }}</option>
                             @endforeach
-                        </select>
-                    </div>
+                        </x-ui.select>
+                    </x-ui.field>
 
-                    <div>
-                        <label for="company-berlaku_sampai" class="block text-xs font-medium text-gray-700">Berlaku Sampai (Opsional)</label>
-                        <input type="date" id="company-berlaku_sampai" name="berlaku_sampai" class="mt-1 block w-full rounded-lg border-gray-300 text-sm">
-                    </div>
+                    <x-ui.field label="Berlaku sampai (opsional)" for="berlaku_sampai" name="berlaku_sampai">
+                        <x-ui.input id="berlaku_sampai" name="berlaku_sampai" type="date" class="tabular-nums" />
+                    </x-ui.field>
 
-                    <div>
-                        <label for="company-dokumen" class="block text-xs font-medium text-gray-700">Berkas (PDF/JPG/PNG) *</label>
-                        <input type="file" id="company-dokumen" name="dokumen" accept=".pdf,.jpg,.jpeg,.png" required class="mt-1 block w-full text-xs text-gray-600">
-                    </div>
+                    <x-ui.field label="Berkas" for="dokumen" name="dokumen" required>
+                        <input type="file" id="dokumen" name="dokumen" accept=".pdf,.jpg,.jpeg,.png" required
+                            @error('dokumen') aria-invalid="true" aria-describedby="dokumen-error" @enderror
+                            @class([
+                                'block w-full rounded-sm border border-dashed bg-surface px-3 py-1.5 text-body-sm text-on-surface',
+                                'file:mr-3 file:h-8 file:cursor-pointer file:rounded-sm file:border-0 file:bg-primary-container file:px-3 file:text-label-md file:font-semibold file:text-on-primary-container',
+                                'hover:file:bg-primary hover:file:text-on-primary',
+                                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring',
+                                $errors->has('dokumen') ? 'border-error' : 'border-outline-input',
+                            ])>
+                    </x-ui.field>
 
-                    <div class="md:col-span-3 flex justify-end">
-                        <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800">
+                    <div class="flex justify-end md:col-span-3">
+                        <x-ui.button type="submit" variant="secondary">
+                            <x-ui.icon name="plus" class="size-[18px]" />
                             Unggah Dokumen
-                        </button>
+                        </x-ui.button>
                     </div>
                 </form>
 
-                @if ($errors->hasAny(['jenis', 'berlaku_sampai', 'dokumen']))
-                    <div class="text-xs text-red-600 space-y-1">
-                        @foreach (['jenis', 'berlaku_sampai', 'dokumen'] as $field)
-                            @error($field) <p>{{ $message }}</p> @enderror
+                @if ($company->documents->count() > 0)
+                    {{-- Di bawah 1024 px tabel menjadi baris ledger (DESIGN.md › Responsive). --}}
+                    <ul class="divide-y divide-outline-hairline border-t border-outline-hairline lg:hidden" aria-label="Dokumen legalitas perusahaan">
+                        @foreach ($company->documents as $doc)
+                            <li class="flex flex-wrap items-center justify-between gap-3 px-[18px] py-4 sm:px-6">
+                                <div class="min-w-0">
+                                    <p class="text-dash-row text-on-surface">{{ $doc->jenis }}</p>
+                                    <p class="text-body-sm text-on-surface-muted">
+                                        Berlaku sampai {{ $doc->berlaku_sampai ? Format::date($doc->berlaku_sampai) : 'seumur hidup' }}
+                                    </p>
+                                    <x-ui.badge class="mt-1.5" :variant="$docVariant($doc->status)">{{ ucfirst(strtolower((string) $doc->status)) }}</x-ui.badge>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <x-ui.button variant="text" href="{{ asset('storage/'.$doc->file_url) }}" target="_blank" class="min-h-11"
+                                        aria-label="Lihat {{ $doc->jenis }}">Lihat</x-ui.button>
+                                    <form method="POST" action="{{ route('companies.documents.destroy', $doc) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <x-ui.button type="submit" variant="text-danger" class="min-h-11"
+                                            aria-label="Hapus {{ $doc->jenis }}">Hapus</x-ui.button>
+                                    </form>
+                                </div>
+                            </li>
                         @endforeach
-                    </div>
-                @endif
+                    </ul>
 
-                <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Daftar dokumen legalitas">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">
-                            <tr>
-                                <th class="px-4 py-3">Jenis Dokumen</th>
-                                <th class="px-4 py-3">Masa Berlaku</th>
-                                <th class="px-4 py-3">Status</th>
-                                <th class="px-4 py-3 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @forelse ($company->documents as $doc)
-                                <tr>
-                                    <td class="px-4 py-3 font-medium text-gray-900">{{ $doc->jenis }}</td>
-                                    <td class="px-4 py-3 text-gray-600">
-                                        {{ $doc->berlaku_sampai ? $doc->berlaku_sampai->format('d M Y') : 'Seumur Hidup' }}
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        @php
-                                            $docBadge = match ($doc->status) {
-                                                'VALID' => 'bg-emerald-100 text-emerald-800',
-                                                'KEDALUWARSA' => 'bg-red-100 text-red-800',
-                                                default => 'bg-amber-100 text-amber-800',
-                                            };
-                                        @endphp
-                                        <span class="px-2 py-0.5 rounded text-xs font-semibold {{ $docBadge }}">
-                                            {{ $doc->status }}
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3 text-right space-x-3">
-                                        <a href="{{ asset('storage/' . $doc->file_url) }}" target="_blank" class="text-emerald-700 hover:underline text-xs font-semibold">Lihat</a>
-                                        <form method="POST" action="{{ route('companies.documents.destroy', $doc) }}" class="inline">
+                    <x-ui.table label="Dokumen legalitas perusahaan" class="hidden lg:block">
+                        <x-slot:head>
+                            <th scope="col" class="px-6">Jenis dokumen</th>
+                            <th scope="col" class="px-4">Berlaku sampai</th>
+                            <th scope="col" class="px-4">Status</th>
+                            <th scope="col" class="px-6 text-right">Aksi</th>
+                        </x-slot:head>
+                        @foreach ($company->documents as $doc)
+                            <tr class="h-14 border-t border-outline-hairline align-middle">
+                                <td class="px-6 py-3 text-dash-row text-on-surface">{{ $doc->jenis }}</td>
+                                <td class="px-4 py-3 tabular-nums whitespace-nowrap text-on-surface-muted">
+                                    {{ $doc->berlaku_sampai ? Format::date($doc->berlaku_sampai) : 'Seumur hidup' }}
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <x-ui.badge :variant="$docVariant($doc->status)">{{ ucfirst(strtolower((string) $doc->status)) }}</x-ui.badge>
+                                </td>
+                                <td class="px-6 py-3 whitespace-nowrap">
+                                    <div class="flex items-center justify-end gap-4">
+                                        <x-ui.button variant="text" href="{{ asset('storage/'.$doc->file_url) }}" target="_blank" class="min-h-10"
+                                            aria-label="Lihat {{ $doc->jenis }}">Lihat</x-ui.button>
+                                        <form method="POST" action="{{ route('companies.documents.destroy', $doc) }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:underline text-xs font-semibold">Hapus</button>
+                                            <x-ui.button type="submit" variant="text-danger" class="min-h-10"
+                                                aria-label="Hapus {{ $doc->jenis }}">Hapus</x-ui.button>
                                         </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-4 py-6 text-center text-gray-500">Belum ada dokumen legalitas yang diunggah.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </x-ui.table>
+                @else
+                    <div class="border-t border-outline-hairline px-6 pb-8 pt-6 text-center">
+                        <p class="text-dash-sub text-on-surface">Belum ada dokumen legalitas</p>
+                        <p class="mt-1 text-body-sm text-on-surface-muted">Unggah NIB dan dokumen lingkungan agar Admin bisa memverifikasi perusahaan Anda.</p>
+                    </div>
+                @endif
+            </x-ui.card>
         @endif
     </div>
 @endsection

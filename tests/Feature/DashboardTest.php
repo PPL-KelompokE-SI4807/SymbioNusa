@@ -4,7 +4,10 @@ namespace Tests\Feature;
 
 use App\Livewire\DashboardOverview;
 use App\Models\Company;
+use App\Models\ImpactLog;
+use App\Models\PurchaseOrder;
 use App\Models\User;
+use App\Services\Dashboard\DashboardService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
@@ -44,11 +47,22 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($admin)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Dinas Lingkungan Hidup');
-        $response->assertSee('Tonase terdaur ulang');
-        $response->assertSee('Alur order');
-        $response->assertSee('Antrean tindakan');
-        $response->assertSee('Material terdaur ulang');
+        $response->assertSee('dash-senja');
+        // Varian Kaca (DESIGN.md, amandemen FND v12): hanya dasbor Admin, susunan mengikuti SymbioNusa Lab.
+        $response->assertSee('dash-kaca');
+        $response->assertSee('kaca-backdrop', false);
+        // Pembungkus bersama x-app.kaca membawa tombol jeda gerak latar (WCAG 2.2.2).
+        $response->assertSee('kaca-still-toggle', false);
+        $response->assertSee('Jeda gerak latar');
+        $response->assertSeeInOrder([
+            'Dashboard', 'Perbandingan periode', 'Perlu keputusan Anda', 'Inspeksi', 'Sungai Order', 'Peta pengawasan',
+            'Umur tagihan', 'Aktivitas terbaru', 'Beban Inspector', 'Tonase per kategori', 'Dampak lingkungan tercatat',
+        ]);
+        // Panel yang DDL belum mendukung memakai contoh dan wajib bertanda Data demo.
+        $response->assertSee('Data demo');
+        $response->assertSee('data-sidebar', false);
+        // Label diagnosis tanpa dasar ambang dilarang.
+        $response->assertDontSee('tertahan');
     }
 
     public function test_seller_can_access_dashboard_and_view_metrics(): void
@@ -79,9 +93,15 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Budi Seller Mandiri');
+        $response->assertSee('dash-senja');
+        // Sejak 26 Nov 2026 dasbor Seller juga Kaca (PANDUAN_KACA §12): struktur Senja di atas material kaca.
+        $response->assertSee('dash-kaca');
+        $response->assertSee('kaca-backdrop', false);
+        $response->assertSeeInOrder(['Perlu tindakan Anda', 'Sedang berjalan', 'Gambaran total tercatat']);
         $response->assertSee('Stok listing aktif');
-        $response->assertSee('Order masuk');
-        $response->assertSee('Listing saya');
+        $response->assertSee('Order Anda per tahap');
+        $response->assertSee('Listing aktif Anda');
+        $response->assertDontSee('tertahan');
     }
 
     public function test_buyer_can_access_dashboard_and_view_metrics(): void
@@ -112,9 +132,13 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Rina Buyer Sekunder');
+        $response->assertSee('dash-senja');
+        $response->assertSee('kaca-backdrop', false);
+        $response->assertSeeInOrder(['Perlu tindakan Anda', 'Sedang berjalan', 'Pengiriman ke Anda', 'Gambaran total tercatat']);
         $response->assertSee('Tagihan terbuka');
-        $response->assertSee('Order pembelian');
-        $response->assertSee('Kebutuhan saya');
+        $response->assertSee('Pembelian Anda per tahap');
+        $response->assertSee('Material yang bisa Anda beli');
+        $response->assertDontSee('tertahan');
     }
 
     public function test_inspector_can_access_dashboard_and_view_metrics(): void
@@ -133,8 +157,12 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Dr. Hendra Inspector Mutu');
-        $response->assertSee('Inspeksi hari ini');
-        $response->assertSee('Jadwal inspeksi');
+        $response->assertSee('dash-senja');
+        $response->assertSee('kaca-backdrop', false);
+        $response->assertSeeInOrder(['Perlu tindakan Anda', 'Sedang berjalan', 'Gambaran total tercatat', 'Kredensial Anda']);
+        $response->assertSee('Jadwal 7 hari');
+        $response->assertSee('Inspeksi selesai');
+        $response->assertDontSee('tertahan');
     }
 
     public function test_dashboard_renders_livewire_component_correctly(): void
@@ -152,8 +180,8 @@ class DashboardTest extends TestCase
         $this->actingAs($admin);
 
         Livewire::test(DashboardOverview::class)
-            ->assertSee('Alur order')
-            ->assertSee('Antrean tindakan')
+            ->assertSee('Sungai Order')
+            ->assertSee('Perlu keputusan Anda')
             ->assertStatus(200);
     }
 
@@ -170,8 +198,74 @@ class DashboardTest extends TestCase
 
         $this->actingAs($admin)->get('/dashboard')
             ->assertOk()
-            ->assertSee('Verifikasi CV Antre Verifikasi')
+            ->assertSee('CV Antre Verifikasi')
             ->assertSee('Verifikasi Mitra');
+    }
+
+    public function test_admin_flow_counts_rows_and_queue_come_from_one_source(): void
+    {
+        $data = app(DashboardService::class)->admin();
+
+        $realCounts = PurchaseOrder::query()->selectRaw('status, COUNT(*) AS n')->groupBy('status')->pluck('n', 'status');
+
+        // 10 tahap STATUS_MAP dalam urutan tetap, lalu 4 jalur keluar dari tahap asal yang benar.
+        $this->assertSame(
+            ['DRAFT', 'MENUNGGU_KONFIRMASI', 'DIKONFIRMASI', 'INSPEKSI', 'LOLOS_INSPEKSI', 'INVOICED', 'DIBAYAR', 'DALAM_PENGIRIMAN', 'DITERIMA', 'SELESAI'],
+            array_column($data['flow']['stages'], 'key')
+        );
+        $this->assertSame(
+            ['DITOLAK' => 'MENUNGGU_KONFIRMASI', 'DIBATALKAN' => 'DIKONFIRMASI', 'GAGAL_INSPEKSI' => 'INSPEKSI', 'SENGKETA' => 'DITERIMA'],
+            array_column($data['flow']['exits'], 'origin', 'key')
+        );
+
+        foreach ([...$data['flow']['stages'], ...$data['flow']['exits']] as $stage) {
+            // Hitungan segmen = total sebenarnya di DB; baris panel = hitungan (atau batas muat, dinyatakan "Menampilkan").
+            $this->assertSame((int) ($realCounts[$stage['key']] ?? 0), $stage['count'], $stage['key']);
+            $this->assertSame(min($stage['count'], $data['flow']['list_limit']), count($stage['orders']), $stage['key']);
+        }
+
+        foreach ($data['queue']['groups'] as $group) {
+            $this->assertGreaterThan(0, $group['count']);
+            $this->assertSame(min($group['count'], 25), count($group['items']), $group['key']);
+            // Item tanpa halaman tujuan tidak boleh berbentuk aksi.
+            foreach ($group['items'] as $item) {
+                $this->assertTrue($item['url'] === null || $group['action'] !== null, $group['key']);
+            }
+        }
+    }
+
+    public function test_seller_flow_counts_are_scoped_to_the_seller_company(): void
+    {
+        $companyId = (int) PurchaseOrder::query()->value('companies_id_seller');
+        if ($companyId === 0) {
+            $this->markTestSkipped('Tidak ada order di basis data uji.');
+        }
+
+        $data = app(DashboardService::class)->seller($companyId);
+        $real = PurchaseOrder::where('companies_id_seller', $companyId)->selectRaw('status, COUNT(*) AS n')->groupBy('status')->pluck('n', 'status');
+
+        foreach ([...$data['flow']['stages'], ...$data['flow']['exits']] as $stage) {
+            $this->assertSame((int) ($real[$stage['key']] ?? 0), $stage['count'], $stage['key']);
+        }
+        // Kelompok "Konfirmasi order masuk" memakai hitungan tahap Menunggu Konfirmasi yang sama.
+        $confirm = collect($data['queue']['groups'])->firstWhere('key', 'konfirmasi');
+        $this->assertSame((int) ($real['MENUNGGU_KONFIRMASI'] ?? 0), $confirm['count'] ?? 0);
+        foreach ($data['queue']['groups'] as $group) {
+            foreach ($group['items'] as $item) {
+                $this->assertTrue($item['url'] === null || $group['action'] !== null, $group['key']);
+            }
+        }
+    }
+
+    public function test_admin_material_shares_use_full_total(): void
+    {
+        $materials = app(DashboardService::class)->admin()['materials'];
+
+        $this->assertEqualsWithDelta((float) ImpactLog::sum('tonase_ton'), $materials['total_ton'], 0.001);
+        if ($materials['rows'] !== []) {
+            $this->assertEqualsWithDelta(1.0, array_sum(array_column($materials['rows'], 'share')), 0.0001);
+            $this->assertEqualsWithDelta($materials['total_ton'], array_sum(array_column($materials['rows'], 'ton')), 0.001);
+        }
     }
 
     public function test_seller_without_company_sees_profile_hint_instead_of_data(): void

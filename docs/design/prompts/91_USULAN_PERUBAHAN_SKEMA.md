@@ -98,6 +98,36 @@ public function down(): void
 
 ---
 
+## Usulan 3 — data bertanggal untuk dashboard (periode, pembanding, umur tahap)
+
+> Dicatat 22 Nov 2026 dari update dashboard Senja di Sawah (keputusan PM). **Tidak dikerjakan dalam tugas dashboard**; dashboard sementara memakai "Total tercatat" dan tidak menampilkan angka yang tidak bisa dihitung.
+
+| | |
+|---|---|
+| PBI | FND-04 / SYM-28 (dashboard, Mayhesa) — bergantung pada pemilik transisi order dan pencatat dampak |
+| Dasar | DESIGN.md › Data honesty dan panduan dashboard Senja §5, §7.12, §8.5: setiap angka Zona 3 butuh label periode dan pembanding; antrean dan tahap menampilkan umur di mana pun ada timestamp. |
+| Masalah | `purchase_orders` dan `impact_logs` tidak punya kolom waktu, jadi "Bulan ini", delta vs bulan lalu, dan grafik mingguan tidak bisa dihitung. `order_status_history.waktu` sudah ada di DDL, tetapi saat ini hanya ditulis `PaymentService` (DIBAYAR) dan tidak diisi seeder, sehingga umur tahap hampir selalu tidak diketahui. |
+| Perubahan | (a) Tambah waktu pembuatan order dan waktu pencatatan dampak. (b) Tanpa perubahan skema: setiap transisi status order menulis satu baris `order_status_history` (`dari`, `ke`, `waktu`, `users_id_user`). |
+
+```sql
+ALTER TABLE `purchase_orders`
+  ADD COLUMN `dibuat_pada` TIMESTAMP(6) NULL AFTER `companies_id_buyer`;
+ALTER TABLE `impact_logs`
+  ADD COLUMN `dicatat_pada` TIMESTAMP(6) NULL AFTER `versi_faktor`;
+```
+
+**Dampak kode (setelah migrasi):**
+- Service transisi order: isi `dibuat_pada` saat order dibuat dan tulis `order_status_history` di setiap perubahan status (termasuk jalur keluar Ditolak, Dibatalkan, Gagal Inspeksi, Sengketa).
+- Pencatat dampak: isi `dicatat_pada` saat `impact_logs` dibuat (order Selesai).
+- Seeder demo: isi kedua kolom dan riwayat status supaya dashboard demo punya periode dan umur.
+- `DashboardService::admin()`: Zona 3 berganti ke "Gambaran <bulan>" dengan delta vs bulan lalu; grafik boleh kembali ke per minggu.
+
+**Keputusan PM yang dibutuhkan (bukan skema):**
+- Ambang umur per tahap (mis. Menunggu Konfirmasi ≤ 2 hari) agar bilah umur boleh berwarna amber/merah dan penanda "Terlama · n hari" boleh tampil.
+- Apakah dashboard DLH butuh target (tonase/tahun). Bila ya, perlu tabel target tersendiri — usulan terpisah.
+
+---
+
 ## Keputusan yang sengaja **tanpa** perubahan skema
 
 | Topik | Keputusan | Pemilik |
@@ -110,6 +140,7 @@ public function down(): void
 ## Checklist
 
 - [ ] Inaya membuat dua migrasi baru (usulan 1 dan 2) di PR terpisah
+- [ ] Usulan 3: PM memutuskan ambang umur tahap dan kebutuhan target DLH; pemilik transisi order menulis `order_status_history` di setiap transisi
 - [ ] Zacky meninjau dan menyesuaikan model, Form Request, Policy, dan service PBI-14 / PBI-15
 - [ ] PM memperbarui `docs/DDL ERD SymbioNusa.sql` setelah migrasi masuk `staging`
 - [ ] Hapus tanda ⏳ di `03_STATUS_MAP.md` setelah migrasi masuk

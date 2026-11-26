@@ -15,7 +15,7 @@
         @if ($profile === null)
             <x-ui.card>
                 <div class="py-6 text-center">
-                    <p class="text-label-md text-on-surface">Anda belum terdaftar di registri Inspector.</p>
+                    <p class="text-dash-sub text-on-surface">Anda belum terdaftar di registri Inspector.</p>
                     <p class="mt-1 text-body-sm text-on-surface-muted">
                         Hubungi Admin Platform untuk didaftarkan beserta bidang keahlian dan sertifikasi Anda.
                     </p>

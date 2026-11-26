@@ -1,0 +1,465 @@
+/*
+ * Komponen dashboard "Senja di Sawah" (panduan dashboard Senja di Sawah, keputusan PM 22 Nov 2026).
+ * Nilai token Senja kini global di @theme resources/css/app.css (satu sumber nilai untuk seluruh aplikasi);
+ * berkas ini hanya memuat kelas komponen dashboard. .dash-senja tetap menjadi kait pembungkus konten dashboard.
+ * Palet terkunci terang: jangan menambah override prefers-color-scheme: dark.
+ */
+
+/* Eyebrow zona: satu-satunya gaya huruf besar ber-tracking. 12 px (batas minimum teks repo). */
+.dash-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--color-on-surface-muted);
+}
+.dash-eyebrow::before {
+  content: "";
+  width: 20px;
+  height: 2px;
+  background: var(--color-primary);
+}
+
+/* Sorotan singkat (±600 ms) untuk panel yang berubah dan baris tujuan "Lihat di antrean". Warna, bukan gerak tata letak. */
+.dash-highlight {
+  animation: dash-highlight 0.6s cubic-bezier(.22, 1, .36, 1);
+}
+@keyframes dash-highlight {
+  0% { background-color: var(--color-surface-muted); }
+  100% { background-color: transparent; }
+}
+
+/* ---------- Sungai Order ---------- */
+.flow-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 3px;
+}
+.flow-group {
+  display: flex;
+  flex-direction: column;
+  min-width: max-content;
+  flex-basis: 0;
+}
+.flow-group-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-on-surface-muted);
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+.flow-row {
+  display: flex;
+  gap: 3px;
+}
+.flow-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: max-content;
+  flex-basis: 0;
+}
+.flow-seg {
+  position: relative;
+  height: 64px;
+  min-width: 44px;
+  border: 1px solid var(--color-flow-segment-line);
+  background: var(--color-flow-segment);
+  border-radius: var(--radius-md);
+  color: var(--color-on-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s cubic-bezier(.22, 1, .36, 1), background-color 0.2s cubic-bezier(.22, 1, .36, 1);
+}
+.flow-seg:hover { border-color: var(--color-primary); }
+.flow-seg[aria-pressed="true"] {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #ffffff;
+}
+.flow-seg canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.flow-seg-num {
+  position: relative;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.flow-seg-label {
+  margin-top: 8px;
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--color-on-surface-muted);
+}
+.flow-seg[aria-pressed="true"] + .flow-seg-label { color: var(--color-on-surface); font-weight: 800; }
+.flow-exit {
+  margin-top: 10px;
+  min-height: 44px;
+  padding: 8px 2px 2px;
+  border-top: 2px dashed var(--color-flow-segment-line);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-align: left;
+  color: var(--color-error);
+  cursor: pointer;
+}
+.flow-exit:hover { text-decoration: underline; text-underline-offset: 3px; }
+.flow-exit[aria-pressed="true"] {
+  border-top: 2px solid var(--color-accent);
+  color: var(--color-on-surface);
+  font-weight: 800;
+}
+
+/* Layar sempit: tiap grup selebar kartu, segmen membungkus ke baris berikutnya (grid), tetap proporsional per baris. */
+@media (max-width: 639px) {
+  .flow-group { flex-basis: 100%; min-width: 0; }
+  .flow-row { flex-wrap: wrap; row-gap: 12px; }
+}
+
+/* ---------- Bilah umur & blok tanggal ---------- */
+.age-bar {
+  display: block;
+  height: 6px;
+  width: 72px;
+  border-radius: 9999px;
+  background: var(--color-age-bar-track);
+  overflow: hidden;
+}
+.age-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--color-age-bar-fresh);
+}
+.date-block {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 64px;
+}
+.date-block b {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.date-block span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-on-surface-muted);
+}
+
+/* ---------- Label di atas foto (panduan §7.9): blok solid forestDeep di atas scrim, radius 6 px ---------- */
+.photo-label {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: var(--color-photo-label);
+  color: var(--color-on-photo-label);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Bilah data kecil (strip metrik, hasil akhir, langkah alur, jadwal 7 hari) ---------- */
+.mini-bar {
+  display: flex;
+  gap: 2px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--color-outline-hairline);
+}
+.mini-bar > span { display: block; height: 100%; }
+.outcome-bar {
+  display: flex;
+  gap: 3px;
+  height: 18px;
+}
+.outcome-bar > span {
+  min-width: 10px;
+  flex-basis: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s cubic-bezier(.22, 1, .36, 1);
+}
+.step-bar {
+  display: inline-flex;
+  gap: 3px;
+}
+.step-bar > i {
+  width: 14px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--color-outline-hairline);
+}
+.step-bar > i.done { background: var(--color-primary); }
+.step-bar > i.now { background: var(--color-accent); }
+.week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 6px 2px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s cubic-bezier(.22, 1, .36, 1);
+}
+.week-day:hover:not(:disabled), .week-day[aria-pressed="true"], .week-day[aria-selected="true"] { background: var(--color-surface-muted); }
+.week-day:disabled { cursor: default; }
+.week-bar-track {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 28px;
+  height: 44px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--color-outline);
+}
+.week-bar {
+  display: block;
+  width: 100%;
+  border-radius: 4px 4px 1px 1px;
+  background: var(--color-primary);
+}
+.week-day[aria-pressed="true"] .week-bar, .week-day[aria-selected="true"] .week-bar { background: var(--color-accent); }
+
+/* ---------- Pelacak rute Buyer (panduan §7.7) ---------- */
+.route-box {
+  border: 1px solid var(--color-outline);
+  border-radius: 12px;
+  padding: 10px 14px 12px;
+  background: var(--color-surface);
+}
+.route-box svg { display: block; width: 100%; height: auto; overflow: visible; }
+.route-base { fill: none; stroke: var(--color-outline); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 6 8; }
+.route-done { fill: none; stroke: var(--color-primary); stroke-width: 4; stroke-linecap: round; }
+.ms-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--color-outline);
+  border-radius: 8px;
+  background: var(--color-surface);
+  font-size: 13px;
+  font-weight: 700;
+  transition: border-color 0.2s cubic-bezier(.22, 1, .36, 1), background-color 0.2s cubic-bezier(.22, 1, .36, 1);
+}
+.ms-btn > i { width: 8px; height: 8px; flex: none; background: var(--color-outline); }
+.ms-btn[data-state="done"] { color: var(--color-on-surface); }
+.ms-btn[data-state="done"] > i { background: var(--color-on-surface); }
+.ms-btn[data-state="now"] { color: var(--color-primary); }
+.ms-btn[data-state="now"] > i { background: var(--color-primary); }
+.ms-btn[data-state="next"] { color: var(--color-on-surface-muted); font-weight: 600; }
+.ms-btn[aria-pressed="true"] { border-color: var(--color-primary); background: var(--color-surface-muted); }
+.ship-pick { width: 100%; text-align: left; border-radius: 8px; cursor: pointer; transition: background-color 0.2s cubic-bezier(.22, 1, .36, 1); }
+.ship-pick:hover, .ship-pick[aria-pressed="true"] { background: var(--color-surface-muted); }
+
+/* ---------- Garis waktu jam Inspector (panduan §7.15) ---------- */
+.tl { position: relative; padding-left: 76px; }
+.tl::before { content: ""; position: absolute; top: 6px; bottom: 6px; left: 60px; width: 2px; background: var(--color-outline); }
+.tl-item { position: relative; padding: 6px 0; }
+.tl-time {
+  position: absolute; left: -76px; top: 18px; width: 48px; text-align: right;
+  font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums;
+}
+.tl-node { position: absolute; left: -20px; top: 22px; width: 10px; height: 10px; background: var(--color-primary); }
+.tl-item[data-done="true"] .tl-node { background: var(--color-outline); }
+.tl-item[data-done="true"] .tl-time, .tl-item[data-done="true"] .tl-card { color: var(--color-on-surface-muted); }
+.tl-card {
+  display: block; width: 100%; text-align: left;
+  border: 1px solid var(--color-outline-hairline); border-radius: 10px;
+  padding: 12px 14px; background: var(--color-surface); cursor: pointer;
+  transition: border-color 0.2s cubic-bezier(.22, 1, .36, 1), box-shadow 0.2s cubic-bezier(.22, 1, .36, 1);
+}
+.tl-card:hover { border-color: var(--color-outline); }
+.tl-item[data-next="true"] .tl-card { border-color: var(--color-primary); box-shadow: 0 12px 28px -16px rgb(62 52 10 / 0.18); }
+.tl-now { position: relative; display: flex; align-items: center; gap: 8px; padding: 6px 0; color: var(--color-accent); }
+.tl-now::before { content: ""; position: absolute; left: -76px; right: 0; top: 50%; border-top: 2px solid var(--color-accent); opacity: .35; }
+.tl-now > span { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; padding-right: 8px; background: var(--color-surface);
+  font-size: 12px; font-weight: 800; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.tl-now > span > i { width: 8px; height: 8px; background: var(--color-accent); }
+
+/* ---------- Segmented control bersudut (thumb persegi digerakkan spring Snappy) ---------- */
+.seg-ctl {
+  position: relative;
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--color-outline-hairline);
+}
+.seg-ctl-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  border-radius: 7px;
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgb(62 52 10 / 0.10);
+  will-change: transform, width;
+}
+.seg-ctl button {
+  position: relative;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-on-surface-muted);
+  white-space: nowrap;
+}
+.seg-ctl button[aria-selected="true"] { color: var(--color-on-surface); }
+
+/* ---------- Grafik batang ---------- */
+.chart { container-type: inline-size; }
+.bars {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  height: 224px;
+}
+.bar-col {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.bar-plot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 26px 4px 0;
+  border-bottom: 1px solid var(--color-outline);
+}
+.bar {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 40px;
+  height: 100%;
+  transform-origin: bottom;
+  border-radius: 5px 5px 2px 2px;
+  background: var(--color-chart-lead);
+  opacity: 0.85;
+}
+.bar-col:hover .bar, .bar-col[aria-pressed="true"] .bar { opacity: 1; }
+.bar-col[aria-pressed="true"] .bar { background: var(--color-accent); }
+.bar-value {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.bar-label {
+  padding: 8px 2px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-on-surface-muted);
+}
+.bar-col[aria-pressed="true"] .bar-label { color: var(--color-on-surface); font-weight: 800; }
+
+/* Kartu sempit: batang horizontal, label penuh di kiri (tidak pernah dipotong/digulir). */
+@container (max-width: 779px) {
+  .bars { flex-direction: column; height: auto; gap: 2px; }
+  .bar-col { grid-template-rows: none; grid-template-columns: 112px 1fr; align-items: center; min-height: 44px; }
+  .bar-label { order: -1; padding: 0 10px 0 0; text-align: left; }
+  .bar-plot { height: 24px; padding: 0 64px 0 0; border-bottom: 0; border-left: 1px solid var(--color-outline); justify-content: flex-start; align-items: stretch; }
+  .bar { max-width: none; transform-origin: left; border-radius: 2px 5px 5px 2px; }
+  .bar-value { left: auto; top: 50%; transform: translateY(-50%); }
+}
+.bar-crosshair {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--color-outline);
+  pointer-events: none;
+}
+.bar-tip {
+  position: absolute;
+  top: 0;
+  z-index: 5;
+  padding: 6px 10px;
+  border-radius: 9px;
+  background: var(--color-photo-label);  /* forestDeep */
+  color: var(--color-on-photo-label);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Donut ---------- */
+.donut-box {
+  position: relative;
+  width: 184px;
+  height: 184px;
+  flex: none;
+}
+.donut-box svg { transform: rotate(-90deg); overflow: visible; }
+.donut-box circle {
+  fill: none;
+  stroke-width: 26;
+  cursor: pointer;
+  transition: opacity 0.2s cubic-bezier(.22, 1, .36, 1);
+}
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  padding: 0 34px;
+}
+
+/* ---------- Tombol: tekan ber-spring (transform dari solver, bukan CSS) ---------- */
+.dash-senja [data-press] { will-change: transform; }
+
+/* ---------- Target sentuh ≥ 44 px di layar sentuh/sempit (panduan §8.7); desktop tetap 40 px ---------- */
+@media (max-width: 1023px), (pointer: coarse) {
+  .dash-senja main button, .dash-senja button, .dash-senja a.inline-flex { min-height: 44px; }
+}
+
+/* ---------- Gerak tereduksi ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .dash-highlight { animation: none; }
+  /* Varian Kaca punya kebijakan sendiri (dashboard-kaca.css): fade tetap jalan, gerak posisi dimatikan. */
+  .dash-senja:not(.dash-kaca) * { transition: none !important; }
+}

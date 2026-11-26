@@ -24,7 +24,7 @@
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-3">
-                <h1 class="text-headline-lg text-on-surface">
+                <h1 class="page-title text-on-surface">
                     RFQ-{{ str_pad((string) $rfq->id_rfq_contract, 4, '0', STR_PAD_LEFT) }}
                 </h1>
                 <x-ui.badge :variant="\App\Support\StatusMap::badge('rfq_contracts.status', $statusValue)">
@@ -40,133 +40,111 @@
 
         <div class="flex items-center gap-2">
             <x-ui.button href="{{ route('rfq.index') }}" variant="secondary">
-                &larr; Kembali ke Daftar
+                <x-ui.icon name="arrow-left" class="size-4" />
+                Kembali ke daftar
             </x-ui.button>
         </div>
     </div>
 
-    @if (session('success'))
-        <x-ui.alert variant="success" class="mb-6">
-            {{ session('success') }}
-        </x-ui.alert>
-    @endif
 
-    @if ($errors->any())
-        <x-ui.alert variant="danger" class="mb-6">
-            {{ $errors->first() }}
-        </x-ui.alert>
-    @endif
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {{-- Kolom Kiri: Utas Negosiasi & Riwayat Tawaran --}}
         <div class="space-y-6 lg:col-span-2">
             {{-- Banner Kesepakatan bila status DISEPAKATI --}}
             @if ($statusValue === 'DISEPAKATI')
-                <div class="rounded-md border border-success bg-success-container p-5 text-on-success-container">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div>
-                            <h3 class="text-headline-sm font-semibold">Kontrak RFQ Telah Disepakati</h3>
-                            <p class="mt-1 text-body-sm">
-                                Kedua belah pihak telah menyepakati volume 
-                                <strong>{{ \App\Support\Format::number($rfq->volume_kg_disepakati) }} kg</strong> dengan harga 
-                                <strong>{{ \App\Support\Format::rupiah($rfq->harga_disepakati) }}/kg</strong> 
-                                (Total: <strong>{{ \App\Support\Format::rupiah((float)$rfq->volume_kg_disepakati * (float)$rfq->harga_disepakati) }}</strong>).
-                            </p>
-                            <p class="mt-2 text-body-xs text-on-success-container">
-                                Volume dan harga terkunci untuk pembuatan Purchase Order resmi.
-                            </p>
-                        </div>
-                        @if ($user && $user->role === 'BUYER' && $rfq->companies_id_company === $user->id_company)
+                <x-ui.alert variant="success" title="Kontrak RFQ telah disepakati">
+                    <p class="mt-1">
+                        Kedua belah pihak telah menyepakati volume 
+                        <strong>{{ \App\Support\Format::number($rfq->volume_kg_disepakati) }} kg</strong> dengan harga 
+                        <strong>{{ \App\Support\Format::rupiah($rfq->harga_disepakati) }}/kg</strong> 
+                        (Total: <strong>{{ \App\Support\Format::rupiah((float)$rfq->volume_kg_disepakati * (float)$rfq->harga_disepakati) }}</strong>).
+                    </p>
+                    <p class="mt-2 text-body-sm">
+                        Volume dan harga terkunci untuk pembuatan Purchase Order resmi.
+                    </p>
+                    @if ($user && $user->role === 'BUYER' && $rfq->companies_id_company === $user->id_company)
+                        <div class="mt-3">
                             @if ($rfq->purchaseOrder)
-                                <x-ui.button href="{{ route('po.show', $rfq->purchaseOrder) }}" variant="primary">
-                                    Lihat PO
-                                </x-ui.button>
+                                <x-ui.button href="{{ route('po.show', $rfq->purchaseOrder) }}">Lihat PO</x-ui.button>
                             @else
-                                <x-ui.button href="{{ route('po.create', ['rfq_id' => $rfq->id_rfq_contract]) }}" variant="primary">
-                                    Buat Purchase Order
-                                </x-ui.button>
+                                <x-ui.button href="{{ route('po.create', ['rfq_id' => $rfq->id_rfq_contract]) }}">Buat Purchase Order</x-ui.button>
                             @endif
-                        @endif
-                    </div>
-                </div>
+                        </div>
+                    @endif
+                </x-ui.alert>
             @endif
 
             {{-- Banner Ditolak --}}
             @if ($statusValue === 'DITOLAK')
-                <div class="rounded-md border border-error bg-error-container p-5 text-on-error-container">
-                    <h3 class="text-headline-sm font-semibold">Penawaran RFQ Ditolak</h3>
-                    <p class="mt-1 text-body-sm">
-                        Negosiasi RFQ ini telah dihentikan karena salah satu pihak menolak tawaran.
-                    </p>
-                </div>
+                <x-ui.alert variant="danger" title="Penawaran RFQ ditolak">
+                    Negosiasi RFQ ini telah dihentikan karena salah satu pihak menolak tawaran.
+                </x-ui.alert>
             @endif
 
             {{-- Banner Kedaluwarsa --}}
             @if ($statusValue === 'KEDALUWARSA' || ($rfq->isExpired() && in_array($statusValue, ['TERBUKA', 'NEGOSIASI'])))
-                <div class="rounded-md border border-outline bg-surface-container-lowest p-5 text-on-surface">
-                    <h3 class="text-headline-sm font-semibold text-on-surface-muted">RFQ Kedaluwarsa</h3>
-                    <p class="mt-1 text-body-sm text-on-surface-muted">
-                        Batas tenggat waktu negosiasi telah berakhir. Tidak ada penawaran lebih lanjut yang dapat diproses.
-                    </p>
-                </div>
+                <x-ui.alert variant="warning" title="RFQ kedaluwarsa">
+                    Batas tenggat waktu negosiasi telah berakhir. Tidak ada penawaran lebih lanjut yang dapat diproses.
+                </x-ui.alert>
             @endif
 
             {{-- Utas Negosiasi Kronologis --}}
-            <x-ui.card title="Utas Negosiasi Penawaran ({{ $rfq->offers->count() }}/5 Putaran)">
-                <div class="space-y-4">
+            <x-ui.card title="Utas negosiasi · {{ $rfq->offers->count() }}/5 putaran">
+                <ol class="divide-y divide-outline-hairline border-t border-outline-hairline">
                     @forelse ($rfq->offers as $offer)
                         @php
                             $isCurrentCompany = $user && $offer->companies_id_company === $user->id_company;
                         @endphp
-                        <div class="rounded-md border p-4 {{ $isCurrentCompany ? 'border-primary/40 bg-surface-container-lowest' : 'border-outline bg-surface' }}">
-                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-outline pb-2">
-                                <div class="flex items-center gap-2">
-                                    <span class="rounded bg-primary/10 px-2 py-0.5 text-label-xs font-semibold text-primary">
-                                        Putaran #{{ $offer->urutan }}
+                        <li class="py-4">
+                            <div class="flex flex-wrap items-baseline justify-between gap-2">
+                                <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                                    <span class="text-label-sm font-bold tabular-nums text-on-surface-muted">
+                                        Putaran {{ $offer->urutan }}
                                     </span>
-                                    <strong class="text-label-md text-on-surface">
+                                    <strong class="text-dash-row text-on-surface">
                                         {{ $offer->company?->nama ?? 'Perusahaan' }}
                                         @if ($isCurrentCompany)
-                                            <span class="text-body-xs text-primary font-normal">(Perusahaan Anda)</span>
+                                            <span class="text-body-sm font-semibold text-primary">· Perusahaan Anda</span>
                                         @endif
                                     </strong>
                                 </div>
-                                <span class="text-body-xs text-on-surface-muted">
-                                    {{ $offer->company?->tipe ?? '' }}
+                                <span class="text-body-sm text-on-surface-muted">
+                                    {{ ucfirst(strtolower((string) ($offer->company?->tipe ?? ''))) }}
                                 </span>
                             </div>
 
                             <div class="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3">
                                 <div>
-                                    <span class="block text-body-xs text-on-surface-muted">Volume Diajukan</span>
-                                    <span class="text-headline-sm font-semibold tabular-nums text-on-surface">
+                                    <span class="block text-body-sm text-on-surface-muted">Volume Diajukan</span>
+                                    <span class="text-dash-sub tabular-nums text-on-surface">
                                         {{ \App\Support\Format::number($offer->volume_kg) }} kg
                                     </span>
                                 </div>
                                 <div>
-                                    <span class="block text-body-xs text-on-surface-muted">Harga Satuan</span>
-                                    <span class="text-headline-sm font-semibold tabular-nums text-on-surface">
+                                    <span class="block text-body-sm text-on-surface-muted">Harga Satuan</span>
+                                    <span class="text-dash-sub tabular-nums text-on-surface">
                                         {{ \App\Support\Format::rupiah($offer->harga_per_kg) }}/kg
                                     </span>
                                 </div>
                                 <div>
-                                    <span class="block text-body-xs text-on-surface-muted">Estimasi Total</span>
-                                    <span class="text-headline-sm font-semibold tabular-nums text-primary">
+                                    <span class="block text-body-sm text-on-surface-muted">Estimasi Total</span>
+                                    <span class="text-dash-sub tabular-nums text-on-surface">
                                         {{ \App\Support\Format::rupiah((float)$offer->volume_kg * (float)$offer->harga_per_kg) }}
                                     </span>
                                 </div>
                             </div>
 
                             @if ($offer->catatan)
-                                <div class="mt-3 border-t border-outline/50 pt-2 text-body-sm text-on-surface">
+                                <p class="mt-3 text-body-sm text-on-surface">
                                     <span class="text-on-surface-muted">Catatan:</span> {{ $offer->catatan }}
-                                </div>
+                                </p>
                             @endif
-                        </div>
+                        </li>
                     @empty
-                        <p class="text-body-sm text-on-surface-muted">Belum ada riwayat tawaran.</p>
+                        <li class="py-4 text-body-sm text-on-surface-muted">Belum ada riwayat tawaran.</li>
                     @endforelse
-                </div>
+                </ol>
             </x-ui.card>
         </div>
 
@@ -175,25 +153,25 @@
             {{-- Kartu Info Kontrak --}}
             <x-ui.card title="Informasi RFQ">
                 <div class="space-y-3 text-body-sm">
-                    <div class="flex justify-between border-b border-outline pb-2">
+                    <div class="flex justify-between border-b border-outline-hairline pb-2">
                         <span class="text-on-surface-muted">Status</span>
                         <x-ui.badge :variant="\App\Support\StatusMap::badge('rfq_contracts.status', $statusValue)">
                             {{ \App\Support\StatusMap::label('rfq_contracts.status', $statusValue) }}
                         </x-ui.badge>
                     </div>
-                    <div class="flex justify-between border-b border-outline pb-2">
+                    <div class="flex justify-between border-b border-outline-hairline pb-2">
                         <span class="text-on-surface-muted">Tenggat Negosiasi</span>
                         <span class="font-medium text-on-surface tabular-nums">
                             {{ $rfq->tenggat ? \App\Support\Format::date($rfq->tenggat) : '–' }}
                         </span>
                     </div>
-                    <div class="flex justify-between border-b border-outline pb-2">
+                    <div class="flex justify-between border-b border-outline-hairline pb-2">
                         <span class="text-on-surface-muted">Stok Listing Tersedia</span>
                         <span class="font-medium text-on-surface tabular-nums">
                             {{ \App\Support\Format::number($rfq->listing?->stok_kg ?? 0) }} kg
                         </span>
                     </div>
-                    <div class="flex justify-between border-b border-outline pb-2">
+                    <div class="flex justify-between border-b border-outline-hairline pb-2">
                         <span class="text-on-surface-muted">Harga Listing Patokan</span>
                         <span class="font-medium text-on-surface tabular-nums">
                             {{ \App\Support\Format::rupiah($rfq->listing?->harga_per_kg ?? 0) }}/kg
@@ -218,12 +196,13 @@
                         </p>
 
                         {{-- Tombol Terima Penawaran --}}
-                        <form method="POST" action="{{ route('rfq.accept', $rfq) }}" class="border-b border-outline pb-5">
+                        <form method="POST" action="{{ route('rfq.accept', $rfq) }}" class="border-b border-outline-hairline pb-5">
                             @csrf
                             <x-ui.button type="submit" variant="primary" class="w-full justify-center">
-                                &check; Terima Penawaran Ini (Disepakati)
+                                <x-ui.icon name="check" class="size-[18px]" />
+                                Terima Penawaran Ini
                             </x-ui.button>
-                            <p class="mt-1 text-center text-body-xs text-on-surface-muted">
+                            <p class="mt-1 text-center text-body-sm text-on-surface-muted">
                                 Menerima tawaran akan mengunci volume & harga menjadi kontrak kesepakatan.
                             </p>
                         </form>
@@ -231,7 +210,7 @@
                         {{-- Form Penawaran Balik --}}
                         @if ($canCounter)
                             <div>
-                                <h4 class="mb-3 text-label-md font-semibold text-on-surface">Ajukan Penawaran Balik</h4>
+                                <h3 class="mb-3 text-dash-sub text-on-surface">Ajukan penawaran balik</h3>
                                 <form method="POST" action="{{ route('rfq.counter', $rfq) }}" class="space-y-4">
                                     @csrf
                                     <div>
@@ -255,13 +234,13 @@
                                 </form>
                             </div>
                         @else
-                            <div class="rounded bg-neutral-container p-3 text-body-xs text-on-neutral-container">
+                            <x-ui.alert variant="info">
                                 Batas maksimal negosiasi (5 putaran) telah tercapai. Anda hanya dapat menerima atau menolak tawaran.
-                            </div>
+                            </x-ui.alert>
                         @endif
 
                         {{-- Form Tolak Penawaran --}}
-                        <div class="border-t border-outline pt-4">
+                        <div class="border-t border-outline-hairline pt-4">
                             <form method="POST" action="{{ route('rfq.reject', $rfq) }}" class="space-y-3">
                                 @csrf
                                 <x-ui.field label="Alasan Penolakan" for="alasan_penolakan" name="alasan_penolakan" required>
@@ -275,15 +254,14 @@
                     </div>
                 @elseif ($isMyOffer && in_array($statusValue, ['TERBUKA', 'NEGOSIASI']) && ! $rfq->isExpired())
                     <div class="space-y-4">
-                        <div class="rounded bg-info-container p-4 text-body-sm text-on-info-container">
-                            <strong class="block font-semibold">Menunggu Tanggapan Lawan</strong>
+                        <x-ui.alert variant="info" title="Menunggu tanggapan lawan">
                             Penawaran terakhir dikirim oleh pihak Anda. Menunggu pihak lawan untuk menerima, menawar balik, atau menolak.
-                        </div>
+                        </x-ui.alert>
 
                         @if ($canWithdraw)
                             <form method="POST" action="{{ route('rfq.withdraw', $rfq) }}">
                                 @csrf
-                                <x-ui.button type="submit" variant="secondary" class="w-full justify-center text-error border-error/30 hover:bg-error-container" onclick="return confirm('Apakah Anda yakin ingin menarik pengajuan RFQ ini?')">
+                                <x-ui.button type="submit" variant="danger" class="w-full justify-center" onclick="return confirm('Apakah Anda yakin ingin menarik pengajuan RFQ ini?')">
                                     Tarik Pengajuan RFQ
                                 </x-ui.button>
                             </form>

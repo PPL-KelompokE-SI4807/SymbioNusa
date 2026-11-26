@@ -1,5 +1,5 @@
 {{--
-    Kepala halaman (DESIGN.md › Layout, amandemen FND v8). Judul 28 px menamai konteks (organisasi, orang, atau
+    Kepala halaman (DESIGN.md › Layout; panduan Senja §8.2). Judul .page-title clamp(25–34 px) / 900 menamai konteks (organisasi, orang, atau
     nama halaman), subjudul satu baris di bawahnya. Di kanan: tanda "Data demo" (selain produksi), indikator
     notifikasi (desktop; di mobile ada di top bar), lalu slot actions (paling banyak satu aksi utama).
     Contoh:
@@ -11,7 +11,7 @@
 
 <div {{ $attributes->class(['mb-6 flex flex-wrap items-center justify-between gap-4']) }}>
     <div class="min-w-0">
-        <h1 class="text-headline-lg text-on-surface">{{ $title }}</h1>
+        <h1 class="page-title text-on-surface">{{ $title }}</h1>
         @if ($subtitle)
             <p class="mt-1 text-body-md text-on-surface-muted">{{ $subtitle }}</p>
         @endif
