@@ -358,8 +358,8 @@ class DashboardService
                         $material['lokasi'] ?? null,
                     ])->filter()->implode(' · '),
                     'status' => StatusMap::label('inspections.status', $i->status),
-                    'step' => $this->flowStep($po?->status),
-                    'step_label' => $po ? StatusMap::label('purchase_orders.status', $po->status) : null,
+                    'step' => $this->flowStep($po->status),
+                    'step_label' => StatusMap::label('purchase_orders.status', $po->status),
                     'time' => $jadwal?->format('H.i'),
                     'date' => $jadwal ? $this->dateBlock($jadwal, $today) : null,
                 ];
@@ -399,8 +399,9 @@ class DashboardService
     }
 
     /** Posisi status order di alur normal 10 langkah (1–10); null untuk jalur keluar atau status tak dikenal. */
-    private function flowStep(?string $status): ?int
+    private function flowStep(string|\BackedEnum|null $status): ?int
     {
+        $status = $status instanceof \BackedEnum ? (string) $status->value : $status;
         $index = array_search($status, array_merge(...array_values(self::FLOW_GROUPS)), true);
 
         return $index === false ? null : $index + 1;
@@ -712,10 +713,12 @@ class DashboardService
 
         $items = $loaded->map(function (PurchaseOrder $po) use ($materials, $shipments, $inspectionAt, $dueAt, $today, $counterpart) {
             // Jangkar waktu sesuai tahap; tanpa catatan tanggal, blok tanggal dikosongkan (tidak ditebak).
+            // status PO di-cast ke OrderStatus (sejak modul PO di staging); bandingkan nilai string-nya.
+            $status = $po->status->value;
             [$when, $caption] = match (true) {
-                in_array($po->status, ['DIKONFIRMASI', 'INSPEKSI'], true) => [$inspectionAt[$po->id_purchase_order] ?? null, 'inspeksi'],
-                $po->status === 'INVOICED' => [$dueAt[$po->id_purchase_order] ?? null, 'jatuh tempo'],
-                in_array($po->status, ['DIBAYAR', 'DALAM_PENGIRIMAN'], true) => [$shipments[$po->id_purchase_order] ?? null, 'kirim'],
+                in_array($status, ['DIKONFIRMASI', 'INSPEKSI'], true) => [$inspectionAt[$po->id_purchase_order] ?? null, 'inspeksi'],
+                $status === 'INVOICED' => [$dueAt[$po->id_purchase_order] ?? null, 'jatuh tempo'],
+                in_array($status, ['DIBAYAR', 'DALAM_PENGIRIMAN'], true) => [$shipments[$po->id_purchase_order] ?? null, 'kirim'],
                 default => [null, null],
             };
             $date = $when ? Carbon::parse($when)->timezone('Asia/Jakarta') : null;
