@@ -94,8 +94,9 @@ class DashboardTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Budi Seller Mandiri');
         $response->assertSee('dash-senja');
-        $response->assertDontSee('dash-kaca');
-        $response->assertDontSee('kaca-backdrop', false);
+        // Sejak 26 Nov 2026 dasbor Seller juga Kaca (PANDUAN_KACA §12): struktur Senja di atas material kaca.
+        $response->assertSee('dash-kaca');
+        $response->assertSee('kaca-backdrop', false);
         $response->assertSeeInOrder(['Perlu tindakan Anda', 'Sedang berjalan', 'Gambaran total tercatat']);
         $response->assertSee('Stok listing aktif');
         $response->assertSee('Order Anda per tahap');
@@ -132,6 +133,7 @@ class DashboardTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Rina Buyer Sekunder');
         $response->assertSee('dash-senja');
+        $response->assertSee('kaca-backdrop', false);
         $response->assertSeeInOrder(['Perlu tindakan Anda', 'Sedang berjalan', 'Pengiriman ke Anda', 'Gambaran total tercatat']);
         $response->assertSee('Tagihan terbuka');
         $response->assertSee('Pembelian Anda per tahap');
@@ -156,6 +158,7 @@ class DashboardTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Dr. Hendra Inspector Mutu');
         $response->assertSee('dash-senja');
+        $response->assertSee('kaca-backdrop', false);
         $response->assertSeeInOrder(['Perlu tindakan Anda', 'Sedang berjalan', 'Gambaran total tercatat', 'Kredensial Anda']);
         $response->assertSee('Jadwal 7 hari');
         $response->assertSee('Inspeksi selesai');

@@ -66,7 +66,7 @@
                                     {{-- Hitung mundur dalam jendela 30 hari: panjang bilah = sisa hari; ≤ 7 hari merah, selain itu amber. --}}
                                     <p class="mt-1.5 flex items-center gap-2">
                                         <span class="age-bar w-28" aria-hidden="true"><span style="width: {{ max(4, round(100 * $item['days_left'] / 30)) }}%; background: var(--color-{{ $item['days_left'] <= 7 ? 'error' : 'warning' }})"></span></span>
-                                        <span @class(['text-label-sm font-bold tabular-nums', 'text-error' => $item['days_left'] <= 7, 'text-warning' => $item['days_left'] > 7])>{{ $item['days_left'] === 0 ? 'Berakhir hari ini' : Format::number($item['days_left']).' hari lagi' }}</span>
+                                        <span @class(['kaca-flag text-label-sm font-bold tabular-nums', 'text-error' => $item['days_left'] <= 7, 'text-warning' => $item['days_left'] > 7])>{{ $item['days_left'] === 0 ? 'Berakhir hari ini' : Format::number($item['days_left']).' hari lagi' }}</span>
                                     </p>
                                 @endisset
                                 @if (($item['age'] ?? null) !== null)
@@ -79,7 +79,7 @@
                             </div>
                             @if ($item['urgent'])
                                 <p class="flex shrink-0 items-center gap-1.5 text-label-sm font-extrabold tracking-wide text-error">
-                                    <span class="size-2 bg-error" aria-hidden="true"></span> SEGERA
+                                    <span class="size-2 bg-error" aria-hidden="true"></span> <span class="kaca-flag">SEGERA</span>
                                 </p>
                             @endif
                             @if ($item['date'])

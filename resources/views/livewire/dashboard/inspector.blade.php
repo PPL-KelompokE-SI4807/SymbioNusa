@@ -132,7 +132,7 @@
                         <p class="mt-0.5 text-body-sm text-on-surface-muted">{{ collect([$c['wilayah'] ? 'Wilayah '.$c['wilayah'] : null, $c['keahlian'] ? implode(', ', $c['keahlian']) : null])->filter()->implode(' · ') }}</p>
                         <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
                             <span @class(['flex items-center gap-1.5 text-label-md font-bold', 'text-success' => $c['tone'] === 'success', 'text-warning' => $c['tone'] === 'warning', 'text-error' => $c['tone'] === 'error', 'text-on-surface-muted' => $c['tone'] === 'meta'])>
-                                <span class="size-2 bg-current" aria-hidden="true"></span>{{ $c['label'] }}
+                                <span class="size-2 bg-current" aria-hidden="true"></span><span @class(['kaca-flag' => in_array($c['tone'], ['warning', 'error'], true)])>{{ $c['label'] }}</span>
                             </span>
                             @if ($c['days'] !== null && $c['days'] >= 0 && $c['days'] <= 30)
                                 <span class="age-bar w-28" aria-hidden="true"><span style="width: {{ max(4, round(100 * $c['days'] / 30)) }}%; background: var(--color-{{ $c['days'] <= 7 ? 'error' : 'warning' }})"></span></span>

@@ -284,6 +284,24 @@ body:has(.dash-kaca) [data-sidebar] {
    (terukur 4,33:1), jadi teks merah di kaca polos selalu duduk di alas field kecil (>= 9:1). Bukan pill: radius 6 px. */
 .dash-kaca .kaca-flag { display: inline-block; border-radius: 6px; background: var(--field); padding: 0 6px; }
 
+/* ---------- Dasbor Seller, Buyer, Inspector di atas kaca ---------- */
+/* Struktur "Tiga pertanyaan" tetap (PANDUAN_KACA §12); komponen Senja (.dash-senja) hanya berganti material.
+   Hanya di .dash-kaca.dash-senja: garis dan isian redup Senja menjadi garis/isian hijau tembus, kontrol tetap putih pekat. */
+.dash-kaca.dash-senja {
+  --color-outline-hairline: var(--line);
+  --color-outline: var(--line-strong);
+  --color-surface-muted: var(--primary-soft);
+  --color-age-bar-track: var(--track);
+}
+/* Sub-panel di dalam kartu kaca: permukaan field (putih .55), bukan kartu putih kedua. */
+.dash-kaca :is(.route-box, .ms-btn, .tl-card) { background: var(--field); border-color: var(--line); }
+.dash-kaca .ms-btn[aria-pressed="true"] { background: var(--panel-strong); border-color: var(--primary); }
+.dash-kaca .tl-item[data-next="true"] .tl-card { background: var(--panel-strong); }
+/* Garis "Sekarang" di garis waktu Inspector: label jingga gelap di alas panel-strong (aturan kontras §9). */
+.dash-kaca .tl-now { color: var(--color-accent-text); }
+.dash-kaca .tl-now > span { background: var(--panel-strong); border-radius: 6px; padding: 0 8px; }
+.dash-kaca .seg-ctl { background: var(--track); box-shadow: inset 0 0 0 1px var(--line); }
+
 /* ---------- Komponen bersama di atas kaca ---------- */
 /* x-ui.summary-strip: satu permukaan kaca (lewat data-card); garis pemisah digambar per sel, sel bening. */
 .dash-kaca [data-summary] > dl { gap: 0; background: none; }

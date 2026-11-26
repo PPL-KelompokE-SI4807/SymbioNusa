@@ -67,7 +67,7 @@
                 <ul class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     @foreach ($listings['items'] as $l)
                         @php($pct = (int) round($l['terjual'] * 100))
-                        <li class="overflow-hidden rounded-lg border border-outline bg-surface">
+                        <li class="overflow-hidden rounded-[16px] border border-line bg-field">
                             <div class="relative h-36 bg-outline-hairline">
                                 @if ($l['photo'])
                                     <img src="{{ $l['photo'] }}" alt="" class="size-full object-cover">

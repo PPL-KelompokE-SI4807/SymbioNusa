@@ -1,6 +1,6 @@
-{{-- Varian Senja di Sawah (.dash-senja) untuk keempat dashboard peran (panduan dashboard Senja). --}}
-{{-- Kaca (DESIGN.md FND v12) hanya untuk Admin sampai dasbor peran lain dibangun ulang; pembungkus Kaca ada di x-app.kaca. --}}
-<x-app.kaca :enabled="$role === 'ADMIN'" :class="in_array($role, ['ADMIN', 'SELLER', 'BUYER', 'INSPECTOR'], true) ? 'dash-senja' : ''">
+{{-- Keempat dasbor peran memakai Kaca (DESIGN.md FND v12, PANDUAN_KACA §12) lewat x-app.kaca. --}}
+{{-- .dash-senja tetap menjadi kait komponen dasbor Seller/Buyer/Inspector (struktur "Tiga pertanyaan"); materialnya kaca. --}}
+<x-app.kaca :enabled="in_array($role, ['ADMIN', 'SELLER', 'BUYER', 'INSPECTOR'], true)" :class="in_array($role, ['ADMIN', 'SELLER', 'BUYER', 'INSPECTOR'], true) ? 'dash-senja' : ''">
     @php
         // Judul menamai konteks (organisasi atau orang), bukan sapaan (DESIGN.md › Typography, amandemen FND v8).
         $now = \Illuminate\Support\Carbon::now('Asia/Jakarta');

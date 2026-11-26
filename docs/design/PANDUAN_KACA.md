@@ -8,16 +8,16 @@
 
 ## 1. Status implementasi (jujur)
 
-| Layar | Status per 25 Nov 2026 |
+| Layar | Status per 26 Nov 2026 |
 |---|---|
-| Dasbor Admin (`/dashboard`, peran ADMIN) | **Sudah Kaca**, lewat `<x-app.kaca>`. Satu-satunya layar yang sudah memakai Kaca. |
+| Dasbor Admin (`/dashboard`, peran ADMIN) | **Sudah Kaca**, lewat `<x-app.kaca>`, susunan ala Lab. |
 | Sidebar | Menjadi kaca otomatis **hanya saat** halaman memuat `.dash-kaca` (`body:has(.dash-kaca) [data-sidebar]`). Di halaman lain masih sidebar Senja solid. |
-| Dasbor Seller, Buyer, Inspector | Masih Senja di Sawah (`.dash-senja`, kartu putih). Perlu dibangun ulang mengikuti panduan ini. |
+| Dasbor Seller, Buyer, Inspector | **Sudah Kaca** (26 Nov 2026): struktur "Tiga pertanyaan" Senja tetap, material kaca. Pembungkus `.dash-kaca.dash-senja` memetakan garis/isian redup Senja ke `--line`/`--primary-soft`; sub-panel (`.route-box`, `.ms-btn`, `.tl-card`, kartu listing) memakai `bg-field`; teks merah/amber kecil di `.kaca-flag`. |
 | Form, tabel, halaman detail (kategori, registri Inspector, verifikasi mitra, dll.) | Masih Senja (kartu putih, `x-ui.*`). Perlu dibangun ulang. |
 | Login, lupa sandi, reset sandi | Masih Senja + panel foto. Perlu dibangun ulang: panel foto tetap, sisi form di atas latar Kaca (§12). |
 | Landing | Permukaan publik; tidak diubah ke Kaca (keputusan §12). |
 
-`tests/Feature/DashboardTest.php` saat ini **menegaskan** bahwa dasbor Seller tidak memuat `dash-kaca` (`assertDontSee('dash-kaca')`). Saat dasbor Seller dibangun ulang dengan Kaca, ubah asersi itu di PR yang sama (pemilik test: lihat `AGENTS.md` §4).
+`tests/Feature/DashboardTest.php` menegaskan `dash-kaca`/`kaca-backdrop` hadir di dasbor Seller, Buyer, dan Inspector (diperbarui 26 Nov 2026).
 
 ## 2. Cara kerja dalam satu gambar
 
@@ -499,7 +499,7 @@ Cara mengukur layar baru: Lampiran A.
 | Login, lupa sandi, reset sandi | Panel foto + overlay hutan di kiri tetap; sisi form memakai latar Kaca (`<x-app.kaca>`) dan form di kartu kaca. Landing tidak diubah (permukaan publik). | Panel foto adalah identitas yang sudah ada; form tetap konsisten dengan aplikasi. |
 | Palet Ctrl K dan laci untuk layar lain | Tetap di `kacaAdmin` sampai ada layar kedua yang membutuhkannya; saat itu diekstrak menjadi komponen bersama, bukan disalin. | Tidak membuat abstraksi sebelum ada pemakai kedua. |
 
-Yang masih harus dikerjakan (bukan keputusan): membangun ulang layar selain dasbor Admin dengan `<x-app.kaca>`, dan memperbarui asersi `assertDontSee('dash-kaca')` di `tests/Feature/DashboardTest.php` saat dasbor Seller dibangun ulang.
+Yang masih harus dikerjakan (bukan keputusan): membangun ulang layar selain keempat dasbor dengan `<x-app.kaca>` (form, tabel, detail, autentikasi).
 
 ## Lampiran A. Mengukur kontras di atas kaca
 

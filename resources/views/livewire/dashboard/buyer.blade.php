@@ -139,7 +139,7 @@
                         @php($pct = (int) round($l['terjual'] * 100))
                         <li>
                             <a @if ($l['url']) href="{{ $l['url'] }}" @endif
-                               @class(['block h-full overflow-hidden rounded-lg border border-outline bg-surface', 'transition-shadow hover:shadow-[var(--shadow-raised)] '.$focusRing => $l['url']])>
+                               @class(['block h-full overflow-hidden rounded-[16px] border border-line bg-field', 'transition-shadow hover:shadow-[var(--shadow-raised)] '.$focusRing => $l['url']])>
                                 <span class="relative block h-36 bg-outline-hairline">
                                     @if ($l['photo'])
                                         <img src="{{ $l['photo'] }}" alt="" class="size-full object-cover">
