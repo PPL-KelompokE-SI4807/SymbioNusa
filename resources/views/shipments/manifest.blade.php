@@ -9,7 +9,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Manifes Angkut {{ $shipment->no_manifes }} · {{ config('app.name', 'SymbioNusa') }}</title>
-    @vite(['resources/css/app.css'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css'])
+    @endif
     <style>
         @page { size: A4; margin: 16mm; }
         @media print { .no-print { display: none !important; } }
