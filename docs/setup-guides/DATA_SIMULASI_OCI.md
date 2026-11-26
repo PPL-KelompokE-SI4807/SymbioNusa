@@ -35,22 +35,23 @@ Ganti kata sandi ini bila server demo bisa diakses publik.
 
 ## Menjalankan di VM
 
-Dari folder aplikasi di VM, setelah kode terbaru ditarik:
+Aplikasi di VM ada di `/var/www/symbionusa` dan selalu mengikuti branch `staging`: setiap push ke `staging`
+menjalankan `.github/workflows/deploy-staging.yml`, yang memanggil `scripts/deploy.sh` (`git reset --hard
+origin/staging` lalu `migrate --force`). Jadi seeder ini baru ada di VM setelah di-merge ke `staging`.
+(`/home/agent-dev/projects/SymbioNusa` adalah salinan kerja ORCA, bukan aplikasi yang dilayani.)
+
+Setelah deploy selesai, SSH ke VM lalu:
 
 ```bash
-composer install --no-dev --optimize-autoloader
-php artisan migrate:fresh --seed --force   # MENGHAPUS seluruh isi database lalu mengisi ulang
-php artisan storage:link
-```
-
-Database sudah berisi data dasar dan hanya ingin menambah data simulasi:
-
-```bash
+cd /var/www/symbionusa
 php artisan db:seed --class=DemoScenarioSeeder --force
 ```
 
-Seeder hanya berjalan sekali: bila perusahaan penanda (NIB `9120000000001`) sudah ada, ia berhenti tanpa
-menulis apa pun. Untuk memuat ulang dari nol, pakai `migrate:fresh --seed`.
+Ini hanya menambah data; tidak menghapus apa pun. Bila akun dasar (`admin@symbionusa.test` dst.) belum ada,
+seeder memuatnya lebih dulu. Seeder hanya berjalan sekali: bila perusahaan penanda (NIB `9120000000001`) sudah
+ada, ia berhenti tanpa menulis apa pun.
+
+Jangan `migrate:fresh` di server (aturan di `scripts/deploy.sh`): perintah itu menghapus seluruh isi database.
 
 Bila web server berjalan sebagai user lain (mis. `www-data`), pastikan berkas yang dibuat seeder bisa dibaca:
 
